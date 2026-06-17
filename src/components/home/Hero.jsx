@@ -87,14 +87,13 @@ export default function Hero() {
 
                     {/* Main Image */}
                     <Image
-                        src="/images/hero-athlete.png"
+                        src="/images/AgentX.png"
                         alt="Fitness Athlete"
                         width={700}
                         height={700}
                         priority
                         className="relative z-10 object-contain"
                     />
-
                     {/* Trainer Card */}
                     <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute top-10 left-0 z-20 rounded-2xl border border-white/10 bg-[var(--card)] p-4 backdrop-blur-xl">
                         <div className="flex items-center gap-3">

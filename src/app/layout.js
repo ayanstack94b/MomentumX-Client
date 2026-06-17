@@ -26,6 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${oswald.variable} h-full scroll-smooth`}
     >
       <body className="min-h-screen flex flex-col bg-[#0B0B0D] text-white">
