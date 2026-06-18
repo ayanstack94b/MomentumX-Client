@@ -78,8 +78,14 @@ export default function Navbar() {
         { name: "Home", href: "/" },
         { name: "All Classes", href: "/classes" },
         { name: "Community Forum", href: "/forum" },
-        { name: "Dashboard", href: "/dashboard" },
     ];
+
+    if (session) {
+        navLinks.push({
+            name: "Dashboard",
+            href: "/dashboard",
+        });
+    }
 
     return (
         <>
