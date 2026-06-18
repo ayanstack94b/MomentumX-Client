@@ -13,27 +13,23 @@ import { useRouter } from "next/navigation";
 
 
 
-const RegisterPage = () => {
+const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const router = useRouter();
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-
-
+    const router = useRouter();
     const onSubmit = async (data) => {
         try {
             const { data: userData, error } =
-                await authClient.signUp.email({
-                    name: data.name,
+                await authClient.signIn.email({
                     email: data.email,
                     password: data.password,
-                    image: data.photoURL,
+                    rememberMe: data.rememberMe,
                 });
 
             if (error) {
                 Swal.fire({
                     icon: "error",
-                    title: "Registration Failed",
+                    title: "Login Failed",
                     text: error.message,
                 });
 
@@ -42,8 +38,8 @@ const RegisterPage = () => {
 
             await Swal.fire({
                 icon: "success",
-                title: "Account Created",
-                text: "Welcome to MomentumX!",
+                title: "Login Successful",
+                text: `Welcome back ${userData.user.name}`,
                 timer: 1500,
                 showConfirmButton: false,
             });
@@ -136,25 +132,16 @@ const RegisterPage = () => {
 
                     <div className="mb-8">
                         <h1 className="heading-font text-4xl">
-                            Create Account
+                            Welcome Back
                         </h1>
 
                         <p className="mt-2 text-(--text-secondary)">
-                            Start your fitness transformation today.
+                            Login to continue your fitness journey.
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-                        <div>
-                            <label className="mb-2 block text-sm">Name</label>
-                            <input
-                                type="text"
-                                placeholder="Enter your name"
-                                {...register("name")}
-                                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-red-500"
-                            />
-                        </div>
 
                         <div>
                             <label className="mb-2 block text-sm">Email</label>
@@ -166,15 +153,6 @@ const RegisterPage = () => {
                             />
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm">Photo URL</label>
-                            <input
-                                type="text"
-                                placeholder="Enter photo url"
-                                {...register("photoURL")}
-                                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none transition-all focus:border-red-500"
-                            />
-                        </div>
                         {/* Password field */}
                         <div>
                             <label className="mb-2 block text-sm">Password</label>
@@ -197,34 +175,29 @@ const RegisterPage = () => {
                             </div>
                         </div>
 
-                        {/* Confirm Password field */}
-
-                        <div>
-                            <label className="mb-2 block text-sm">Confirm Password</label>
-
-                            <div className="relative">
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                                 <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Confirm password"
-                                    {...register("confirmPassword")}
-                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-12 outline-none transition-all focus:border-red-500"
+                                    type="checkbox"
+                                    {...register("remember")}
+                                    className="h-4 w-4 accent-red-500"
                                 />
+                                Remember Me
+                            </label>
 
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
-                                >
-                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                </button>
-                            </div>
+                            <button
+                                type="button"
+                                className="text-sm text-red-500 hover:text-red-400"
+                            >
+                                Forgot Password?
+                            </button>
                         </div>
 
                         <button
                             type="submit"
                             className="w-full rounded-xl bg-linear-to-r from-red-600 to-red-500 py-3 font-medium transition-all duration-300 hover:shadow-[0_0_25px_rgba(220,38,38,0.35)]"
                         >
-                            Register
+                            Login
                         </button>
 
                         {/* ===============Google Button============== */}
@@ -244,9 +217,9 @@ const RegisterPage = () => {
                     </form>
 
                     <p className="mt-6 text-center text-sm text-(--text-secondary)">
-                        Already have an account?{" "}
-                        <Link href="/login" className="text-red-500 hover:text-red-400">
-                            Login
+                        Don't have an account?{" "}
+                        <Link href="/register" className="text-red-500 hover:text-red-400">
+                            Register
                         </Link>
                     </p>
 
@@ -257,4 +230,4 @@ const RegisterPage = () => {
     );
 };
 
-export default RegisterPage;
+export default LoginPage;
