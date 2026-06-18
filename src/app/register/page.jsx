@@ -29,7 +29,29 @@ const RegisterPage = () => {
                     password: data.password,
                     image: data.photoURL,
                 });
+            const response = await fetch("http://localhost:5000/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    image: data.photoURL,
+                    role: "member",
+                    membership: "basic",
+                    bio: "",
+                    phone: "",
+                    location: "",
+                    createdAt: userData.user.createdAt,
+                }),
+            });
 
+            console.log("POST Status:", response.status);
+
+            const result = await response.json();
+
+            console.log("POST Result:", result);
             if (error) {
                 Swal.fire({
                     icon: "error",
@@ -47,8 +69,8 @@ const RegisterPage = () => {
                 timer: 1500,
                 showConfirmButton: false,
             });
-
             router.push("/dashboard");
+
         } catch (error) {
             Swal.fire({
                 icon: "error",
