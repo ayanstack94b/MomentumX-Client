@@ -3,23 +3,16 @@
 import { motion } from "framer-motion";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
-import { FaUserCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { FaUserShield, FaPhone, FaMapMarkerAlt, FaEdit } from "react-icons/fa";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 
 export default function ProfilePage() {
     const { data: session, isPending } = authClient.useSession();
     const [profile, setProfile] = useState(null);
     const [loadingProfile, setLoadingProfile] = useState(true);
-
-
-    if (isPending) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                Loading...
-            </div>
-        );
-    }
 
     const user = session?.user;
     const email = session?.user?.email;
@@ -45,52 +38,134 @@ export default function ProfilePage() {
 
         fetchProfile();
     }, [email]);
-    if (loadingProfile) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                Loading Profile...
-            </div>
-        );
+
+    const roleColor = {
+        member: "badge-info",
+        trainer: "badge-success",
+        admin: "badge-error",
+    };
+    // to prevent error while loading
+
+    if (isPending || loadingProfile) {
+        return <LoadingSpinner />;
+    }
+
+    if (!profile) {
+        return <LoadingSpinner />;
     }
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-5"
+            transition={{ duration: 0.4 }}
+            className="space-y-6 p-5"
         >
-            <h1 className="heading-font mb-6 text-4xl">
-                My Profile
-            </h1>
-
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-                <div className="flex flex-col items-center gap-6 md:flex-row">
-                    {user?.image?.startsWith("http") ? (
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex flex-col items-center gap-5 md:flex-row">
                         <Image
-                            src={user.image}
-                            alt={user.name}
-                            width={120}
-                            height={120}
-                            className="h-30 w-30 rounded-full object-cover border-4 border-red-500"
+                            src={profile?.image}
+                            alt={profile?.name}
+                            width={140}
+                            height={140}
+                            priority
+                            className="rounded-full border-4 border-red-500 object-cover"
                         />
-                    ) : (
-                        <FaUserCircle className="text-[120px] text-gray-500" />
-                    )}
 
-                    <div className="space-y-3">
-                        <h2 className="text-3xl font-bold">
-                            {user?.name}
-                        </h2>
+                        <div>
+                            <h1 className="heading-font text-3xl">
+                                {profile?.name}
+                            </h1>
 
-                        <p className="text-[var(--text-secondary)]">
-                            {user?.email}
-                        </p>
+                            <p className="mt-1 text-(--text-secondary)">
+                                {profile.email}
+                            </p>
 
-                        <p className="text-sm text-[var(--text-secondary)]">
-                            Member Since:{" "}
-                            {new Date(user?.createdAt).toLocaleDateString()}
-                        </p>
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                <span
+                                    className={`badge badge-lg ${roleColor[profile.role]} p-3`}
+                                >
+                                    {profile?.role}
+                                </span>
+
+                                <span className="badge badge-outline badge-lg p-2">
+                                    {profile?.membership}
+                                </span>
+
+                                <span className="badge badge-success badge-lg p-3">
+                                    {profile?.status}
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
+                    <motion.div
+                        whileHover={{
+                            scale: 1.05,
+                            y: -2,
+                        }}
+                        whileTap={{
+                            scale: 0.95,
+                        }}
+                        transition={{
+                            duration: 0.5,
+                        }}
+                    >
+                        <Link
+                            href="/dashboard/profile/edit"
+                            className="btn border-none bg-red-600 text-white hover:bg-red-700"
+                        >
+                            <FaEdit />
+                            Edit Profile
+                        </Link>
+                    </motion.div>
+                </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                    <div className="mb-3 flex items-center gap-2">
+                        <FaPhone className="text-red-500" />
+                        <h3 className="font-semibold">Phone</h3>
+                    </div>
+
+                    <p className="text-[var(--text-secondary)]">
+                        {profile.phone || "Not added yet"}
+                    </p>
+                </div>
+
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                    <div className="mb-3 flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-red-500" />
+                        <h3 className="font-semibold">Location</h3>
+                    </div>
+
+                    <p className="text-[var(--text-secondary)]">
+                        {profile.location || "Not added yet"}
+                    </p>
+                </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 className="mb-3 font-semibold">
+                    Bio
+                </h3>
+
+                <p className="text-[var(--text-secondary)]">
+                    {profile.bio || "No bio added yet."}
+                </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <div className="flex items-center gap-2">
+                    <FaUserShield className="text-red-500" />
+
+                    <span className="font-semibold">
+                        Member Since:
+                    </span>
+
+                    <span className="text-[var(--text-secondary)]">
+                        {profile.createdAt?.split("T")[0]}                    </span>
                 </div>
             </div>
         </motion.div>
