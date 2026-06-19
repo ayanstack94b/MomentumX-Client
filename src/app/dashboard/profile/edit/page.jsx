@@ -171,84 +171,118 @@ export default function EditProfilePage() {
 
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="mt-8 space-y-6"
             >
-                {/* Name field */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Name
-                    </label>
+                <div className="grid gap-6 md:grid-cols-2">
 
-                    <input
-                        {...register("name", {
-                            required: "Name is required",
-                        })}
-                        className="input input-bordered w-full bg-white/5"
-                    />
+                    {/* Name */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-white">
+                            Full Name
+                        </label>
 
-                    {errors.name && (
-                        <p className="mt-1 text-red-500">
-                            {errors.name.message}
-                        </p>
-                    )}
+                        <input
+                            {...register("name", {
+                                required: "Name is required",
+                            })}
+                            placeholder="Enter your full name"
+                            className="input w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
+                        />
+
+                        {errors.name && (
+                            <p className="text-sm text-red-500">
+                                {errors.name.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Phone */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-white">
+                            Phone Number
+                        </label>
+
+                        <input
+                            {...register("phone")}
+                            placeholder="+91 9876543210"
+                            className="input w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
+                        />
+                    </div>
+
+                    {/* Photo URL */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-white">
+                            Profile Photo URL
+                        </label>
+
+                        <input
+                            {...register("image")}
+                            placeholder="https://example.com/profile.jpg"
+                            className="input w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
+                        />
+                    </div>
+
+                    {/* Location */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-white">
+                            Location
+                        </label>
+
+                        <input
+                            {...register("location")}
+                            placeholder="Kolkata, West Bengal"
+                            className="input w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
+                        />
+                    </div>
                 </div>
 
-                {/* Phone URL field */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Phone
-                    </label>
-
-                    <input
-                        {...register("phone")}
-                        className="input input-bordered w-full bg-white/5"
-                    />
-                </div>
-                {/* Photo URL field */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Photo URL
-                    </label>
-
-                    <input
-                        {...register("image")}
-                        className="input input-bordered w-full bg-white/5"
-                    />
-                </div>
-
-                {/* Location field */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Location
-                    </label>
-
-                    <input
-                        {...register("location")}
-                        className="input input-bordered w-full bg-white/5"
-                    />
-                </div>
-
-                {/* Bio field */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium">
+                {/* Bio */}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-white">
                         Bio
                     </label>
 
                     <textarea
-                        rows={5}
+                        rows={6}
                         {...register("bio")}
-                        className="textarea textarea-bordered w-full bg-white/5"
+                        placeholder="Tell others about yourself, your fitness journey, goals, interests, and achievements..."
+                        className="textarea w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
                     />
                 </div>
 
-                {/* Save Button */}
-                <button
-                    type="submit"
-                    className="btn border-none bg-red-600 text-white hover:bg-red-700"
-                >
-                    Save Changes
-                </button>
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-4 pt-4 sm:flex-row">
 
+                    <motion.button
+                        whileHover={{
+                            scale: 1.03,
+                            y: -2,
+                        }}
+                        whileTap={{
+                            scale: 0.97,
+                        }}
+                        type="submit"
+                        className="btn flex-1 border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                    >
+                        Save Changes
+                    </motion.button>
+
+                    <motion.button
+                        whileHover={{
+                            scale: 1.03,
+                            y: -2,
+                        }}
+                        whileTap={{
+                            scale: 0.97,
+                        }}
+                        type="button"
+                        onClick={() => router.push("/dashboard/profile")}
+                        className="btn flex-1 border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                    >
+                        Cancel
+                    </motion.button>
+
+                </div>
             </form>
 
 
