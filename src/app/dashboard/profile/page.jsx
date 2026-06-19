@@ -4,10 +4,14 @@ import { motion } from "framer-motion";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { FaUserCircle } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 
 export default function ProfilePage() {
     const { data: session, isPending } = authClient.useSession();
+    const [profile, setProfile] = useState(null);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+
 
     if (isPending) {
         return (
@@ -18,7 +22,36 @@ export default function ProfilePage() {
     }
 
     const user = session?.user;
+    const email = session?.user?.email;
 
+    useEffect(() => {
+        if (!email) return;
+
+        const fetchProfile = async () => {
+            try {
+                const res = await fetch(
+                    `http://localhost:5000/users/${email}`
+                );
+
+                const data = await res.json();
+
+                setProfile(data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoadingProfile(false);
+            }
+        };
+
+        fetchProfile();
+    }, [email]);
+    if (loadingProfile) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                Loading Profile...
+            </div>
+        );
+    }
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}

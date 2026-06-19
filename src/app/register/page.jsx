@@ -38,11 +38,19 @@ const RegisterPage = () => {
                     name: data.name,
                     email: data.email,
                     image: data.photoURL,
+
                     role: "member",
+                    status: "active",
+
                     membership: "basic",
+
+                    trainerApplicationStatus: null,
+                    trainerFeedback: "",
+
                     bio: "",
                     phone: "",
                     location: "",
+
                     createdAt: userData.user.createdAt,
                 }),
             });
