@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
+import { authClient } from "@/lib/auth-client";
 
 const classNames = [
     "Full Body Strength",
@@ -75,6 +76,12 @@ const pricingPlans = [
 export default function AddClassPage() {
 
     const [loading, setLoading] = useState(false);
+    const { data: session } = authClient.useSession();
+
+    const trainerName = session?.user?.name;
+    const trainerEmail = session?.user?.email;
+
+  
 
     const {
         register,
@@ -89,9 +96,16 @@ export default function AddClassPage() {
 
             const classData = {
                 ...data,
+
+                trainerName,
+                trainerEmail,
+
                 price: Number(data.price),
+
                 bookingCount: 0,
+
                 status: "pending",
+
                 createdAt: new Date(),
             };
 
