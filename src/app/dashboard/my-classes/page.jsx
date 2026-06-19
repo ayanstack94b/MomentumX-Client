@@ -3,6 +3,7 @@ import { authClient } from '@/lib/auth-client';
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Swal from 'sweetalert2';
 
 
 const MyClassesPage = () => {
@@ -34,6 +35,47 @@ const MyClassesPage = () => {
         fetchClasses();
     }, [email]);
 
+    const handleDelete = async (id) => {
+        const result = await Swal.fire({
+            title: "Delete Class?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc2626",
+            confirmButtonText: "Delete",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const res = await fetch(
+                `http://localhost:5000/classes/${id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            const data = await res.json();
+
+            if (data.deletedCount > 0) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Deleted",
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+
+                setClasses((prev) =>
+                    prev.filter((item) => item._id !== id)
+                );
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Delete Failed",
+            });
+        }
+    };
 
     if (loading) {
         return (
@@ -132,9 +174,25 @@ const MyClassesPage = () => {
                                         Update
                                     </button>
 
-                                    <button className="btn btn-sm flex-1 btn-outline border-red-500 text-red-500">
+                                    <motion.button
+                                        onClick={() => handleDelete(item._id)}
+                                        whileHover={{
+                                            scale: 1.05,
+                                            y: -2,
+                                        }}
+                                        whileTap={{
+                                            scale: 0.95,
+                                        }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 400,
+                                            damping: 15,
+                                        }}
+                                        className="btn btn-sm flex-1 border border-red-500 bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white"
+                                    >
                                         Delete
-                                    </button>
+                                    </motion.button>
+
                                 </div>
                             </div>
                         </motion.div>

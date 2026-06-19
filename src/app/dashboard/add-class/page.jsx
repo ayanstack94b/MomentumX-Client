@@ -6,19 +6,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
 import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 
-const classNames = [
-    "Full Body Strength",
-    "Yoga Flow",
-    "HIIT Training",
-    "CrossFit Fundamentals",
-    "Cardio Blast",
-    "Muscle Building",
-    "Weight Loss Bootcamp",
-    "Core Strength",
-    "Functional Fitness",
-    "Powerlifting Basics",
-];
 const durations = [
     "30 Minutes",
     "45 Minutes",
@@ -70,18 +59,87 @@ const pricingPlans = [
         price: 1999,
     },
 ];
-
+const classTemplates = [
+    {
+        id: "full-body-strength",
+        className: "Full Body Strength",
+        category: "Strength",
+        image: "/classes/strength.png",
+    },
+    {
+        id: "yoga-flow",
+        className: "Yoga Flow",
+        category: "Yoga",
+        image: "/classes/yoga.png",
+    },
+    {
+        id: "hiit-training",
+        className: "HIIT Training",
+        category: "HIIT",
+        image: "/classes/hiit.png",
+    },
+    {
+        id: "crossfit-fundamentals",
+        className: "CrossFit Fundamentals",
+        category: "CrossFit",
+        image: "/classes/crossfit.png",
+    },
+    {
+        id: "cardio-blast",
+        className: "Cardio Blast",
+        category: "Cardio",
+        image: "/classes/cardio.png",
+    },
+    {
+        id: "muscle-building",
+        className: "Muscle Building",
+        category: "Bodybuilding",
+        image: "/classes/muscle-building.png",
+    },
+    {
+        id: "weight-loss-bootcamp",
+        className: "Weight Loss Bootcamp",
+        category: "Cardio",
+        image: "/classes/weight-loss.png",
+    },
+    {
+        id: "core-strength",
+        className: "Core Strength",
+        category: "Strength",
+        image: "/classes/core-strength.png",
+    },
+    {
+        id: "functional-fitness",
+        className: "Functional Fitness",
+        category: "Strength",
+        image: "/classes/functional-fitness.png",
+    },
+    {
+        id: "powerlifting-basics",
+        className: "Powerlifting Basics",
+        category: "Strength",
+        image: "/classes/powerlifting.png",
+    },
+    {
+        id: "custom-class",
+        className: "Custom Class",
+        category: "",
+        image: "",
+    },
+];
 
 
 export default function AddClassPage() {
 
+
     const [loading, setLoading] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
     const { data: session } = authClient.useSession();
 
     const trainerName = session?.user?.name;
     const trainerEmail = session?.user?.email;
 
-  
+    
 
     const {
         register,
@@ -90,17 +148,37 @@ export default function AddClassPage() {
         reset,
     } = useForm();
 
+   
+
     const onSubmit = async (data) => {
+        if (!selectedTemplate) {
+            Swal.fire({
+                icon: "error",
+                title: "Please select a class template",
+            });
+
+            return;
+        }
         try {
             setLoading(true);
 
             const classData = {
-                ...data,
+                templateId: selectedTemplate.id,
+
+                className: selectedTemplate.className,
+
+                category: selectedTemplate.category,
+
+                image: selectedTemplate.image,
+
+                difficulty: data.difficulty,
+                duration: data.duration,
+                schedule: data.schedule,
+                price: Number(data.price),
+                description: data.description,
 
                 trainerName,
                 trainerEmail,
-
-                price: Number(data.price),
 
                 bookingCount: 0,
 
@@ -108,6 +186,7 @@ export default function AddClassPage() {
 
                 createdAt: new Date(),
             };
+
 
             const res = await fetch(
                 "http://localhost:5000/classes",
@@ -152,7 +231,7 @@ export default function AddClassPage() {
                 transition={{ duration: 0.4 }}
                 className="relative overflow-hidden p-5"
             >
-                {/* Animated Background */}
+                {/* Animated Background Blob 1 */}
                 <motion.div
                     animate={{
                         x: [0, 40, 0],
@@ -166,6 +245,7 @@ export default function AddClassPage() {
                     className="absolute left-0 top-0 h-72 w-72 rounded-full bg-red-600/10 blur-3xl"
                 />
 
+                {/* Animated Background Blob 2 */}
                 <motion.div
                     animate={{
                         x: [0, -40, 0],
@@ -179,205 +259,212 @@ export default function AddClassPage() {
                     className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-red-500/10 blur-3xl"
                 />
 
+                {/* Main Card */}
                 <div className="relative z-10 mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-                    <h1 className="heading-font text-4xl">
-                        Add a New Class
-                    </h1>
 
-                    <p className="mt-2 text-[var(--text-secondary)]">
-                        Create a new fitness class for MomentumX members.
-                    </p>
+                    <div className="mb-8">
+                        <h1 className="heading-font text-4xl">
+                            Add a New Class
+                        </h1>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+                        <p className="mt-2 text-[var(--text-secondary)]">
+                            Create and publish a new fitness class for MomentumX members.
+                        </p>
+                    </div>
 
-                        <div className="grid gap-6 md:grid-cols-2">
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="mt-8 space-y-8"
+                    >
+                        {/* Template Selection */}
+                        <div className="space-y-4">
+                            <label className="block text-sm font-medium">
+                                Fitness Class Template
+                            </label>
 
-                            {/* Class Name */}                           
-                            <div>
-                                <label className="mb-2 block">
-                                    Class Name
-                                </label>
+                            <select
+                                onChange={(e) => {
+                                    const template = classTemplates.find(
+                                        (item) =>
+                                            item.className === e.target.value
+                                    );
 
-                                <select
-                                    {...register("className", {
-                                        required: "Class name is required",
-                                    })}
-                                    className="select w-full border border-white/10 bg-slate-800 text-white"
-                                >
-                                    <option value="">
-                                        Select a Class
-                                    </option>
+                                    setSelectedTemplate(template);
+                                }}
+                                className="select w-full border border-white/10 bg-slate-800 text-white"
+                            >
+                                <option value="">
+                                    Select Class Template
+                                </option>
 
-                                    {classNames.map((item) => (
-                                        <option
-                                            key={item}
-                                            value={item}
-                                        >
-                                            {item}
-                                        </option>
-                                    ))}
-                                </select>
-
-                                {errors.className && (
-                                    <p className="mt-1 text-red-500">
-                                        {errors.className.message}
-                                    </p>
-                                )}
-                            </div>
-                            {/* Image */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Image URL
-                                </label>
-
-                                <input
-                                    {...register("image")}
-                                    placeholder="https://example.com/class.jpg"
-                                    className="input w-full border border-white/10 bg-slate-900/50"
-                                />
-                            </div>
-
-                            {/* Category */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Category
-                                </label>
-
-                                <select
-                                    {...register("category")}
-                                    className="select w-full border border-white/10 bg-slate-900"
-                                >
-                                    {categories.map((category) => (
-                                        <option
-                                            key={category}
-                                            value={category}
-                                        >
-                                            {category}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Difficulty */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Difficulty
-                                </label>
-
-                                <select
-                                    {...register("difficulty")}
-                                    className="select w-full border border-white/10 bg-slate-900"
-                                >
-                                    {difficulties.map((difficulty) => (
-                                        <option
-                                            key={difficulty}
-                                            value={difficulty}
-                                        >
-                                            {difficulty}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Duration */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Duration
-                                </label>
-
-                                <select
-                                    {...register("duration")}
-                                    className="select w-full border border-white/10 bg-slate-800 text-white focus:border-red-500"
-                                >
-                                    <option value="">
-                                        Select Duration
-                                    </option>
-
-                                    {durations.map((duration) => (
-                                        <option
-                                            key={duration}
-                                            value={duration}
-                                        >
-                                            {duration}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Schedule */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Schedule
-                                </label>
-
-                                <select
-                                    {...register("schedule")}
-                                    className="select w-full border border-white/10 bg-slate-800 text-white focus:border-red-500"
-                                >
-                                    <option value="">
-                                        Select Schedule
-                                    </option>
-
-                                    {schedules.map((schedule) => (
-                                        <option
-                                            key={schedule}
-                                            value={schedule}
-                                        >
-                                            {schedule}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Price */}
-                            <div>
-                                <label className="mb-2 block">
-                                    Membership Plan
-                                </label>
-
-                                <select
-                                    {...register("price", {
-                                        required: "Membership plan is required",
-                                    })}
-                                    defaultValue=""
-                                    className="select w-full border border-white/10 bg-slate-800 text-white focus:border-red-500"
-                                >
+                                {classTemplates.map((item) => (
                                     <option
-                                        value=""
-                                        disabled
+                                        key={item.id}
+                                        value={item.className}
                                     >
-                                        Select Membership Plan
+                                        {item.className}
                                     </option>
+                                ))}
+                            </select>
 
-                                    {pricingPlans.map((plan) => (
-                                        <option
-                                            key={plan.price}
-                                            value={plan.price}
-                                        >
-                                            {plan.name} - ₹{plan.price}
+                            {selectedTemplate && (
+                                <motion.div
+                                    initial={{
+                                        opacity: 0,
+                                        y: 20,
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
+                                    transition={{
+                                        duration: 0.3,
+                                    }}
+                                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
+                                >
+                                    <div className="grid md:grid-cols-[320px_1fr]">
+                                        <Image
+                                            src={selectedTemplate.image}
+                                            alt={selectedTemplate.className}
+                                            width={500}
+                                            height={300}
+                                            className="h-full min-h-[240px] w-full object-cover"
+                                        />
+
+                                        <div className="flex flex-col justify-center p-6">
+                                            <span className="mb-3 w-fit rounded-full bg-red-600/20 px-3 py-1 text-sm text-red-400">
+                                                {selectedTemplate.category}
+                                            </span>
+
+                                            <h3 className="text-2xl font-bold">
+                                                {selectedTemplate.className}
+                                            </h3>
+
+                                            <p className="mt-2 text-sm text-gray-400">
+                                                Template selected and ready for publishing.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+
+                        {/* Class Settings */}
+                        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <h3 className="mb-6 text-xl font-semibold">
+                                Class Settings
+                            </h3>
+
+                            <div className="grid gap-6 md:grid-cols-2">
+                                {/* Difficulty */}
+                                <div>
+                                    <label className="mb-2 block">
+                                        Difficulty
+                                    </label>
+
+                                    <select
+                                        {...register("difficulty")}
+                                        className="select w-full border border-white/10 bg-slate-800 text-white"
+                                    >
+                                        {difficulties.map((difficulty) => (
+                                            <option
+                                                key={difficulty}
+                                                value={difficulty}
+                                            >
+                                                {difficulty}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Duration */}
+                                <div>
+                                    <label className="mb-2 block">
+                                        Duration
+                                    </label>
+
+                                    <select
+                                        {...register("duration")}
+                                        className="select w-full border border-white/10 bg-slate-800 text-white"
+                                    >
+                                        <option value="">
+                                            Select Duration
                                         </option>
-                                    ))}
-                                </select>
 
-                                {errors.price && (
-                                    <p className="mt-1 text-red-500">
-                                        {errors.price.message}
-                                    </p>
-                                )}
+                                        {durations.map((duration) => (
+                                            <option
+                                                key={duration}
+                                                value={duration}
+                                            >
+                                                {duration}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Schedule */}
+                                <div>
+                                    <label className="mb-2 block">
+                                        Schedule
+                                    </label>
+
+                                    <select
+                                        {...register("schedule")}
+                                        className="select w-full border border-white/10 bg-slate-800 text-white"
+                                    >
+                                        <option value="">
+                                            Select Schedule
+                                        </option>
+
+                                        {schedules.map((schedule) => (
+                                            <option
+                                                key={schedule}
+                                                value={schedule}
+                                            >
+                                                {schedule}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Membership */}
+                                <div>
+                                    <label className="mb-2 block">
+                                        Membership Plan
+                                    </label>
+
+                                    <select
+                                        {...register("price")}
+                                        className="select w-full border border-white/10 bg-slate-800 text-white"
+                                    >
+                                        <option value="">
+                                            Select Membership
+                                        </option>
+
+                                        {pricingPlans.map((plan) => (
+                                            <option
+                                                key={plan.price}
+                                                value={plan.price}
+                                            >
+                                                {plan.name} - ₹{plan.price}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         {/* Description */}
-                        <div>
-                            <label className="mb-2 block">
-                                Description
+                        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                            <label className="mb-3 block text-lg font-semibold">
+                                Class Description
                             </label>
 
                             <textarea
                                 rows={6}
                                 {...register("description")}
-                                placeholder="Describe your class, training style, goals, and what members will learn."
-                                className="textarea w-full border border-white/10 bg-slate-900/50"
+                                placeholder="Describe the training style, goals, benefits, and what members can expect from this class..."
+                                className="textarea w-full border border-white/10 bg-slate-800 text-white"
                             />
                         </div>
 
@@ -398,9 +485,9 @@ export default function AddClassPage() {
                                 : "Create Class"}
                         </motion.button>
                     </form>
+
                 </div>
             </motion.div>
-
         </PrivateRoute>
     );
 }
