@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import {FaTachometerAlt,FaUser,FaCalendarCheck,FaSignOutAlt,} from "react-icons/fa";
+import {FaTachometerAlt,FaUser,FaCalendarCheck,FaSignOutAlt, FaPlusCircle,} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useState } from "react";
@@ -55,6 +55,11 @@ export default function Sidebar() {
             href: "/dashboard/book-class",
             icon: <FaCalendarCheck />,
         },
+        {
+            name: "Add Class",
+            href: "/dashboard/add-class",
+            icon: <FaPlusCircle />,
+        }
     ];
 
     return (

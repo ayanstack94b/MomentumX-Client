@@ -92,7 +92,7 @@ export default function EditProfilePage() {
         };
 
         fetchProfile();
-    }, [email]);
+    }, [email, reset]);
 
 
     if (isPending || loadingProfile || !profile) {
