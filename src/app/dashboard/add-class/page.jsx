@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const durations = [
     "30 Minutes",
@@ -135,11 +136,11 @@ export default function AddClassPage() {
     const [loading, setLoading] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const { data: session } = authClient.useSession();
-
+    const router = useRouter()
     const trainerName = session?.user?.name;
     const trainerEmail = session?.user?.email;
 
-    
+
 
     const {
         register,
@@ -148,7 +149,7 @@ export default function AddClassPage() {
         reset,
     } = useForm();
 
-   
+
 
     const onSubmit = async (data) => {
         if (!selectedTemplate) {
@@ -211,6 +212,7 @@ export default function AddClassPage() {
                 });
 
                 reset();
+                router.push("/dashboard/my-classes");
             }
         } catch (error) {
             Swal.fire({
@@ -323,13 +325,17 @@ export default function AddClassPage() {
                                     className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
                                 >
                                     <div className="grid md:grid-cols-[320px_1fr]">
-                                        <Image
-                                            src={selectedTemplate.image}
-                                            alt={selectedTemplate.className}
-                                            width={500}
-                                            height={300}
-                                            className="h-full min-h-[240px] w-full object-cover"
-                                        />
+                                        <div className="relative h-[240px]">
+                                            <Image
+                                                src={selectedTemplate.image}
+                                                alt={selectedTemplate.className}
+                                                fill
+                                                priority
+                                                
+                                                sizes="(max-width: 768px) 100vw, 50vw"
+                                                className="object-cover"
+                                            />
+                                        </div>
 
                                         <div className="flex flex-col justify-center p-6">
                                             <span className="mb-3 w-fit rounded-full bg-red-600/20 px-3 py-1 text-sm text-red-400">
