@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Swal from 'sweetalert2';
+import Link from 'next/link';
 
 
 const MyClassesPage = () => {
@@ -171,9 +172,12 @@ const MyClassesPage = () => {
                                 </div>
 
                                 <div className="mt-5 flex gap-3">
-                                    <button className="btn btn-sm flex-1 bg-red-600 text-white border-none hover:bg-red-700">
+                                    <Link
+                                        href={`/dashboard/update-class/${item._id}`}
+                                        className="btn btn-sm flex-1 bg-red-600 text-white border-none hover:bg-red-700"
+                                    >
                                         Update
-                                    </button>
+                                    </Link>
 
                                     <motion.button
                                         onClick={() => handleDelete(item._id)}
