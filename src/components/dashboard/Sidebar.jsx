@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import {FaTachometerAlt,FaUser,FaCalendarCheck,FaSignOutAlt, FaPlusCircle, FaClipboardList,} from "react-icons/fa";
+import {FaTachometerAlt,FaUser,FaCalendarCheck,FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck,} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useState } from "react";
@@ -64,7 +64,12 @@ export default function Sidebar() {
             name: "My Classes",
             href: "/dashboard/my-classes",
             icon: <FaClipboardList />,
-        }
+        },
+        {
+            name: "Trainer Status",
+            href: "/dashboard/trainer-status",
+            icon: <FaUserCheck />,
+        },
     ];
 
     return (

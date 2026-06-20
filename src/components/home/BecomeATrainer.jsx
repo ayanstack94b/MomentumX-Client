@@ -1,34 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
 
-const BecomeATrainerPage = () => {
-    const { data: session } = authClient.useSession();
-    const router = useRouter()
-    const [loading, setLoading] = useState(false);
 
+const BecomeATrainer = () => {
+    const { data: session } = authClient.useSession();
+
+    const router = useRouter();
+
+    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
     const [application, setApplication] = useState(null);
+    const email = session?.user?.email;
 
+
+    if (
+        application &&
+        application.status !== "rejected"
+    ) {
+        router.push(
+            "/dashboard/trainer-status"
+        );
+    }
+
+    useEffect(() => {
+        if (!email) return;
+
+        const fetchApplication = async () => {
+            try {
+                const res = await fetch(
+                    `http://localhost:5000/trainer-applications/${email}`
+                );
+                
+                const data = await res.json();
+
+                console.log("Application:", data);
+
+                setApplication(data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchApplication();
+    }, [email]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        setLoading(true);
+        setSubmitting(true);
 
         const form = e.target;
 
         const applicationData = {
             name:
                 session?.user?.name,
+
             email:
                 session?.user?.email,
+
             image:
                 session?.user?.image,
 
@@ -38,7 +76,8 @@ const BecomeATrainerPage = () => {
             specialization:
                 form.specialization.value,
 
-            bio: form.bio.value,
+            bio:
+                form.bio.value,
 
             status: "pending",
 
@@ -61,15 +100,21 @@ const BecomeATrainerPage = () => {
                 }
             );
 
-            const data = await res.json();
+            const data =
+                await res.json();
 
             if (data.insertedId) {
-                await Swal.fire({
+                Swal.fire({
                     icon: "success",
-                    title: "Application Submitted",
-                    text: "Your trainer application is pending review.",
+                    title:
+                        "Application Submitted",
+                    text:
+                        "Your application is pending review.",
                 });
-                router.push("/dashboard/trainer-status");
+
+                setApplication(
+                    applicationData
+                );
             }
         } catch (error) {
             console.error(error);
@@ -80,9 +125,8 @@ const BecomeATrainerPage = () => {
                     "Submission Failed",
             });
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
-
     };
 
     if (loading) {
@@ -91,38 +135,52 @@ const BecomeATrainerPage = () => {
 
     if (application) {
         return (
-            <div>
-                Trainer Application
-                <br />
-                Status: {application.status}
-            </div>
+            <section className="mx-auto max-w-4xl p-5">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+                    <h1 className="heading-font text-4xl">
+                        Trainer Application
+                    </h1>
+
+                    <p className="mt-4 text-lg">
+                        Status:
+                        <span className="ml-2 font-semibold text-yellow-500">
+                            {application.status}
+                        </span>
+                    </p>
+
+                    <p className="mt-4 text-gray-400">
+                        Your application
+                        has already been
+                        submitted and is
+                        waiting for admin
+                        review.
+                    </p>
+                </div>
+            </section>
         );
     }
 
-
-
-
     return (
-        <motion.div
-            initial={{
-                opacity: 0,
-                y: 20,
-            }}
-            animate={{
-                opacity: 1,
-                y: 0,
-            }}
-            className="mx-auto max-w-3xl p-5"
-        >
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+        <section className="mx-auto max-w-4xl p-5">
+            <motion.div
+                initial={{
+                    opacity: 0,
+                    y: 20,
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0,
+                }}
+                className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
+            >
                 <h1 className="heading-font text-4xl">
-                    Become a Trainer
+                    Become A Trainer
                 </h1>
 
-                <p className="mt-2 text-gray-400">
+                <p className="mt-3 text-gray-400">
                     Submit your trainer
-                    application for
-                    review.
+                    application and join
+                    the MomentumX team.
                 </p>
 
                 <form
@@ -138,8 +196,8 @@ const BecomeATrainerPage = () => {
 
                         <input
                             name="experience"
-                            placeholder="3 Years"
                             required
+                            placeholder="3 Years"
                             className="input w-full border border-white/10 bg-slate-800"
                         />
                     </div>
@@ -151,8 +209,8 @@ const BecomeATrainerPage = () => {
 
                         <input
                             name="specialization"
-                            placeholder="Strength Training"
                             required
+                            placeholder="Strength Training"
                             className="input w-full border border-white/10 bg-slate-800"
                         />
                     </div>
@@ -166,8 +224,8 @@ const BecomeATrainerPage = () => {
                             name="bio"
                             rows={5}
                             required
-                            className="textarea w-full border border-white/10 bg-slate-800"
                             placeholder="Tell us about your training experience..."
+                            className="textarea w-full border border-white/10 bg-slate-800"
                         />
                     </div>
 
@@ -179,19 +237,19 @@ const BecomeATrainerPage = () => {
                             scale: 0.97,
                         }}
                         disabled={
-                            loading
+                            submitting
                         }
                         type="submit"
                         className="btn border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
                     >
-                        {loading
+                        {submitting
                             ? "Submitting..."
                             : "Apply Now"}
                     </motion.button>
                 </form>
-            </div>
-        </motion.div>
+            </motion.div>
+        </section>
     );
 };
 
-export default BecomeATrainerPage;
+export default BecomeATrainer;
