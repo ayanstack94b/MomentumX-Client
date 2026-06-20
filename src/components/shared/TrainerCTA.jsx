@@ -58,7 +58,7 @@ const TrainerCTA = () => {
                             </span>
                         </div>
                         <Link
-                            href="/dashboard/apply-trainer"
+                            href="/dashboard/become-trainer"
                             className="group mt-10 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-red-600 to-red-500 px-8 py-4 font-medium transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(220,38,38,0.35)]"
                         >
                             Apply As Trainer
