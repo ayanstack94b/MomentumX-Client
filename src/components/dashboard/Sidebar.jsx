@@ -70,6 +70,10 @@ export default function Sidebar() {
             href: "/dashboard/trainer-status",
             icon: <FaUserCheck />,
         },
+        {
+            name: "Trainer Applications",
+            href: "/dashboard/all-trainer-applications",
+        },
     ];
 
     return (
