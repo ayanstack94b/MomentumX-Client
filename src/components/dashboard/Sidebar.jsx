@@ -122,6 +122,11 @@ export default function Sidebar() {
                 name: "Trainer Applications",
                 href: "/dashboard/all-trainer-applications",
                 icon: <FaUserCheck />,
+            },
+            {
+                name: "Manage Classes",
+                href: "/dashboard/manage-classes",
+                icon: <FaClipboardList />,
             }
         );
     }
