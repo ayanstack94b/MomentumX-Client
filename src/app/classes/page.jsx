@@ -11,6 +11,7 @@ const ClassesPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+
         const fetchClasses = async () => {
             try {
                 const res = await fetch(

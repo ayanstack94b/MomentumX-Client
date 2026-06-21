@@ -18,6 +18,7 @@ export default function Sidebar() {
     const { data: session } = authClient.useSession();
 
     useEffect(() => {
+        // if (!email) return;
         if (!session?.user?.email)
             return;
 

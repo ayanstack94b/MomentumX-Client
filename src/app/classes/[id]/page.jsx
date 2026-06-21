@@ -22,6 +22,7 @@ const ClassDetailsPage = () => {
 
 
     useEffect(() => {
+
         const fetchClass = async () => {
             try {
                 const res = await fetch(
@@ -45,6 +46,7 @@ const ClassDetailsPage = () => {
 
 
     const handleBooking = async () => {
+
         if (!session?.user) {
             Swal.fire({
                 icon: "warning",

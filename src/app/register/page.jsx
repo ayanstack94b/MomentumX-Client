@@ -25,11 +25,10 @@ const RegisterPage = () => {
             const { data: userData, error } =
                 await authClient.signUp.email({
                     name: data.name,
-                    email: data.email,
+                    email: data.email.toLowerCase(),
                     password: data.password,
                     image: data.photoURL || "",
                 });
-
             if (error) {
                 Swal.fire({
                     icon: "error",

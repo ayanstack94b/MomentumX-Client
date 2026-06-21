@@ -16,10 +16,20 @@ export default function EditProfilePage() {
 
     const [profile, setProfile] = useState(null);
     const [loadingProfile, setLoadingProfile] = useState(true);
-    const email = session?.user?.email;
+    const email = session?.user?.email?.toLowerCase();
     const router = useRouter();
 
     const onSubmit = async (data) => {
+        if (!profile?._id) {
+            Swal.fire({
+                icon: "error",
+                title: "Profile ID Missing",
+            });
+
+            console.log(profile);
+            console.log(profile?._id);
+            return;
+        }
         try {
             const response = await fetch(
                 `http://localhost:5000/users/${profile._id}`,
@@ -144,14 +154,20 @@ export default function EditProfilePage() {
                 </p>
 
                 <div className="my-8 flex flex-col items-center gap-4">
-                    <Image
-                        src={profile.image}
-                        alt={profile.name}
-                        width={120}
-                        height={120}
-                        priority
-                        className="rounded-full border-4 border-red-500 object-cover"
-                    />
+                    {profile?.image ? (
+                        <Image
+                            src={profile.image}
+                            alt={profile.name || "User"}
+                            width={120}
+                            height={120}
+                            priority
+                            className="rounded-full border-4 border-red-500 object-cover"
+                        />
+                    ) : (
+                        <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full border-4 border-red-500 bg-white/5">
+                            User
+                        </div>
+                    )}
 
                     <h2 className="text-2xl font-bold">
                         {profile.name}
