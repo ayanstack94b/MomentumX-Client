@@ -47,7 +47,8 @@ const RegisterPage = () => {
                 body: JSON.stringify({
                     name: data.name,
                     email: data.email,
-                    image: data.photoURL,
+                    image:
+                        data.photoURL || "",
 
                     role: "member",
                     status: "active",

@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const ClassDetailsPage = () => {
     const { id } = useParams();
-
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
     const { data: session } = authClient.useSession();
@@ -42,7 +43,22 @@ const ClassDetailsPage = () => {
         }
     }, [id]);
 
+
     const handleBooking = async () => {
+        if (!session?.user) {
+            Swal.fire({
+                icon: "warning",
+                title: "Login Required",
+                text: "Please create an account to book this class.",
+                confirmButtonText: "Register Now",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/register");
+                }
+            });
+
+            return;
+        }
         const bookingData = {
             classId: classData._id,
             className: classData.className,
@@ -79,7 +95,18 @@ const ClassDetailsPage = () => {
             }
         );
 
-        const result = await res.json();
+        if (!res.ok) {
+            const error =
+                await res.json();
+
+            return Swal.fire({
+                icon: "error",
+                title: error.message,
+            });
+        }
+
+        const result =
+            await res.json();
 
         if (result.insertedId) {
             Swal.fire({
@@ -218,14 +245,14 @@ const ClassDetailsPage = () => {
                                     <span className="font-semibold">
                                         Name:
                                     </span>{" "}
-                                    {classData.trainerName}
+                                    {classData.trainerName || "Trainer Not Assigned yet"}
                                 </p>
 
                                 <p>
                                     <span className="font-semibold">
                                         Email:
                                     </span>{" "}
-                                    {classData.trainerEmail}
+                                    {classData.trainerEmail || "Not Available"}
                                 </p>
 
                                 <p>
@@ -248,10 +275,16 @@ const ClassDetailsPage = () => {
                             }}
                             className="btn mt-10 border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
                         >
-                            Book Now
+                            {session?.user
+                                ? "Book Now"
+                                : "Register To Book"}
                         </motion.button>
+
+
                     </div>
                 </motion.div>
+
+
             </div>
         </section>
     );
