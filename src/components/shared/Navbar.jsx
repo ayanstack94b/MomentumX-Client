@@ -120,15 +120,15 @@ export default function Navbar() {
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.15 }}
                         >
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className="body-font text-sm font-medium text-[var(--text-primary)] transition-all duration-300 hover:text-red-500 mr-5"
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className="body-font text-sm font-medium text-[var(--text-primary)] transition-all duration-300 hover:text-red-500 mr-5"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
                         </motion.div>
                     </nav>
 
@@ -138,10 +138,10 @@ export default function Navbar() {
                         {session ? (
                             <>
                                 <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                                    {session.image?.startsWith("http") ?(
+                                    {session.image?.startsWith("http") ? (
                                         <Image
-                                            src={session.user.image}
-                                            alt={session.user.name}
+                                            src={session?.user?.image}
+                                            alt={session?.user?.name}
                                             width={40}
                                             height={40}
                                             className="h-10 w-10 rounded-full object-cover"
@@ -179,7 +179,7 @@ export default function Navbar() {
 
                                 <Link
                                     href="/register"
-                                        className="rounded-lg bg-linear-to-r from-red-600 to-red-500 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-red-600/20"
+                                    className="rounded-lg bg-linear-to-r from-red-600 to-red-500 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-red-600/20"
                                 >
                                     Register
                                 </Link>
@@ -259,8 +259,8 @@ export default function Navbar() {
                                         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
                                             {session.user.image?.startsWith("http") ? (
                                                 <Image
-                                                    src={session.user.image}
-                                                    alt={session.user.name}
+                                                    src={session?.user?.image}
+                                                    alt={session?.user?.name}
                                                     width={50}
                                                     height={50}
                                                     className="h-12 w-12 rounded-full object-cover"

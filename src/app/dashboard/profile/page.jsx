@@ -25,7 +25,9 @@ export default function ProfilePage() {
                 const res = await fetch(
                     `http://localhost:5000/users/${email}`
                 );
-
+                console.log("Status:", res.status);
+                console.log("OK:", res.ok);
+                
                 const data = await res.json();
 
                 setProfile(data);

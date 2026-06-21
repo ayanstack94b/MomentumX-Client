@@ -171,6 +171,34 @@ const TrainerStatusPage = () => {
                         >
                             {application.status}
                         </span>
+                        {
+                            application.status ===
+                            "rejected" &&
+                            application.feedback && (
+                                <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-5">
+                                    <h3 className="font-semibold text-red-400">
+                                        Admin Feedback
+                                    </h3>
+
+                                    <p className="mt-3 text-sm text-gray-300">
+                                        {
+                                            application.feedback
+                                        }
+                                    </p>
+                                </div>
+                            )
+                        }
+                        {
+                            application.status ===
+                            "rejected" && (
+                                <Link
+                                    href="/dashboard/become-trainer"
+                                    className="btn mt-5 border-none bg-red-600 text-white"
+                                >
+                                    Apply Again
+                                </Link>
+                            )
+                        }
                     </div>
                 </div>
 

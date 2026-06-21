@@ -28,6 +28,10 @@ export default function Sidebar() {
                         `http://localhost:5000/users/${session.user.email}`
                     );
 
+                if (!res.ok) {
+                    return;
+                }
+
                 const data =
                     await res.json();
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import Swal from "sweetalert2";
@@ -132,14 +132,46 @@ const classTemplates = [
 
 export default function AddClassPage() {
 
-
     const [loading, setLoading] = useState(false);
+    const [profile, setProfile] = useState(null);
+    const [profileLoading, setProfileLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const { data: session } = authClient.useSession();
     const router = useRouter()
     const trainerName = session?.user?.name;
     const trainerEmail = session?.user?.email;
 
+    useEffect(() => {
+        if (!session?.user?.email)
+            return;
+
+        const fetchProfile =
+            async () => {
+                try {
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/users/${session.user.email}`
+                        );
+
+                    if (!res.ok) {
+                        return;
+                    }
+
+                    const data =
+                        await res.json();
+
+                    setProfile(data);
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setProfileLoading(
+                        false
+                    );
+                }
+            };
+
+        fetchProfile();
+    }, [session]);
 
 
     const {
@@ -224,6 +256,36 @@ export default function AddClassPage() {
             setLoading(false);
         }
     };
+
+
+    if (profileLoading) {
+        return (
+            <div className="p-10">
+                Loading...
+            </div>
+        );
+    }
+
+    if (
+        profile &&
+        profile.role !== "trainer"
+    ) {
+        return (
+            <div className="flex min-h-[60vh] items-center justify-center">
+                <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-10 text-center">
+                    <h2 className="text-3xl font-bold text-red-400">
+                        Access Denied
+                    </h2>
+
+                    <p className="mt-3 text-gray-400">
+                        Only trainers can
+                        create classes.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
 
     return (
         <PrivateRoute>

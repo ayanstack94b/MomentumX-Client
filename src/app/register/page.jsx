@@ -27,8 +27,18 @@ const RegisterPage = () => {
                     name: data.name,
                     email: data.email,
                     password: data.password,
-                    image: data.photoURL,
+                    image: data.photoURL || "",
                 });
+
+            if (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Registration Failed",
+                    text: error.message,
+                });
+
+                return;
+            }
             const response = await fetch("http://localhost:5000/users", {
                 method: "POST",
                 headers: {
@@ -58,6 +68,8 @@ const RegisterPage = () => {
             console.log("POST Status:", response.status);
 
             const result = await response.json();
+            console.log("User Data:", userData);
+            console.log("Mongo Result:", result);
 
             console.log("POST Result:", result);
             if (error) {

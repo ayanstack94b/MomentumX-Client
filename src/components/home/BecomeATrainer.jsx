@@ -17,6 +17,7 @@ const BecomeATrainer = () => {
     const [submitting, setSubmitting] = useState(false);
 
     const [application, setApplication] = useState(null);
+    
     const email = session?.user?.email;
 
 
@@ -184,9 +185,7 @@ const BecomeATrainer = () => {
                 </p>
 
                 <form
-                    onSubmit={
-                        handleSubmit
-                    }
+                    onSubmit={handleSubmit}
                     className="mt-8 space-y-6"
                 >
                     <div>

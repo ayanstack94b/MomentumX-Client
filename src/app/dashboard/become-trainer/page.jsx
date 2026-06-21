@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
+import ApplicationStatusCard from "@/components/dashboard/ApplicationStatusCard";
 
 const BecomeATrainerPage = () => {
     const { data: session } = authClient.useSession();
@@ -16,6 +17,35 @@ const BecomeATrainerPage = () => {
 
     const [application, setApplication] = useState(null);
 
+
+    useEffect(() => {
+        if (!session?.user?.email)
+            return;
+
+        const fetchApplication =
+            async () => {
+                try {
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/trainer-applications/${session.user.email}`
+                        );
+
+                    if (!res.ok)
+                        return;
+
+                    const data =
+                        await res.json();
+
+                    setApplication(
+                        data
+                    );
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+
+        fetchApplication();
+    }, [session]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -89,17 +119,45 @@ const BecomeATrainerPage = () => {
         return <LoadingSpinner />;
     }
 
-    if (application) {
+    if (
+        application &&
+        application.status ===
+        "pending"
+    ) {
         return (
-            <div>
-                Trainer Application
-                <br />
-                Status: {application.status}
+            <div className="p-10">
+                <h2 className="text-3xl font-bold text-yellow-400">
+                    Application Pending
+                </h2>
+                <ApplicationStatusCard
+                    title="Application Pending"
+                    description="Your trainer application is waiting for admin review."
+                    color="pending"
+                />
+
             </div>
         );
     }
 
+    if (
+        application &&
+        application.status ===
+        "approved"
+    ) {
+        return (
+            <div className="p-10">
+                <h2 className="text-3xl font-bold text-green-400">
+                    Trainer Approved
+                </h2>
 
+                <ApplicationStatusCard
+                    title="Trainer Approved"
+                    description="You are already a trainer."
+                    color="approved"
+                />
+            </div>
+        );
+    }
 
 
     return (
