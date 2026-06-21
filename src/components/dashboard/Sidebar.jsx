@@ -4,16 +4,39 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import {FaTachometerAlt,FaUser,FaCalendarCheck,FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck,} from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const [profile, setProfile] = useState(null);
+    const { data: session } = authClient.useSession();
+
+    useEffect(() => {
+        if (!session?.user?.email)
+            return;
+
+        const fetchProfile =
+            async () => {
+                const res =
+                    await fetch(
+                        `http://localhost:5000/users/${session.user.email}`
+                    );
+
+                const data =
+                    await res.json();
+
+                setProfile(data);
+            };
+
+        fetchProfile();
+    }, [session]);
+
 
     const handleLogout = async () => {
         try {
@@ -45,36 +68,59 @@ export default function Sidebar() {
             href: "/dashboard",
             icon: <FaTachometerAlt />,
         },
+
         {
             name: "Profile",
             href: "/dashboard/profile",
             icon: <FaUser />,
         },
-        {
-            name: "Book Class",
-            href: "/dashboard/book-class",
-            icon: <FaCalendarCheck />,
-        },
-        {
-            name: "Add Class",
-            href: "/dashboard/add-class",
-            icon: <FaPlusCircle />,
-        },
-        {
-            name: "My Classes",
-            href: "/dashboard/my-classes",
-            icon: <FaClipboardList />,
-        },
-        {
-            name: "Trainer Status",
-            href: "/dashboard/trainer-status",
-            icon: <FaUserCheck />,
-        },
-        {
-            name: "Trainer Applications",
-            href: "/dashboard/all-trainer-applications",
-        },
     ];
+
+    // Conditional sidebars
+    if (profile?.role === "member") {
+        links.push(
+            {
+                name: "Book Class",
+                href: "/dashboard/book-class",
+                icon: <FaCalendarCheck />,
+            },
+            {
+                name: "Become Trainer",
+                href: "/dashboard/become-trainer",
+                icon: <FaUserCheck />,
+            },
+            {
+                name: "Trainer Status",
+                href: "/dashboard/trainer-status",
+                icon: <FaUserCheck />,
+            }
+        );
+    }
+    // Trainer
+    if (profile?.role === "trainer") {
+        links.push(
+            {
+                name: "Add Class",
+                href: "/dashboard/add-class",
+                icon: <FaPlusCircle />,
+            },
+            {
+                name: "My Classes",
+                href: "/dashboard/my-classes",
+                icon: <FaClipboardList />,
+            }
+        );
+    }
+    // Admin
+    if (profile?.role === "admin") {
+        links.push(
+            {
+                name: "Trainer Applications",
+                href: "/dashboard/all-trainer-applications",
+                icon: <FaUserCheck />,
+            }
+        );
+    }
 
     return (
         <>
@@ -97,8 +143,8 @@ export default function Sidebar() {
                             key={link.href}
                             href={link.href}
                             className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 ${pathname === link.href
-                                    ? "bg-red-600 text-white"
-                                    : "text-gray-300 hover:bg-white/5"
+                                ? "bg-red-600 text-white"
+                                : "text-gray-300 hover:bg-white/5"
                                 }`}
                         >
                             {link.icon}
@@ -162,8 +208,8 @@ export default function Sidebar() {
                                         href={link.href}
                                         onClick={() => setIsOpen(false)}
                                         className={`flex items-center gap-3 rounded-xl px-4 py-3 ${pathname === link.href
-                                                ? "bg-red-600 text-white"
-                                                : "text-gray-300"
+                                            ? "bg-red-600 text-white"
+                                            : "text-gray-300"
                                             }`}
                                     >
                                         {link.icon}
