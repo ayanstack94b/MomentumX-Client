@@ -142,7 +142,9 @@ const MyClassesPage = () => {
                                     <span
                                         className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "approved"
                                                 ? "bg-green-500/20 text-green-400"
-                                                : "bg-yellow-500/20 text-yellow-400"
+                                                : item.status === "rejected"
+                                                    ? "bg-red-500/20 text-red-400"
+                                                    : "bg-yellow-500/20 text-yellow-400"
                                             }`}
                                     >
                                         {item.status}
@@ -166,9 +168,21 @@ const MyClassesPage = () => {
                                     </p>
 
                                     <p>
+                                        <strong>Created:</strong>{" "}
+                                        {new Date(
+                                            item.createdAt
+                                        ).toLocaleDateString()}
+                                    </p>
+
+                                    <p>
                                         <strong>Price:</strong> ₹
                                         {item.price}
                                     </p>
+                                    <p>
+                                        <strong>Bookings:</strong>{" "}
+                                        {item.bookingCount}
+                                    </p>
+                                    
                                 </div>
 
                                 <div className="mt-5 flex gap-3">

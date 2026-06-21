@@ -123,11 +123,13 @@ export default function Sidebar() {
                 href: "/dashboard/all-trainer-applications",
                 icon: <FaUserCheck />,
             },
+         
             {
                 name: "Manage Classes",
                 href: "/dashboard/manage-classes",
                 icon: <FaClipboardList />,
-            }
+            },
+         
         );
     }
 
