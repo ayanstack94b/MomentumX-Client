@@ -360,7 +360,7 @@ const ClassDetailsPage = () => {
                                         scale: 0.97,
                                     }
                             }
-                            className="btn border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
+                            className="btn mt-5 border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {alreadyBooked
                                 ? "Already Booked"

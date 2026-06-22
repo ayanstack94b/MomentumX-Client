@@ -54,7 +54,7 @@ const SuccessStories = () => {
                     className="overflow-hidden"
                 >
                     <div className="mb-14 text-center">
-                       
+
 
                         <span className="rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 mt-5 text-sm text-red-400">
                             Success Stories
