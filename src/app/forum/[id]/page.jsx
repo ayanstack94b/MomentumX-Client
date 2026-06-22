@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
+import Swal from "sweetalert2";
 
 const ForumDetailsPage = () => {
     const { id } = useParams();
@@ -13,6 +14,10 @@ const ForumDetailsPage = () => {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [commentText, setCommentText] = useState("");
+
+
     useEffect(() => {
         const fetchPost = async () => {
 
@@ -85,6 +90,36 @@ const ForumDetailsPage = () => {
         session?.user?.email,
     ]);
 
+    useEffect(() => {
+
+        const fetchComments =
+            async () => {
+
+                try {
+
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/comments/${id}`
+                        );
+
+                    const data =
+                        await res.json();
+
+                    setComments(data);
+
+                } catch (error) {
+
+                    console.error(error);
+
+                }
+            };
+
+        if (id) {
+            fetchComments();
+        }
+
+    }, [id]);
+
 
     const handleReaction = async (type) => {
 
@@ -139,9 +174,87 @@ const ForumDetailsPage = () => {
             }
         };
 
-        // Delete btn
-    const handleDelete =
-        async (id) => {
+    const handleComment = async () => {
+
+            if (!session?.user) {
+
+                return Swal.fire({
+                    icon: "warning",
+                    title:
+                        "Login Required",
+                });
+            }
+
+            if (!commentText.trim()) {
+
+                return Swal.fire({
+                    icon: "warning",
+                    title:
+                        "Write a comment first",
+                });
+            }
+
+            const commentData = {
+                forumId: id,
+
+                userName:
+                    session.user.name,
+
+                userEmail:
+                    session.user.email,
+
+                comment:
+                    commentText,
+
+                createdAt:
+                    new Date().toISOString(),
+            };
+
+            const res =
+                await fetch(
+                    "http://localhost:5000/comments",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+
+                        body: JSON.stringify(
+                            commentData
+                        ),
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if (data.insertedId) {
+
+                setComments([
+                    {
+                        ...commentData,
+                        _id:
+                            data.insertedId,
+                    },
+                    ...comments,
+                ]);
+
+                setCommentText("");
+
+                Swal.fire({
+                    icon: "success",
+                    title:
+                        "Comment Added",
+                    timer: 1200,
+                    showConfirmButton:
+                        false,
+                });
+            }
+        };
+
+    const handleDelete = async (id) => {
 
             const result =
                 await Swal.fire({
@@ -344,6 +457,74 @@ const ForumDetailsPage = () => {
 
                             </div>
 
+                            <div className="my-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+
+                                <h3 className="mb-4 text-xl font-bold">
+                                    Join The Discussion
+                                </h3>
+
+                                <textarea
+                                    value={commentText}
+                                    onChange={(e) =>
+                                        setCommentText(
+                                            e.target.value
+                                        )
+                                    }
+                                    rows={4}
+                                    placeholder="Write your comment..."
+                                    className="textarea w-full"
+                                />
+
+                                <motion.button
+                                    onClick={handleComment}
+                                    whileHover={{
+                                        scale: 1.02,
+                                    }}
+                                    whileTap={{
+                                        scale: 0.97,
+                                    }}
+                                    className="btn mt-4 border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                                >
+                                    Post Comment
+                                </motion.button>
+
+                            </div>
+
+                            <div className="mt-8">
+
+                                <h3 className="mb-4 text-xl font-bold">
+                                    Comments
+                                </h3>
+
+                                {comments.map(
+                                    (comment) => (
+
+                                        <div
+                                            key={
+                                                comment._id
+                                            }
+                                            className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+                                        >
+
+                                            <h4 className="font-semibold">
+                                                {
+                                                    comment.userName
+                                                }
+                                            </h4>
+
+                                            <p className="mt-2 text-gray-400">
+                                                {
+                                                    comment.comment
+                                                }
+                                            </p>
+
+                                        </div>
+
+                                    )
+                                )}
+
+                            </div>
+
                         </div>
 
                     </div>
@@ -351,6 +532,8 @@ const ForumDetailsPage = () => {
                 </motion.div>
 
             </div>
+
+           
 
         </section>
     );
