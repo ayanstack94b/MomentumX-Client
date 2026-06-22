@@ -9,8 +9,8 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 const ForumPage = () => {
 
     const [posts, setPosts] = useState([]);
-
     const [loading, setLoading] = useState(true);
+    const [expandedPosts, setExpandedPosts] =  useState({});
 
     useEffect(() => {
 
@@ -178,9 +178,10 @@ const ForumPage = () => {
                                         By {post.authorName}
                                     </p>
 
-                                    <p className="mt-4 line-clamp-3 text-gray-400">
+                                    <p className="line-clamp-4 text-gray-400">
                                         {post.description}
                                     </p>
+                                  
 
                                     <Link
                                         href={`/forum/${post._id}`}

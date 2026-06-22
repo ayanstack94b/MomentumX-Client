@@ -16,33 +16,36 @@ const ForumDetailsPage = () => {
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
+    const [editingId, setEditingId] = useState(null);
+    const [editText, setEditText] = useState("");
+
 
 
     useEffect(() => {
         const fetchPost = async () => {
 
-                try {
+            try {
 
-                    const res =
-                        await fetch(
-                            `http://localhost:5000/forums/${id}`
-                        );
+                const res =
+                    await fetch(
+                        `http://localhost:5000/forums/${id}`
+                    );
 
-                    const data =
-                        await res.json();
+                const data =
+                    await res.json();
 
-                    setPost(data);
+                setPost(data);
 
-                } catch (error) {
+            } catch (error) {
 
-                    console.error(error);
+                console.error(error);
 
-                } finally {
+            } finally {
 
-                    setLoading(false);
+                setLoading(false);
 
-                }
-            };
+            }
+        };
 
         if (id) {
             fetchPost();
@@ -91,7 +94,6 @@ const ForumDetailsPage = () => {
     ]);
 
     useEffect(() => {
-
         const fetchComments =
             async () => {
 
@@ -123,194 +125,350 @@ const ForumDetailsPage = () => {
 
     const handleReaction = async (type) => {
 
-            if (
-                !session?.user?.email
-            ) {
-                return Swal.fire({
-                    icon: "warning",
-                    title:
-                        "Login Required",
-                });
-            }
+        if (
+            !session?.user?.email
+        ) {
+            return Swal.fire({
+                icon: "warning",
+                title:
+                    "Login Required",
+            });
+        }
 
-            const res =
-                await fetch(
-                    `http://localhost:5000/forums/react/${id}`,
+        const res =
+            await fetch(
+                `http://localhost:5000/forums/react/${id}`,
+                {
+                    method:
+                        "PATCH",
+
+                    headers:
                     {
-                        method:
-                            "PATCH",
+                        "Content-Type":
+                            "application/json",
+                    },
 
-                        headers:
-                        {
-                            "Content-Type":
-                                "application/json",
-                        },
+                    body:
+                        JSON.stringify(
+                            {
+                                email:
+                                    session
+                                        .user
+                                        .email,
 
-                        body:
-                            JSON.stringify(
-                                {
-                                    email:
-                                        session
-                                            .user
-                                            .email,
+                                type,
+                            }
+                        ),
+                }
+            );
 
-                                    type,
-                                }
-                            ),
-                    }
+        if (res.ok) {
+
+            const updated =
+                await fetch(
+                    `http://localhost:5000/forums/${id}`
                 );
 
-            if (res.ok) {
+            const data =
+                await updated.json();
 
-                const updated =
-                    await fetch(
-                        `http://localhost:5000/forums/${id}`
-                    );
-
-                const data =
-                    await updated.json();
-
-                setPost(data);
-            }
-        };
+            setPost(data);
+        }
+    };
 
     const handleComment = async () => {
 
-            if (!session?.user) {
+        if (!session?.user) {
 
-                return Swal.fire({
-                    icon: "warning",
-                    title:
-                        "Login Required",
-                });
-            }
+            return Swal.fire({
+                icon: "warning",
+                title:
+                    "Login Required",
+            });
+        }
 
-            if (!commentText.trim()) {
+        if (!commentText.trim()) {
 
-                return Swal.fire({
-                    icon: "warning",
-                    title:
-                        "Write a comment first",
-                });
-            }
+            return Swal.fire({
+                icon: "warning",
+                title:
+                    "Write a comment first",
+            });
+        }
 
-            const commentData = {
-                forumId: id,
+        const commentData = {
+            forumId: id,
 
-                userName:
-                    session.user.name,
+            userName:
+                session.user.name,
 
-                userEmail:
-                    session.user.email,
+            userEmail:
+                session.user.email,
 
-                comment:
-                    commentText,
+            comment:
+                commentText,
 
-                createdAt:
-                    new Date().toISOString(),
-            };
-
-            const res =
-                await fetch(
-                    "http://localhost:5000/comments",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-
-                        body: JSON.stringify(
-                            commentData
-                        ),
-                    }
-                );
-
-            const data =
-                await res.json();
-
-            if (data.insertedId) {
-
-                setComments([
-                    {
-                        ...commentData,
-                        _id:
-                            data.insertedId,
-                    },
-                    ...comments,
-                ]);
-
-                setCommentText("");
-
-                Swal.fire({
-                    icon: "success",
-                    title:
-                        "Comment Added",
-                    timer: 1200,
-                    showConfirmButton:
-                        false,
-                });
-            }
+            createdAt:
+                new Date().toISOString(),
         };
+
+        const res =
+            await fetch(
+                "http://localhost:5000/comments",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body: JSON.stringify(
+                        commentData
+                    ),
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if (data.insertedId) {
+
+            setComments([
+                {
+                    ...commentData,
+                    _id:
+                        data.insertedId,
+                },
+                ...comments,
+            ]);
+
+            setCommentText("");
+
+            Swal.fire({
+                icon: "success",
+                title:
+                    "Comment Added",
+                timer: 1200,
+                showConfirmButton:
+                    false,
+            });
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+
+        const result =
+            await Swal.fire({
+                title:
+                    "Delete Comment?",
+                icon:
+                    "warning",
+                showCancelButton:
+                    true,
+            });
+
+        if (
+            !result.isConfirmed
+        ) {
+            return;
+        }
+
+        const res =
+            await fetch(
+                `http://localhost:5000/comments/${commentId}`,
+                {
+                    method:
+                        "DELETE",
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if (
+            data.deletedCount >
+            0
+        ) {
+
+            setComments(
+                comments.filter(
+                    (
+                        item
+                    ) =>
+                        item._id !==
+                        commentId
+                )
+            );
+        }
+    };
+
+    const handleEditComment = async (commentId) => {
+
+        const res =
+            await fetch(
+                `http://localhost:5000/comments/${commentId}`,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body: JSON.stringify({
+                        comment:
+                            editText,
+                    }),
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if (
+            data.modifiedCount >
+            0
+        ) {
+
+            setComments(
+                comments.map(
+                    (item) =>
+                        item._id ===
+                            commentId
+                            ? {
+                                ...item,
+                                comment:
+                                    editText,
+                            }
+                            : item
+                )
+            );
+
+            setEditingId(
+                null
+            );
+
+            setEditText("");
+        }
+    };
+
 
     const handleDelete = async (id) => {
 
-            const result =
-                await Swal.fire({
-                    title:
-                        "Delete Post?",
-                    text:
-                        "This action cannot be undone.",
-                    icon:
-                        "warning",
-                    showCancelButton:
-                        true,
-                    confirmButtonText:
-                        "Delete",
-                });
+        const result =
+            await Swal.fire({
+                title:
+                    "Delete Post?",
+                text:
+                    "This action cannot be undone.",
+                icon:
+                    "warning",
+                showCancelButton:
+                    true,
+                confirmButtonText:
+                    "Delete",
+            });
 
-            if (
-                !result.isConfirmed
-            ) {
-                return;
-            }
+        if (
+            !result.isConfirmed
+        ) {
+            return;
+        }
 
-            const res =
-                await fetch(
-                    `http://localhost:5000/forums/${id}`,
-                    {
-                        method:
-                            "DELETE",
-                    }
-                );
+        const res =
+            await fetch(
+                `http://localhost:5000/forums/${id}`,
+                {
+                    method:
+                        "DELETE",
+                }
+            );
 
-            const data =
-                await res.json();
+        const data =
+            await res.json();
 
-            if (
-                data.deletedCount >
-                0
-            ) {
+        if (
+            data.deletedCount >
+            0
+        ) {
 
-                setPosts(
-                    posts.filter(
-                        (
-                            post
-                        ) =>
-                            post._id !==
-                            id
-                    )
-                );
+            setPosts(
+                posts.filter(
+                    (
+                        post
+                    ) =>
+                        post._id !==
+                        id
+                )
+            );
 
-                Swal.fire({
-                    icon:
-                        "success",
-                    title:
-                        "Post Deleted",
-                });
-            }
-        };
+            Swal.fire({
+                icon:
+                    "success",
+                title:
+                    "Post Deleted",
+            });
+        }
+    };
+
+    // const handleEditComment = async (
+    //         commentId) => {
+
+    //         const res =
+    //             await fetch(
+    //                 `http://localhost:5000/comments/${commentId}`,
+    //                 {
+    //                     method:
+    //                         "PATCH",
+
+    //                     headers:
+    //                     {
+    //                         "Content-Type":
+    //                             "application/json",
+    //                     },
+
+    //                     body:
+    //                         JSON.stringify(
+    //                             {
+    //                                 comment:
+    //                                     editText,
+    //                             }
+    //                         ),
+    //                 }
+    //             );
+
+    //         const data =
+    //             await res.json();
+
+    //         if (
+    //             data.modifiedCount >
+    //             0
+    //         ) {
+
+    //             setComments(
+    //                 comments.map(
+    //                     (
+    //                         item
+    //                     ) =>
+    //                         item._id ===
+    //                             commentId
+    //                             ? {
+    //                                 ...item,
+    //                                 comment:
+    //                                     editText,
+    //                             }
+    //                             : item
+    //                 )
+    //             );
+
+    //             setEditingId(
+    //                 null
+    //             );
+
+    //             setEditText("");
+    //         }
+    //     };
 
 
     if (loading) {
@@ -496,32 +654,129 @@ const ForumDetailsPage = () => {
                                     Comments
                                 </h3>
 
-                                {comments.map(
-                                    (comment) => (
+                                {comments.map((comment) => (
 
-                                        <div
-                                            key={
-                                                comment._id
-                                            }
-                                            className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4"
-                                        >
+                                    <div
+                                        key={comment._id}
+                                        className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl"
+                                    >
 
-                                            <h4 className="font-semibold">
-                                                {
-                                                    comment.userName
-                                                }
-                                            </h4>
+                                        <h4 className="font-semibold">
+                                            {comment.userName}
+                                        </h4>
+
+                                        {editingId === comment._id ? (
+
+                                            <div className="mt-3">
+
+                                                <textarea
+                                                    value={editText}
+                                                    onChange={(e) =>
+                                                        setEditText(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    className="textarea w-full"
+                                                />
+
+                                                <div className="mt-3 flex gap-3">
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleEditComment(
+                                                                comment._id
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            editText.trim() ===
+                                                            comment.comment
+                                                        }
+                                                        className={`rounded-xl px-5 py-2 text-sm font-medium text-white transition-all ${editText.trim() ===
+                                                            comment.comment
+                                                            ? "cursor-not-allowed bg-gray-700 opacity-50"
+                                                            : "bg-gradient-to-r from-red-600 to-red-500"
+                                                            }`}
+                                                    >
+                                                        Save Changes
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+
+                                                            setEditingId(
+                                                                null
+                                                            );
+
+                                                            setEditText("");
+                                                        }}
+                                                        className="rounded-xl border border-orange-500/20 bg-gradient-to-r from-orange-500/10 to-amber-500/10 px-5 py-2 text-sm font-medium text-orange-400 transition-all hover:from-orange-500/20 hover:to-amber-500/20 hover:text-orange-300"
+                                                    >
+                                                        Cancel
+                                                    </button>
+
+                                                </div>
+                                            </div>
+
+                                        ) : (
 
                                             <p className="mt-2 text-gray-400">
-                                                {
-                                                    comment.comment
-                                                }
+                                                {comment.comment}
                                             </p>
 
-                                        </div>
+                                        )}
 
-                                    )
-                                )}
+                                        {comment.userEmail ===
+                                            session?.user?.email && (
+
+                                                <div className="mt-4 flex gap-3">
+
+                                                    <motion.button
+                                                        onClick={() => {
+
+                                                            setEditingId(
+                                                                comment._id
+                                                            );
+
+                                                            setEditText(
+                                                                comment.comment
+                                                            );
+
+                                                        }}
+                                                        whileHover={{
+                                                            scale: 1.05,
+                                                        }}
+                                                        whileTap={{
+                                                            scale: 0.95,
+                                                        }}
+                                                        className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/20"
+                                                    >
+                                                        ✏️ Edit
+                                                    </motion.button>
+
+                                                    <motion.button
+                                                        onClick={() =>
+                                                            handleDeleteComment(
+                                                                comment._id
+                                                            )
+                                                        }
+                                                        whileHover={{
+                                                            scale: 1.05,
+                                                        }}
+                                                        whileTap={{
+                                                            scale: 0.95,
+                                                        }}
+                                                        className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-600 hover:text-white"
+                                                    >
+                                                        🗑 Delete
+                                                    </motion.button>
+
+                                                </div>
+
+                                            )}
+
+                                    </div>
+
+                                ))}
 
                             </div>
 
@@ -533,7 +788,7 @@ const ForumDetailsPage = () => {
 
             </div>
 
-           
+
 
         </section>
     );
