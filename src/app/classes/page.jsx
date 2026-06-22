@@ -9,14 +9,16 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 const ClassesPage = () => {
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] =  useState("");
+    const [category, setCategory] = useState("");
 
     useEffect(() => {
 
         const fetchClasses = async () => {
             try {
                 const res = await fetch(
-                    "http://localhost:5000/classes"
-                );
+                    `http://localhost:5000/classes?search=${search}&category=${category}`
+                )
 
                 const data = await res.json();
 
@@ -29,7 +31,7 @@ const ClassesPage = () => {
         };
 
         fetchClasses();
-    }, []);
+    }, [search, category]);
 
     if (loading) {
         return <LoadingSpinner />;
@@ -73,6 +75,56 @@ const ClassesPage = () => {
                     </p>
                 </motion.div>
 
+             {/* Search bar */}
+
+                <div className="mb-10 flex flex-col gap-4 md:flex-row">
+                    <input
+                        type="text"
+                        placeholder="Search classes..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+                        className="input flex-1 border border-white/10 bg-white/5 p-2"
+                    />
+
+                    <select
+                        value={category}
+                        onChange={(e) =>
+                            setCategory(
+                                e.target.value
+                            )
+                        }
+                        className="select border border-white/10 bg-slate-800"
+                    >
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        <option value="Yoga">
+                            Yoga
+                        </option>
+
+                        <option value="Cardio">
+                            Cardio
+                        </option>
+
+                        <option value="CrossFit">
+                            CrossFit
+                        </option>
+
+                        <option value="Strength">
+                            Strength
+                        </option>
+
+                        <option value="HIIT">
+                            HIIT
+                        </option>
+                    </select>
+                </div>
+
                 {classes.length === 0 ? (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center backdrop-blur-xl">
                         <h3 className="text-2xl font-semibold">
@@ -84,6 +136,9 @@ const ClassesPage = () => {
                         </p>
                     </div>
                 ) : (
+
+                    
+
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                         {classes.map((item, index) => (
                             <motion.div
