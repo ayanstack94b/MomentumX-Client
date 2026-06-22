@@ -61,65 +61,11 @@ const ClassDetailsPage = () => {
 
             return;
         }
-        const bookingData = {
-            classId: classData._id,
-            className: classData.className,
-            image: classData.image,
 
-            trainerName:
-                classData.trainerName,
-
-            trainerEmail:
-                classData.trainerEmail,
-
-            memberName,
-            memberEmail,
-
-            price: classData.price,
-
-            status: "pending",
-
-            bookedAt:
-                new Date().toISOString(),
-        };
-
-        const res = await fetch(
-            "http://localhost:5000/bookings",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify(
-                    bookingData
-                ),
-            }
+        router.push(
+            `/payment/${classData._id}`
         );
-
-        if (!res.ok) {
-            const error =
-                await res.json();
-
-            return Swal.fire({
-                icon: "error",
-                title: error.message,
-            });
-        }
-
-        const result =
-            await res.json();
-
-        if (result.insertedId) {
-            Swal.fire({
-                icon: "success",
-                title: "Class Booked",
-                text: "Your booking has been saved.",
-            });
-            router.push("/dashboard/booked-classes");
-        }
     };
-
     const handleFavorite = async () => {
         if (!session?.user) {
             Swal.fire({

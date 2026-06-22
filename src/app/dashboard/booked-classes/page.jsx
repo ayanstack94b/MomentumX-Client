@@ -7,31 +7,36 @@ import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 const BookedClassesPage = () => {
-    const { data: session } = authClient.useSession();
-
+    const { data: session, isPending } = authClient.useSession();
     const email = session?.user?.email;
 
+    
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+
 
     useEffect(() => {
         if (!email) return;
 
-        const fetchBookings = async () => {
-            try {
-                const res = await fetch(
-                    `http://localhost:5000/bookings/member/${email}`
-                );
+        const fetchBookings =
+            async () => {
+                try {
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/bookings/${email}`
+                        );
 
-                const data = await res.json();
+                    const data = await res.json();
 
-                setBookings(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+                    setBookings(data);
+                } catch (error) {
+                    console.error(error);
+                }
+                finally {
+                    setLoading(false);
+                }
+            };
 
         fetchBookings();
     }, [email]);

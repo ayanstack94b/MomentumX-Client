@@ -8,34 +8,36 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 const ClassesPage = () => {
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] =  useState("");
+    const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [classes, setClasses] = useState([]);
     const [allClasses, setAllClasses] = useState([]);
     const [placeholder, setPlaceholder] = useState("");
     const [wordIndex, setWordIndex] = useState(0);
     const [charIndex, setCharIndex] = useState(0);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
 
-    const words = [
-        "Search classes...",
-        "Yoga Classes...",
-        "HIIT Training...",
-        "CrossFit Fundamentals...",
-        "Full Body Strength...",
-    ];
 
     useEffect(() => {
 
         const fetchClasses = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/classes?search=${search}&category=${category}`
+                    `http://localhost:5000/classes?search=${search}&category=${category}&page=${page}&limit=6`
                 )
 
                 const data = await res.json();
 
-                setClasses(data);
-                setAllClasses(data);
+                setClasses(
+                    data.classes
+                );
+
+                setTotalPages(
+                    Math.ceil(
+                        data.total / 6
+                    )
+                );
             } catch (error) {
                 console.error(error);
             } finally {
@@ -45,15 +47,22 @@ const ClassesPage = () => {
 
         fetchClasses();
 
-    }, [search, category]);
+    }, [search, category, page]);
 
     useEffect(() => {
-        const currentWord =
-            words[wordIndex];
+
+        const words = [
+            "Search classes...",
+            "Yoga Classes...",
+            "HIIT Training...",
+            "CrossFit Fundamentals...",
+            "Full Body Strength...",
+        ];
+
+        const currentWord = words[wordIndex];
 
         if (
-            charIndex <
-            currentWord.length
+            charIndex < currentWord.length
         ) {
             const timeout =
                 setTimeout(() => {
@@ -136,7 +145,7 @@ const ClassesPage = () => {
                     </p>
                 </motion.div>
 
-             {/* Search bar */}
+                {/* Search bar */}
 
                 <div className="mb-10 flex flex-col gap-4 md:flex-row">
                     <input
@@ -206,9 +215,6 @@ const ClassesPage = () => {
                         </p>
                     </div>
                 ) : (
-
-                    
-
                     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                         {classes.map((item, index) => (
                             <motion.div
@@ -275,7 +281,7 @@ const ClassesPage = () => {
 
                                     <Link
                                         href={`/classes/${item._id}`}
-                                        className="btn mt-6 w-full border-none bg-red-600 text-white hover:bg-red-700"
+                                        className="btn btn-sm w-full bg-red-600 text-white border-none hover:bg-red-700"
                                     >
                                         View Details
                                     </Link>
@@ -284,6 +290,57 @@ const ClassesPage = () => {
                         ))}
                     </div>
                 )}
+
+
+                <div className="mt-12 flex justify-center gap-2">
+                    <button
+                        onClick={() =>
+                            setPage(
+                                page - 1
+                            )
+                        }
+                        disabled={page === 1}
+                        className="btn"
+                    >
+                        Prev
+                    </button>
+
+                    {[...Array(totalPages)].map(
+                        (_, index) => (
+                            <button
+                                key={index}
+                                onClick={() =>
+                                    setPage(
+                                        index + 1
+                                    )
+                                }
+                                className={`btn ${page ===
+                                    index + 1
+                                    ? "bg-red-600 text-white"
+                                    : ""
+                                    }`}
+                            >
+                                {index + 1}
+                            </button>
+                        )
+                    )}
+
+                    <button
+                        onClick={() =>
+                            setPage(
+                                page + 1
+                            )
+                        }
+                        disabled={
+                            page ===
+                            totalPages
+                        }
+                        className="btn"
+                    >
+                        Next
+                    </button>
+                </div>
+
             </div>
         </section>
     );
