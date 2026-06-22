@@ -304,7 +304,7 @@ export default function AddForumPostPage() {
                                 {...register(
                                     "image"
                                 )}
-                                className="select w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
+                                className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
                             >
                                 <option value="">
                                     Select Forum Cover Image

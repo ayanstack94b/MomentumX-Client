@@ -12,11 +12,9 @@ const ForumDetailsPage = () => {
     const { data: session } = authClient.useSession();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const [posts, setPosts] = useState([]);
     useEffect(() => {
-
-        const fetchPost =
-            async () => {
+        const fetchPost = async () => {
 
                 try {
 
@@ -46,6 +44,47 @@ const ForumDetailsPage = () => {
         }
 
     }, [id]);
+
+    useEffect(() => {
+
+        if (
+            !session?.user?.email
+        ) {
+            return;
+        }
+
+        const fetchPosts =
+            async () => {
+
+                try {
+
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/forums/user/${session.user.email}`
+                        );
+
+                    const data =
+                        await res.json();
+
+                    setPosts(data);
+
+                } catch (error) {
+
+                    console.error(error);
+
+                } finally {
+
+                    setLoading(false);
+
+                }
+            };
+
+        fetchPosts();
+
+    }, [
+        session?.user?.email,
+    ]);
+
 
     const handleReaction = async (type) => {
 
@@ -99,6 +138,67 @@ const ForumDetailsPage = () => {
                 setPost(data);
             }
         };
+
+        // Delete btn
+    const handleDelete =
+        async (id) => {
+
+            const result =
+                await Swal.fire({
+                    title:
+                        "Delete Post?",
+                    text:
+                        "This action cannot be undone.",
+                    icon:
+                        "warning",
+                    showCancelButton:
+                        true,
+                    confirmButtonText:
+                        "Delete",
+                });
+
+            if (
+                !result.isConfirmed
+            ) {
+                return;
+            }
+
+            const res =
+                await fetch(
+                    `http://localhost:5000/forums/${id}`,
+                    {
+                        method:
+                            "DELETE",
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if (
+                data.deletedCount >
+                0
+            ) {
+
+                setPosts(
+                    posts.filter(
+                        (
+                            post
+                        ) =>
+                            post._id !==
+                            id
+                    )
+                );
+
+                Swal.fire({
+                    icon:
+                        "success",
+                    title:
+                        "Post Deleted",
+                });
+            }
+        };
+
 
     if (loading) {
         return <LoadingSpinner />;

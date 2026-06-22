@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -103,11 +103,16 @@ export default function Sidebar() {
                 icon: <FaCalendarCheck />,
             },
             {
+                name: "My Community Posts",
+                href: "/dashboard/my-forum-posts",
+                icon: <FaComments></FaComments>,
+            },
+            {
                 name: "Become Trainer",
                 href: "/dashboard/become-trainer",
                 icon: <FaUserCheck />,
             },
-           
+
             {
                 name: "Trainer Status",
                 href: "/dashboard/trainer-status",
@@ -127,6 +132,16 @@ export default function Sidebar() {
                 name: "My Classes",
                 href: "/dashboard/my-classes",
                 icon: <FaClipboardList />,
+            },
+            {
+                name: "Add Forum Post",
+                href: "/dashboard/add-forum-post",
+                icon: <FaPen />,
+            },
+            {
+                name: "My Community Posts",
+                href: "/dashboard/my-forum-posts",
+                icon: <FaRegComments />,
             }
         );
     }
@@ -138,13 +153,24 @@ export default function Sidebar() {
                 href: "/dashboard/all-trainer-applications",
                 icon: <FaUserCheck />,
             },
-         
+
             {
                 name: "Manage Classes",
                 href: "/dashboard/manage-classes",
                 icon: <FaClipboardList />,
             },
-         
+
+            {
+                name: "Add Forum Post",
+                href: "/dashboard/add-forum-post",
+                icon: <FaPen />,
+            },
+
+            {
+                name: "Manage Forum Posts",
+                href: "/dashboard/manage-forum-posts",
+                icon: <FaComments />,
+            }
         );
     }
 
