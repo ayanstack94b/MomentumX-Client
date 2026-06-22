@@ -116,9 +116,99 @@ const ClassDetailsPage = () => {
                 title: "Class Booked",
                 text: "Your booking has been saved.",
             });
+            router.push("/dashboard/booked-classes");
         }
     };
 
+    const handleFavorite = async () => {
+        if (!session?.user) {
+            Swal.fire({
+                icon: "warning",
+                title: "Login Required",
+                text: "Please login first.",
+            });
+
+            return;
+        }
+
+        const favoriteData = {
+            classId: classData._id,
+            className: classData.className,
+            image: classData.image,
+
+            trainerName:
+                classData.trainerName,
+
+            category:
+                classData.category,
+
+            difficulty:
+                classData.difficulty,
+
+            duration:
+                classData.duration,
+
+            price:
+                classData.price,
+
+            userEmail:
+                session.user.email,
+
+            createdAt:
+                new Date().toISOString(),
+        };
+
+        try {
+            const res = await fetch(
+                "http://localhost:5000/favorites",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body: JSON.stringify(
+                        favoriteData
+                    ),
+                }
+            );
+
+            const result =
+                await res.json();
+
+            if (res.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Added To Favorites",
+                    timer: 1200,
+                    showConfirmButton: false,
+                    
+                });
+
+                router.push(
+                    "/dashboard/favorite-classes"
+                );
+
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title:
+                        result.message ||
+                        "Already Added",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title:
+                    "Failed To Add Favorite",
+            });
+        }
+    };
 
     if (loading || !classData) {
         return <LoadingSpinner />;
@@ -266,21 +356,36 @@ const ClassDetailsPage = () => {
                             </div>
                         </div>
 
-                        <motion.button
-                            onClick={handleBooking}
-                            whileHover={{
-                                scale: 1.03,
-                                y: -2,
-                            }}
-                            whileTap={{
-                                scale: 0.97,
-                            }}
-                            className="btn mt-10 border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
-                        >
-                            {session?.user
-                                ? "Book Now"
-                                : "Register To Book"}
-                        </motion.button>
+                        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                            <motion.button
+                                onClick={handleFavorite}
+                                whileHover={{
+                                    scale: 1.03,
+                                }}
+                                whileTap={{
+                                    scale: 0.97,
+                                }}
+                                className="btn border border-red-500 bg-transparent text-red-500 hover:bg-red-600 hover:text-white"
+                            >
+                                ❤ Save To Favorites
+                            </motion.button>
+
+                            <motion.button
+                                onClick={handleBooking}
+                                whileHover={{
+                                    scale: 1.03,
+                                    y: -2,
+                                }}
+                                whileTap={{
+                                    scale: 0.97,
+                                }}
+                                className="btn border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                            >
+                                {session?.user
+                                    ? "Book Now"
+                                    : "Register To Book"}
+                            </motion.button>
+                        </div>
 
 
                     </div>

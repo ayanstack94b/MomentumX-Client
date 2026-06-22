@@ -68,19 +68,75 @@ const TrainerStatusPage = () => {
 
     if (!application) {
         return (
-            <div className="flex min-h-[60vh] items-center justify-center">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl">
-                    <h2 className="text-2xl font-bold">
+            <motion.div
+                initial={{
+                    opacity: 0,
+                    scale: 0.95,
+                    y: 20,
+                }}
+                animate={{
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                }}
+                transition={{
+                    duration: 0.5,
+                }}
+                className="flex min-h-[50vh] items-center justify-center px-4 py-10"
+            >
+                <motion.div
+                    whileHover={{
+                        y: -5,
+                        scale: 1.02,
+                    }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                    }}
+                    className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center backdrop-blur-xl"
+                >
+                    {/* Glow Effects */}
+                    <div className="absolute -left-10 -top-10 h-24 w-24 rounded-full bg-red-600/10 blur-3xl" />
+
+                    <div className="absolute -bottom-10 -right-10 h-24 w-24 rounded-full bg-red-500/10 blur-3xl" />
+
+                    {/* Floating Icon */}
+                    <motion.div
+                        animate={{
+                            y: [0, -6, 0],
+                        }}
+                        transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                        }}
+                        className="mb-4 text-4xl sm:text-5xl"
+                    >
+                        🏋️
+                    </motion.div>
+
+                    <h2 className="heading-font text-2xl sm:text-3xl font-bold">
                         No Application Found
                     </h2>
 
-                    <p className="mt-3 text-gray-400">
-                        You have not applied
-                        to become a trainer
-                        yet.
+                    <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-400">
+                        You haven't applied to become a trainer yet.
+                        Submit your application and start your
+                        journey as a MomentumX trainer.
                     </p>
-                </div>
-            </div>
+
+                    <motion.div
+                        animate={{
+                            opacity: [0.4, 1, 0.4],
+                        }}
+                        transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                        }}
+                        className="mt-6 h-1 w-20 mx-auto rounded-full bg-gradient-to-r from-red-600 to-red-400"
+                    />
+                </motion.div>
+            </motion.div>
         );
     }
 

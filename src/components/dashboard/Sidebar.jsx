@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { GrStatusUnknown } from "react-icons/gr";
 
 
 export default function Sidebar() {
@@ -81,12 +82,24 @@ export default function Sidebar() {
         },
     ];
 
-    // Conditional sidebars
+    //------------------------------------------------ Conditional sidebars
+
+    // Members
     if (profile?.role === "member") {
         links.push(
             {
-                name: "Book Class",
+                name: "Book a Class",
                 href: "/dashboard/book-class",
+                icon: <FaClipboardList />,
+            },
+            {
+                name: "Favorite Classes",
+                href: "/dashboard/favorite-classes",
+                icon: <FaHeart />,
+            },
+            {
+                name: "My Booked classes",
+                href: "/dashboard/booked-classes",
                 icon: <FaCalendarCheck />,
             },
             {
@@ -94,10 +107,11 @@ export default function Sidebar() {
                 href: "/dashboard/become-trainer",
                 icon: <FaUserCheck />,
             },
+           
             {
                 name: "Trainer Status",
                 href: "/dashboard/trainer-status",
-                icon: <FaUserCheck />,
+                icon: <GrStatusUnknown />,
             }
         );
     }
