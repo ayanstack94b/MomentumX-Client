@@ -14,6 +14,8 @@ const ClassDetailsPage = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
+    const [alreadyBooked, setAlreadyBooked] = useState(false);
+
     const { data: session } = authClient.useSession();
 
     const memberName = session?.user?.name;
@@ -43,6 +45,44 @@ const ClassDetailsPage = () => {
             fetchClass();
         }
     }, [id]);
+
+
+
+    // Checak booking use effect
+    useEffect(() => {
+        const checkBooking =
+            async () => {
+
+                if (
+                    !session?.user?.email ||
+                    !classData?._id
+                ) {
+                    return;
+                }
+
+                try {
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/bookings/check?email=${session.user.email}&classId=${classData._id}`
+                        );
+
+                    const data =
+                        await res.json();
+
+                    setAlreadyBooked(
+                        data.booked
+                    );
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+
+        checkBooking();
+
+    }, [
+        session?.user?.email,
+        classData?._id,
+    ]);
 
 
     const handleBooking = async () => {
@@ -302,36 +342,32 @@ const ClassDetailsPage = () => {
                             </div>
                         </div>
 
-                        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                            <motion.button
-                                onClick={handleFavorite}
-                                whileHover={{
-                                    scale: 1.03,
-                                }}
-                                whileTap={{
-                                    scale: 0.97,
-                                }}
-                                className="btn border border-red-500 bg-transparent text-red-500 hover:bg-red-600 hover:text-white"
-                            >
-                                ❤ Save To Favorites
-                            </motion.button>
-
-                            <motion.button
-                                onClick={handleBooking}
-                                whileHover={{
-                                    scale: 1.03,
-                                    y: -2,
-                                }}
-                                whileTap={{
-                                    scale: 0.97,
-                                }}
-                                className="btn border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
-                            >
-                                {session?.user
+                        <motion.button
+                            onClick={handleBooking}
+                            disabled={alreadyBooked}
+                            whileHover={
+                                alreadyBooked
+                                    ? {}
+                                    : {
+                                        scale: 1.03,
+                                        y: -2,
+                                    }
+                            }
+                            whileTap={
+                                alreadyBooked
+                                    ? {}
+                                    : {
+                                        scale: 0.97,
+                                    }
+                            }
+                            className="btn border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {alreadyBooked
+                                ? "Already Booked"
+                                : session?.user
                                     ? "Book Now"
                                     : "Register To Book"}
-                            </motion.button>
-                        </div>
+                        </motion.button>
 
 
                     </div>

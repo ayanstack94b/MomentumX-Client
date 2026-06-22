@@ -10,17 +10,12 @@ import { authClient } from "@/lib/auth-client";
 
 const PaymentPage = () => {
     const { id } = useParams();
-
+    const { data: session } = authClient.useSession();
     const router = useRouter();
+    
+    const [loading, setLoading] = useState(true);
+    const [classData, setClassData] = useState(null);
 
-    const { data: session } =
-        authClient.useSession();
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [classData, setClassData] =
-        useState(null);
 
     useEffect(() => {
         const fetchClass =
@@ -52,6 +47,8 @@ const PaymentPage = () => {
             fetchClass();
         }
     }, [id]);
+
+
 
     const handlePayment = async () => {
             const bookingData = {
