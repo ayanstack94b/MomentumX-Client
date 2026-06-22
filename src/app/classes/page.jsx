@@ -7,10 +7,22 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 const ClassesPage = () => {
-    const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] =  useState("");
     const [category, setCategory] = useState("");
+    const [classes, setClasses] = useState([]);
+    const [allClasses, setAllClasses] = useState([]);
+    const [placeholder, setPlaceholder] = useState("");
+    const [wordIndex, setWordIndex] = useState(0);
+    const [charIndex, setCharIndex] = useState(0);
+
+    const words = [
+        "Search classes...",
+        "Yoga Classes...",
+        "HIIT Training...",
+        "CrossFit Fundamentals...",
+        "Full Body Strength...",
+    ];
 
     useEffect(() => {
 
@@ -23,6 +35,7 @@ const ClassesPage = () => {
                 const data = await res.json();
 
                 setClasses(data);
+                setAllClasses(data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -31,7 +44,55 @@ const ClassesPage = () => {
         };
 
         fetchClasses();
+
     }, [search, category]);
+
+    useEffect(() => {
+        const currentWord =
+            words[wordIndex];
+
+        if (
+            charIndex <
+            currentWord.length
+        ) {
+            const timeout =
+                setTimeout(() => {
+                    setPlaceholder(
+                        currentWord.slice(
+                            0,
+                            charIndex + 1
+                        )
+                    );
+
+                    setCharIndex(
+                        (prev) =>
+                            prev + 1
+                    );
+                }, 100);
+
+            return () =>
+                clearTimeout(timeout);
+        }
+
+        const nextWordTimeout =
+            setTimeout(() => {
+                setCharIndex(0);
+
+                setPlaceholder("");
+
+                setWordIndex(
+                    (prev) =>
+                        (prev + 1) %
+                        words.length
+                );
+            }, 1500);
+
+        return () =>
+            clearTimeout(
+                nextWordTimeout
+            );
+    }, [charIndex, wordIndex]);
+
 
     if (loading) {
         return <LoadingSpinner />;
@@ -80,7 +141,7 @@ const ClassesPage = () => {
                 <div className="mb-10 flex flex-col gap-4 md:flex-row">
                     <input
                         type="text"
-                        placeholder="Search classes..."
+                        placeholder={placeholder}
                         value={search}
                         onChange={(e) =>
                             setSearch(
@@ -89,6 +150,15 @@ const ClassesPage = () => {
                         }
                         className="input flex-1 border border-white/10 bg-white/5 p-2"
                     />
+
+                    <datalist id="class-suggestions">
+                        {allClasses.map((item) => (
+                            <option
+                                key={item._id}
+                                value={item.className}
+                            />
+                        ))}
+                    </datalist>
 
                     <select
                         value={category}
