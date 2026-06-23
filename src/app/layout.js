@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-screen flex flex-col bg-[#0B0B0D] text-white">
         <Navbar></Navbar>
-        <main className="flex-1 pt-24">{children}</main>
+        <main className="flex-1 py-24">{children}</main>
         <Footer></Footer>
       </body>
     </html>
