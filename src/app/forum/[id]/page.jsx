@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { FaRegPenToSquare, FaRegTrashCan } from "react-icons/fa6";
 
 const ForumDetailsPage = () => {
     const { id } = useParams();
@@ -18,6 +20,11 @@ const ForumDetailsPage = () => {
     const [commentText, setCommentText] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
+    const [replyText, setReplyText] = useState("");
+    const [replyingTo, setReplyingTo] = useState(null);
+    const [showReplies, setShowReplies] = useState({});
+    const [editingReplyId, setEditingReplyId] = useState(null);
+    const [editReplyText, setEditReplyText] = useState("");
 
 
 
@@ -353,21 +360,110 @@ const ForumDetailsPage = () => {
         }
     };
 
+    const handleReply = async (
+        commentId
+    ) => {
 
-    const handleDelete = async (id) => {
+        if (!session?.user) {
+
+            return Swal.fire({
+                icon: "warning",
+                title:
+                    "Login Required",
+            });
+        }
+
+        if (!replyText.trim()) {
+
+            return Swal.fire({
+                icon: "warning",
+                title:
+                    "Write a reply first",
+            });
+        }
+
+        const replyData = {
+
+            _id:
+                crypto.randomUUID(),
+
+            userName:
+                session.user.name,
+
+            userEmail:
+                session.user.email,
+
+            reply:
+                replyText,
+
+            createdAt:
+                new Date().toISOString(),
+        };
+
+        const res =
+            await fetch(
+                `http://localhost:5000/comments/reply/${commentId}`,
+                {
+                    method:
+                        "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body:
+                        JSON.stringify(
+                            replyData
+                        ),
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if (
+            data.modifiedCount >
+            0
+        ) {
+
+            Swal.fire({
+                icon:
+                    "success",
+                title:
+                    "Reply Added",
+                timer:
+                    1200,
+                showConfirmButton:
+                    false,
+            });
+
+            setReplyText("");
+
+            setReplyingTo(
+                null
+            );
+
+            // Temporary refresh
+            window.location.reload();
+        }
+    };
+
+    const handleDeleteReply = async (
+        commentId,
+        replyId
+    ) => {
 
         const result =
             await Swal.fire({
                 title:
-                    "Delete Post?",
-                text:
-                    "This action cannot be undone.",
+                    "Delete Reply?",
                 icon:
                     "warning",
                 showCancelButton:
                     true,
-                confirmButtonText:
-                    "Delete",
+                confirmButtonColor:
+                    "#dc2626",
             });
 
         if (
@@ -378,10 +474,23 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/forums/${id}`,
+                `http://localhost:5000/comments/reply/delete/${commentId}`,
                 {
                     method:
-                        "DELETE",
+                        "PATCH",
+
+                    headers:
+                    {
+                        "Content-Type":
+                            "application/json",
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                replyId,
+                            }
+                        ),
                 }
             );
 
@@ -389,87 +498,105 @@ const ForumDetailsPage = () => {
             await res.json();
 
         if (
-            data.deletedCount >
+            data.modifiedCount >
             0
         ) {
-
-            setPosts(
-                posts.filter(
-                    (
-                        post
-                    ) =>
-                        post._id !==
-                        id
-                )
-            );
 
             Swal.fire({
                 icon:
                     "success",
                 title:
-                    "Post Deleted",
+                    "Reply Deleted",
+                timer:
+                    1200,
+                showConfirmButton:
+                    false,
             });
+
+            window.location.reload();
         }
     };
 
-    // const handleEditComment = async (
-    //         commentId) => {
+    const handleEditReply = (
+        commentId,
+        replyId,
+        currentReply
+    ) => {
 
-    //         const res =
-    //             await fetch(
-    //                 `http://localhost:5000/comments/${commentId}`,
-    //                 {
-    //                     method:
-    //                         "PATCH",
+        setEditingReplyId(
+            replyId
+        );
 
-    //                     headers:
-    //                     {
-    //                         "Content-Type":
-    //                             "application/json",
-    //                     },
+        setEditReplyText(
+            currentReply
+        );
+    };
 
-    //                     body:
-    //                         JSON.stringify(
-    //                             {
-    //                                 comment:
-    //                                     editText,
-    //                             }
-    //                         ),
-    //                 }
-    //             );
+    const handleSaveReply = async (
+            commentId,
+            replyId
+        ) => {
 
-    //         const data =
-    //             await res.json();
+            if (
+                !editReplyText.trim()
+            ) {
+                return;
+            }
 
-    //         if (
-    //             data.modifiedCount >
-    //             0
-    //         ) {
+            const res =
+                await fetch(
+                    `http://localhost:5000/comments/reply/edit/${commentId}`,
+                    {
+                        method:
+                            "PATCH",
 
-    //             setComments(
-    //                 comments.map(
-    //                     (
-    //                         item
-    //                     ) =>
-    //                         item._id ===
-    //                             commentId
-    //                             ? {
-    //                                 ...item,
-    //                                 comment:
-    //                                     editText,
-    //                             }
-    //                             : item
-    //                 )
-    //             );
+                        headers:
+                        {
+                            "Content-Type":
+                                "application/json",
+                        },
 
-    //             setEditingId(
-    //                 null
-    //             );
+                        body:
+                            JSON.stringify(
+                                {
+                                    replyId,
+                                    reply:
+                                        editReplyText,
+                                }
+                            ),
+                    }
+                );
 
-    //             setEditText("");
-    //         }
-    //     };
+            const data =
+                await res.json();
 
+            if (
+                data.modifiedCount >
+                0
+            ) {
+
+                Swal.fire({
+                    icon:
+                        "success",
+                    title:
+                        "Reply Updated",
+                    timer:
+                        1200,
+                    showConfirmButton:
+                        false,
+                });
+
+                setEditingReplyId(
+                    null
+                );
+
+                setEditReplyText(
+                    ""
+                );
+
+                window.location.reload();
+            }
+        };
 
     if (loading) {
         return <LoadingSpinner />;
@@ -594,12 +721,31 @@ const ForumDetailsPage = () => {
                                             "like"
                                         )
                                     }
+                                    whileHover={{
+                                        scale: 1.05,
+                                    }}
+                                    whileTap={{
+                                        scale: 0.95,
+                                    }}
+                                    className="flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-2 text-green-400 transition-all hover:bg-green-500/20"
                                 >
-                                    👍 Like (
-                                    {post.likes || 0}
-                                    )
-                                </motion.button>
+                                    <motion.div
+                                        whileHover={{
+                                            rotate: -15,
+                                            scale: 1.2,
+                                        }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 300,
+                                        }}
+                                    >
+                                        <FaThumbsUp />
+                                    </motion.div>
 
+                                    <span>
+                                        Like ({post.likes || 0})
+                                    </span>
+                                </motion.button>
 
                                 <motion.button
                                     onClick={() =>
@@ -607,10 +753,30 @@ const ForumDetailsPage = () => {
                                             "dislike"
                                         )
                                     }
+                                    whileHover={{
+                                        scale: 1.05,
+                                    }}
+                                    whileTap={{
+                                        scale: 0.95,
+                                    }}
+                                    className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-red-400 transition-all hover:bg-red-500/20"
                                 >
-                                    👎 Dislike (
-                                    {post.dislikes || 0}
-                                    )
+                                    <motion.div
+                                        whileHover={{
+                                            rotate: 15,
+                                            scale: 1.2,
+                                        }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 300,
+                                        }}
+                                    >
+                                        <FaThumbsDown />
+                                    </motion.div>
+
+                                    <span>
+                                        Dislike ({post.dislikes || 0})
+                                    </span>
                                 </motion.button>
 
                             </div>
@@ -718,61 +884,322 @@ const ForumDetailsPage = () => {
                                             </div>
 
                                         ) : (
+                                            <>
+                                                <p className="mt-2 text-gray-400">
+                                                    {comment.comment}
+                                                </p>
 
-                                            <p className="mt-2 text-gray-400">
-                                                {comment.comment}
-                                            </p>
+                                                <div className="mt-3 flex flex-wrap gap-2">
 
-                                        )}
+                                                    {comment.replies?.length > 0 && (
+                                                        <button
+                                                            onClick={() =>
+                                                                setShowReplies((prev) => ({
+                                                                    ...prev,
+                                                                    [comment._id]:
+                                                                        !prev[comment._id],
+                                                                }))
+                                                            }
+                                                            className="rounded-lg border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-400"
+                                                        >
+                                                            {showReplies[comment._id]
+                                                                ? "Hide Replies"
+                                                                : `Replies (${comment.replies.length})`}
+                                                        </button>
+                                                    )}
 
-                                        {comment.userEmail ===
-                                            session?.user?.email && (
-
-                                                <div className="mt-4 flex gap-3">
-
-                                                    <motion.button
-                                                        onClick={() => {
-
-                                                            setEditingId(
-                                                                comment._id
-                                                            );
-
-                                                            setEditText(
-                                                                comment.comment
-                                                            );
-
-                                                        }}
-                                                        whileHover={{
-                                                            scale: 1.05,
-                                                        }}
-                                                        whileTap={{
-                                                            scale: 0.95,
-                                                        }}
-                                                        className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-400 transition-all hover:bg-blue-500/20"
-                                                    >
-                                                        ✏️ Edit
-                                                    </motion.button>
-
-                                                    <motion.button
-                                                        onClick={() =>
-                                                            handleDeleteComment(
-                                                                comment._id
-                                                            )
-                                                        }
-                                                        whileHover={{
-                                                            scale: 1.05,
-                                                        }}
-                                                        whileTap={{
-                                                            scale: 0.95,
-                                                        }}
-                                                        className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-600 hover:text-white"
-                                                    >
-                                                        🗑 Delete
-                                                    </motion.button>
-
+                                                    {comment.userEmail !==
+                                                        session?.user?.email && (
+                                                            <button
+                                                                onClick={() =>
+                                                                    setReplyingTo(
+                                                                        replyingTo ===
+                                                                            comment._id
+                                                                            ? null
+                                                                            : comment._id
+                                                                    )
+                                                                }
+                                                                className="rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400"
+                                                            >
+                                                                Reply
+                                                            </button>
+                                                        )}
                                                 </div>
 
-                                            )}
+                                                {replyingTo ===
+                                                    comment._id && (
+                                                        <div className="mt-3">
+
+                                                            <textarea
+                                                                value={replyText}
+                                                                onChange={(e) =>
+                                                                    setReplyText(
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                                placeholder="Write a reply..."
+                                                                className="textarea textarea-sm w-full"
+                                                            />
+
+                                                            <div className="mt-2 flex gap-2">
+
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleReply(
+                                                                            comment._id
+                                                                        )
+                                                                    }
+                                                                    className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-2 text-sm text-green-400"
+                                                                >
+                                                                    Post Reply
+                                                                </button>
+
+                                                                <button
+                                                                    onClick={() =>
+                                                                        setReplyingTo(
+                                                                            null
+                                                                        )
+                                                                    }
+                                                                    className="rounded-lg border border-orange-500/20 bg-orange-500/10 px-4 py-2 text-sm text-orange-400"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+
+                                                            </div>
+
+                                                        </div>
+                                                    )}
+
+                                                {/* Replies Dropdown */}
+                                                <AnimatePresence>
+
+                                                    {showReplies[
+                                                        comment._id
+                                                    ] && (
+
+                                                            <motion.div
+                                                                initial={{
+                                                                    opacity: 0,
+                                                                    height: 0,
+                                                                }}
+                                                                animate={{
+                                                                    opacity: 1,
+                                                                    height: "auto",
+                                                                }}
+                                                                exit={{
+                                                                    opacity: 0,
+                                                                    height: 0,
+                                                                }}
+                                                                transition={{
+                                                                    duration: 0.3,
+                                                                }}
+                                                                className="overflow-hidden"
+                                                            >
+
+                                                                <div className="mt-3 space-y-2">
+
+                                                                    {comment.replies?.map(
+                                                                        (
+                                                                            reply,
+                                                                            index
+                                                                        ) => (
+
+                                                                            <motion.div
+                                                                                key={index}
+                                                                                initial={{
+                                                                                    opacity: 0,
+                                                                                    x: -10,
+                                                                                }}
+                                                                                animate={{
+                                                                                    opacity: 1,
+                                                                                    x: 0,
+                                                                                }}
+                                                                                transition={{
+                                                                                    delay:
+                                                                                        index *
+                                                                                        0.05,
+                                                                                }}
+                                                                                className="ml-6 rounded-xl border border-white/10 bg-black/20 p-3"
+                                                                            >
+
+                                                                                {/* Reply Author */}
+                                                                                <h5 className="text-sm font-medium text-red-400">
+                                                                                    {reply.userName}
+                                                                                </h5>
+
+                                                                                {/* Reply Content */}
+                                                                                {editingReplyId ===
+                                                                                    reply._id ? (
+
+                                                                                    <div className="mt-2">
+
+                                                                                        <textarea
+                                                                                            value={editReplyText}
+                                                                                            onChange={(e) =>
+                                                                                                setEditReplyText(
+                                                                                                    e.target.value
+                                                                                                )
+                                                                                            }
+                                                                                            className="textarea textarea-sm w-full"
+                                                                                        />
+
+                                                                                        <div className="mt-2 flex gap-2">
+
+                                                                                                <button
+                                                                                                    onClick={() =>
+                                                                                                        handleSaveReply(
+                                                                                                            comment._id,
+                                                                                                            reply._id
+                                                                                                        )
+                                                                                                    }
+                                                                                                    disabled={
+                                                                                                        editReplyText.trim() ===
+                                                                                                        reply.reply
+                                                                                                    }
+                                                                                                    className={`rounded-lg px-3 py-1 text-xs text-white transition-all ${editReplyText.trim() ===
+                                                                                                            reply.reply
+                                                                                                            ? "cursor-not-allowed bg-gray-700 opacity-50"
+                                                                                                            : "bg-green-600 hover:bg-green-700"
+                                                                                                        }`}
+                                                                                                >
+                                                                                                    Save
+                                                                                                </button>
+
+                                                                                            <button
+                                                                                                onClick={() => {
+
+                                                                                                    setEditingReplyId(
+                                                                                                        null
+                                                                                                    );
+
+                                                                                                    setEditReplyText(
+                                                                                                        ""
+                                                                                                    );
+
+                                                                                                }}
+                                                                                                className="rounded-lg border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-xs text-orange-400"
+                                                                                            >
+                                                                                                Cancel
+                                                                                            </button>
+
+                                                                                        </div>
+
+                                                                                    </div>
+
+                                                                                ) : (
+
+                                                                                    <p className="mt-1 text-sm text-gray-400">
+                                                                                        {reply.reply}
+                                                                                    </p>
+
+                                                                                )}
+
+                                                                                {/* Reply Actions */}
+                                                                                {reply.userEmail ===
+                                                                                    session?.user?.email && (
+
+                                                                                        <div className="mt-2 flex gap-2">
+
+                                                                                            <div className="mt-2 flex gap-2">
+
+                                                                                                <button
+                                                                                                    onClick={() =>
+                                                                                                        handleEditReply(
+                                                                                                            comment._id,
+                                                                                                            reply._id,
+                                                                                                            reply.reply
+                                                                                                        )
+                                                                                                    }
+                                                                                                    className="flex items-center justify-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs text-blue-400 transition-all hover:bg-blue-500/20"
+                                                                                                >
+                                                                                                    <FaRegPenToSquare className="text-blue-500" />
+                                                                                                    Edit Reply
+                                                                                                </button>
+
+                                                                                                <button
+                                                                                                    onClick={() =>
+                                                                                                        handleDeleteReply(
+                                                                                                            comment._id,
+                                                                                                            reply._id
+                                                                                                        )
+                                                                                                    }
+                                                                                                    className="flex items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs text-red-400 transition-all hover:bg-red-500/20"
+                                                                                                >
+                                                                                                    <FaRegTrashCan className="text-red-500" />
+                                                                                                    Delete Reply
+                                                                                                </button>
+
+                                                                                            </div>
+
+
+                                                                                        </div>
+
+                                                                                    )}
+
+                                                                            </motion.div>
+
+                                                                        )
+                                                                    )}
+                                                                </div>
+
+                                                            </motion.div>
+
+                                                        )}
+
+                                                </AnimatePresence>
+                                            </>
+                                        )}
+
+                                        {/* Show comment actions only for comment owner */}
+                                        {comment.userEmail === session?.user?.email && (
+
+                                            <div className="mt-3 flex flex-wrap gap-2">
+
+                                                {/* Edit Comment */}
+                                                <motion.button
+                                                    onClick={() => {
+
+                                                        setEditingId(
+                                                            comment._id
+                                                        );
+
+                                                        setEditText(
+                                                            comment.comment
+                                                        );
+
+                                                    }}
+                                                    whileHover={{
+                                                        scale: 1.05,
+                                                    }}
+                                                    whileTap={{
+                                                        scale: 0.95,
+                                                    }}
+                                                    className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400 transition-all hover:bg-blue-500/20"
+                                                >
+                                                    ✏️ Edit
+                                                </motion.button>
+
+                                                {/* Delete Comment */}
+                                                <motion.button
+                                                    onClick={() =>
+                                                        handleDeleteComment(
+                                                            comment._id
+                                                        )
+                                                    }
+                                                    whileHover={{
+                                                        scale: 1.05,
+                                                    }}
+                                                    whileTap={{
+                                                        scale: 0.95,
+                                                    }}
+                                                    className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400 transition-all hover:bg-red-600 hover:text-white"
+                                                >
+                                                    🗑 Delete
+                                                </motion.button>
+
+                                            </div>
+
+                                        )}
 
                                     </div>
 
