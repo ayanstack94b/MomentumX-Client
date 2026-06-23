@@ -3,72 +3,65 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const featuredClasses = [
-    {
-        id: 1,
-        name: "Elite Strength Training",
-        trainer: "Alex Carter",
-        category: "Strength",
-        duration: "12 Weeks",
-        bookings: 245,
-        price: "$49",
-        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200",
-    },
-    {
-        id: 2,
-        name: "HIIT Burn Session",
-        trainer: "Sophia Reed",
-        category: "HIIT",
-        duration: "8 Weeks",
-        bookings: 187,
-        price: "$39",
-        image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200",
-    },
-    {
-        id: 3,
-        name: "Power Yoga Flow",
-        trainer: "Emma Wilson",
-        category: "Yoga",
-        duration: "10 Weeks",
-        bookings: 163,
-        price: "$35",
-        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200",
-    },
-    {
-        id: 4,
-        name: "Cardio Endurance",
-        trainer: "Michael Stone",
-        category: "Cardio",
-        duration: "6 Weeks",
-        bookings: 132,
-        price: "$29",
-        image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200",
-    },
-    {
-        id: 5,
-        name: "CrossFit Performance",
-        trainer: "Ryan Brooks",
-        category: "CrossFit",
-        duration: "10 Weeks",
-        bookings: 201,
-        price: "$45",
-        image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1200",
-    },
-    {
-        id: 6,
-        name: "Body Recomposition",
-        trainer: "Daniel Scott",
-        category: "Strength",
-        duration: "16 Weeks",
-        bookings: 289,
-        price: "$59",
-        image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200",
-    },
-];
-
+import { useEffect, useState } from "react";
 
 const FeaturedClasses = () => {
+
+    const [featuredClasses, setFeaturedClasses] =  useState([]);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        const fetchFeaturedClasses =
+            async () => {
+
+                try {
+
+                    const res =
+                        await fetch(
+                            "http://localhost:5000/classes"
+                        );
+
+                    const data =
+                        await res.json();
+
+                    const topClasses =
+                        data.classes
+                            .filter(
+                                (item) =>
+                                    item.status ===
+                                    "approved"
+                            )
+                            .sort(
+                                (a, b) =>
+                                    b.bookingCount -
+                                    a.bookingCount
+                            )
+                            .slice(0, 6);
+
+                    setFeaturedClasses(
+                        topClasses
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                } finally {
+
+                    setLoading(false);
+
+                }
+
+            };
+
+        fetchFeaturedClasses();
+
+    }, []);
+
     return (
         <section className="py-24">
             <div className="section-container">
@@ -91,10 +84,10 @@ const FeaturedClasses = () => {
 
                 {/* Classes Grid */}
                 <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-                    {featuredClasses.map((item) => (
+                    {featuredClasses.map((item, index) => (
                         <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: item.id % 2 === 0 ? 50 : -50, }}
+                            key={item._id}
+                            initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50, }}
                             whileInView={{ opacity: 1, x: 0, }}
                             viewport={{ once: true, amount: 0.2 }}
                             whileHover={{ y: -6 }}
@@ -105,7 +98,7 @@ const FeaturedClasses = () => {
                             <div className="relative h-64 overflow-hidden">
                                 <Image
                                     src={item.image}
-                                    alt={item.name}
+                                    alt={item.className}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                     className="object-cover transition duration-500 hover:scale-110"
@@ -116,7 +109,7 @@ const FeaturedClasses = () => {
                                 </div>
 
                                 <div className="absolute right-4 top-4 rounded-full bg-black/70 px-3 py-1 text-xs">
-                                    {item.bookings}+ Bookings
+                                    {item.bookingCount}+ Bookings
                                 </div>
                             </div>
 
@@ -127,7 +120,7 @@ const FeaturedClasses = () => {
                                 </h3>
 
                                 <p className="mt-2 text-sm text-(--text-secondary)">
-                                    Trainer: {item.trainer}
+                                    Trainer: {item.trainerName}
                                 </p>
 
                                 <div className="mt-5 flex items-center justify-between text-sm text-(--text-secondary)">
@@ -139,7 +132,7 @@ const FeaturedClasses = () => {
                                 </div>
 
                                 <Link
-                                    href={`/classes/${item.id}`}
+                                    href={`/classes/${item._id}`}
                                     className="mt-6 btn flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-red-600 to-red-500 py-3 font-medium transition-all duration-300 hover:shadow-lg hover:shadow-red-600/20"
                                 >
                                     View Details

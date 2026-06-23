@@ -22,7 +22,11 @@ const ClassDetailsPage = () => {
 
     const memberEmail = session?.user?.email;
 
+    console.log(id);
+    console.log(classData);
+    console.log(loading);
 
+    
     useEffect(() => {
 
         const fetchClass = async () => {
@@ -34,6 +38,7 @@ const ClassDetailsPage = () => {
                 const data = await res.json();
 
                 setClassData(data);
+                console.log("Fetched Class:", data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -196,9 +201,19 @@ const ClassDetailsPage = () => {
         }
     };
 
-    if (loading || !classData) {
+    if (loading) {
         return <LoadingSpinner />;
     }
+
+    if (!classData) {
+        return (
+            <div className="p-10 text-center">
+                Class Not Found
+            </div>
+        );
+    }
+    console.log("Rendering:", classData);
+
 
     return (
         <section className="relative overflow-hidden py-20">

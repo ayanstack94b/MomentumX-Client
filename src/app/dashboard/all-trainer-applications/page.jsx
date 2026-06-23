@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Swal from "sweetalert2";
-import { FaSearch } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const AllTrainerApplicationsPage = () => {
     const [applications, setApplications] = useState([]);
@@ -168,6 +168,91 @@ const AllTrainerApplicationsPage = () => {
         applications[0]
     );
 
+    // Handle delete 
+    const handleDeleteApplication = async (id) => {
+
+        const result =
+            await Swal.fire({
+                title:
+                    "Delete Application?",
+                text:
+                    "This action cannot be undone.",
+                icon:
+                    "warning",
+                showCancelButton:
+                    true,
+                confirmButtonColor:
+                    "#dc2626",
+                cancelButtonColor:
+                    "#374151",
+                confirmButtonText:
+                    "Delete",
+            });
+
+        if (
+            !result.isConfirmed
+        ) {
+            return;
+        }
+
+        try {
+
+            const res =
+                await fetch(
+                    `http://localhost:5000/trainer-applications/${id}`,
+                    {
+                        method:
+                            "DELETE",
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if (
+                data.deletedCount >
+                0
+            ) {
+
+                setApplications(
+                    (
+                        prev
+                    ) =>
+                        prev.filter(
+                            (
+                                item
+                            ) =>
+                                item._id !==
+                                id
+                        )
+                );
+
+                Swal.fire({
+                    icon:
+                        "success",
+                    title:
+                        "Application Deleted",
+                    timer:
+                        1500,
+                    showConfirmButton:
+                        false,
+                });
+
+            }
+
+        } catch (
+        error
+        ) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    };
+
+
     return (
         <div className="p-5">
             <h1 className="heading-font mb-8 text-4xl">
@@ -268,8 +353,8 @@ const AllTrainerApplicationsPage = () => {
                                     setFilter(status)
                                 }
                                 className={`rounded-xl px-4 py-3 text-center text-sm font-medium capitalize transition-all ${filter === status
-                                        ? "bg-red-600 text-white"
-                                        : "border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
+                                    ? "bg-red-600 text-white"
+                                    : "border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
                                     }`}
                             >
                                 {status}
@@ -309,84 +394,103 @@ const AllTrainerApplicationsPage = () => {
 
 
 
-                            <div className="flex flex-col gap-3">
+                            <div className="flex w-full flex-col gap-3 md:w-auto md:min-w-[180px]">
+
+                                {/* Status Badge */}
                                 <span
-                                    className={`rounded-full px-4 py-2 text-center text-xs font-semibold ${application.status ===
-                                        "approved"
-                                        ? "bg-green-500/10 text-green-400"
-                                        : application.status ===
-                                            "rejected"
-                                            ? "bg-red-500/10 text-red-400"
-                                            : "bg-yellow-500/10 text-yellow-400"
+                                    className={`rounded-full px-4 py-2 text-center text-xs font-semibold ${application.status === "approved"
+                                            ? "bg-green-500/10 text-green-400"
+                                            : application.status === "rejected"
+                                                ? "bg-red-500/10 text-red-400"
+                                                : "bg-yellow-500/10 text-yellow-400"
                                         }`}
                                 >
                                     {application.status}
                                 </span>
 
-                                {application.status ===
-                                    "pending" && (
-                                        <>
-                                            <button
-                                                onClick={() =>
+                                {/* Pending Actions */}
+                                {application.status === "pending" && (
+
+                                    <div className="grid grid-cols-2 gap-2">
+
+                                        <button
+                                            onClick={() =>
+                                                updateApplicationStatus(
+                                                    application._id,
+                                                    "approved"
+                                                )
+                                            }
+                                            className="rounded-xl border border-green-500/20 bg-green-500/10 px-3 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/20"
+                                        >
+                                            Approve
+                                        </button>
+
+                                        <button
+                                            onClick={async () => {
+
+                                                const result =
+                                                    await Swal.fire({
+                                                        title:
+                                                            "Reject Application",
+                                                        input:
+                                                            "textarea",
+                                                        inputLabel:
+                                                            "Feedback",
+                                                        inputPlaceholder:
+                                                            "Tell the applicant why they were rejected...",
+                                                        showCancelButton:
+                                                            true,
+                                                        confirmButtonText:
+                                                            "Reject",
+                                                        confirmButtonColor:
+                                                            "#dc2626",
+                                                    });
+
+                                                if (
+                                                    result.isConfirmed &&
+                                                    result.value
+                                                ) {
+
                                                     updateApplicationStatus(
                                                         application._id,
-                                                        "approved"
-                                                    )
-                                                }
-                                                className="btn border-none bg-green-600 text-white"
-                                            >
-                                                Approve
-                                            </button>
-
-                                            <button
-                                                onClick={async () => {
-                                                    const result =
-                                                        await Swal.fire({
-                                                            title:
-                                                                "Reject Application",
-                                                            input: "textarea",
-                                                            inputLabel:
-                                                                "Feedback",
-                                                            inputPlaceholder:
-                                                                "Tell the applicant why they were rejected...",
-                                                            showCancelButton: true,
-                                                            confirmButtonText:
-                                                                "Reject",
-                                                            confirmButtonColor:
-                                                                "#dc2626",
-                                                        });
-
-                                                    if (
-                                                        result.isConfirmed &&
+                                                        "rejected",
                                                         result.value
-                                                    ) {
-                                                        updateApplicationStatus(
-                                                            application._id,
-                                                            "rejected",
-                                                            result.value
-                                                        );
-                                                    }
-                                                }}
-                                                className="btn border-none bg-red-600 text-white"
-                                            >
-                                                Reject
-                                            </button>
-                                        </>
-                                    )}
+                                                    );
 
-                                {application.status ===
-                                    "approved" && (
-                                        <div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-2 text-center text-sm font-medium text-green-400">
-                                            ✓ Approved
-                                        </div>
-                                    )}
+                                                }
 
-                                {application.status ===
-                                    "rejected" && (
-                                        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-center text-sm font-medium text-red-400">
-                                            ✕ Rejected
-                                        </div>
-                                    )}
+                                            }}
+                                            className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20"
+                                        >
+                                            Reject
+                                        </button>
+
+                                    </div>
+
+                                )}
+
+                                {/* Rejected Action */}
+                                {application.status === "rejected" && (
+
+                                    <motion.button
+                                        whileHover={{
+                                            scale: 1.03,
+                                        }}
+                                        whileTap={{
+                                            scale: 0.97,
+                                        }}
+                                        onClick={() =>
+                                            handleDeleteApplication(
+                                                application._id
+                                            )
+                                        }
+                                        className="rounded-xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-rose-500/10 px-4 py-3 text-sm font-medium text-red-400 transition-all hover:from-red-500/20 hover:to-rose-500/20"
+                                    >
+                                        🗑 Delete Application
+                                    </motion.button>
+
+                                )}
+
                             </div>
                         </div>
                     </div>

@@ -10,6 +10,12 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 export default function BookClassPage() {
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [totalClasses, setTotalClasses] = useState(0);
+
+    // console.log(JSON.stringify(classes, null, 2));
+    // console.log(Array.isArray(classes));
+    // console.log(classes);
+
 
     useEffect(() => {
         const fetchClasses = async () => {
@@ -20,7 +26,8 @@ export default function BookClassPage() {
 
                 const data = await res.json();
 
-                setClasses(data);
+                setClasses(data.classes);
+                setTotalClasses(data.total);
             } catch (error) {
                 console.error(error);
             } finally {
