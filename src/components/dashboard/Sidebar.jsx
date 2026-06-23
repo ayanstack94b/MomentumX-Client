@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, FaUsers, } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, FaUsers, FaChartLine, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -24,20 +24,20 @@ export default function Sidebar() {
             return;
 
         const fetchProfile = async () => {
-                const res =
-                    await fetch(
-                        `http://localhost:5000/users/${session.user.email}`
-                    );
+            const res =
+                await fetch(
+                    `http://localhost:5000/users/${session.user.email}`
+                );
 
-                if (!res.ok) {
-                    return;
-                }
+            if (!res.ok) {
+                return;
+            }
 
-                const data =
-                    await res.json();
+            const data =
+                await res.json();
 
-                setProfile(data);
-            };
+            setProfile(data);
+        };
 
         fetchProfile();
     }, [session]);
@@ -152,7 +152,11 @@ export default function Sidebar() {
                 href: "/dashboard/all-trainer-applications",
                 icon: <FaUserCheck />,
             },
-
+            {
+                name: "Admin Overview",
+                href: "/dashboard/admin-overview",
+                icon: <FaChartLine />,
+            },
             {
                 name: "Manage Classes",
                 href: "/dashboard/manage-classes",
