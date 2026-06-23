@@ -3,32 +3,54 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { motion } from "framer-motion";
+
 
 const ManageClassesPage = () => {
-    const [classes, setClasses] =
-        useState([]);
+    const [classes, setClasses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState("latest");
+    const [applications, setApplications] = useState([]);
 
-    const [loading, setLoading] =
-        useState(true);
+    
+    const fetchClasses = async () => {
 
-    const fetchClasses =
-        async () => {
-            try {
-                const res =
-                    await fetch(
-                        "http://localhost:5000/admin/classes"
-                    );
+        try {
 
-                const data =
-                    await res.json();
+            const res =
+                await fetch(
+                    "http://localhost:5000/admin/classes"
+                );
 
-                setClasses(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+            const data =
+                await res.json();
+
+            const sortedClasses =
+                data.sort(
+                    (a, b) =>
+                        new Date(
+                            b.createdAt
+                        ) -
+                        new Date(
+                            a.createdAt
+                        )
+                );
+
+            setClasses(
+                sortedClasses
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
 
 
     useEffect(() => {
@@ -39,8 +61,6 @@ const ManageClassesPage = () => {
         loadData();
     }, []);
 
-
-
     const updateStatus = async (id, status) => {
         try {
             const res =
@@ -48,7 +68,7 @@ const ManageClassesPage = () => {
                     `http://localhost:5000/classes/${id}`,
                     {
                         method:
-                            "PATCH",
+                            "DELETE",
 
                         headers: {
                             "Content-Type":
@@ -83,19 +103,150 @@ const ManageClassesPage = () => {
         }
     };
 
+    const handleDeleteClass = async (id) => {
+        console.log(
+            "Deleting ID:",
+            id
+        );
+        const result =
+            await Swal.fire({
+                title:
+                    "Delete Application?",
+                text:
+                    "This action cannot be undone.",
+                icon:
+                    "warning",
+                showCancelButton:
+                    true,
+                confirmButtonColor:
+                    "#dc2626",
+                cancelButtonColor:
+                    "#374151",
+                confirmButtonText:
+                    "Yes, Delete",
+            });
+
+        if (!result.isConfirmed)
+            return;
+
+        try {
+
+            const res =
+                await fetch(
+                    `http://localhost:5000/classes/${id}`,
+                    {
+                        method:
+                            "DELETE",
+                    }
+                );
+
+            const data = await res.json();
+
+            console.log(data);
+
+
+            if (
+                data.deletedCount > 0
+            ) {
+
+                setApplications(
+                    (prev) => prev.filter((item) => item._id !== id)
+                );
+                console.log(item);
+
+                Swal.fire({
+                    icon:
+                        "success",
+                    title:
+                        "Deleted",
+                    text:
+                        "Application removed successfully.",
+                    timer:
+                        1500,
+                    showConfirmButton:
+                        false,
+                });
+
+            }
+
+        } catch (
+        error
+        ) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    };
+
     if (loading)
         return (
             <LoadingSpinner />
         );
 
+    const sortedClasses = [...classes].sort(
+        (a, b) =>
+
+            sortBy ===
+                "latest"
+
+                ? new Date(
+                    b.createdAt
+                ) -
+                new Date(
+                    a.createdAt
+                )
+
+                : new Date(
+                    a.createdAt
+                ) -
+                new Date(
+                    b.createdAt
+                )
+    );
+
+
     return (
         <div className="p-5">
-            <h1 className="heading-font mb-8 text-4xl">
+            {/* Page Header */}
+            <h1 className="text-4xl font-bold">
                 Manage Classes
             </h1>
 
+            {/* dropdown filter div */}
+            <div className="mb-5 flex items-center justify-between">
+
+                <h2 className="text-lg font-semibold text-white">
+                    Classes List
+                </h2>
+
+                <select
+                    value={sortBy}
+                    onChange={(e) =>
+                        setSortBy(
+                            e.target.value
+                        )
+                    }
+                    className="select select-bordered select-sm bg-white/5"
+                >
+
+                    <option value="latest">
+                        Latest First
+                    </option>
+
+                    <option value="oldest">
+                        Oldest First
+                    </option>
+
+                </select>
+
+            </div>
+
+            {/* Main conditional grid*/}
             <div className="grid gap-5">
-                {classes.map(
+                {sortedClasses.map(
                     (item) => (
                         <div
                             key={
@@ -110,6 +261,13 @@ const ManageClassesPage = () => {
                                             item.className
                                         }
                                     </h3>
+                                    <p className="mt-1 text-xs text-gray-500">
+
+                                        {new Date(
+                                            item.createdAt
+                                        ).toLocaleDateString()}
+
+                                    </p>
 
                                     <p className="text-sm text-gray-400">
                                         Trainer:
@@ -138,35 +296,69 @@ const ManageClassesPage = () => {
                                             }`}
                                     >
                                         {item.status}
-                                        
+
                                     </span>
 
+                                    {/* Approve reject btn */}
                                     {item.status === "pending" && (
                                         <>
-                                            <button
+                                            <motion.button
+                                                whileHover={{
+                                                    scale: 1.03,
+                                                }}
+                                                whileTap={{
+                                                    scale: 0.97,
+                                                }}
                                                 onClick={() =>
                                                     updateStatus(
                                                         item._id,
                                                         "approved"
                                                     )
                                                 }
-                                                className="btn border-none bg-green-600 text-white"
+                                                className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/20 hover:text-green-300"
                                             >
-                                                Approve
-                                            </button>
+                                                ✓ Approve
+                                            </motion.button>
 
-                                            <button
+                                            <motion.button
+                                                whileHover={{
+                                                    scale: 1.03,
+                                                }}
+                                                whileTap={{
+                                                    scale: 0.97,
+                                                }}
                                                 onClick={() =>
                                                     updateStatus(
                                                         item._id,
                                                         "rejected"
                                                     )
                                                 }
-                                                className="btn border-none bg-red-600 text-white"
+                                                className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
                                             >
-                                                Reject
-                                            </button>
+                                                ✕ Reject
+                                            </motion.button>
                                         </>
+                                    )}
+
+                                    {item.status === "rejected" && (
+
+                                        <motion.button
+                                            whileHover={{
+                                                scale: 1.03,
+                                            }}
+                                            whileTap={{
+                                                scale: 0.97,
+                                            }}
+                                            onClick={() =>
+                                                handleDeleteClass(
+                                                    item._id
+                                                )
+                                            }
+                                            className="rounded-xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-rose-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:from-red-500/20 hover:to-rose-500/20"
+                                        >
+                                            🗑 Delete
+                                        </motion.button>
+
                                     )}
                                 </div>
                             </div>
