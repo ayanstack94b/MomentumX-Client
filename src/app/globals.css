@@ -42,3 +42,24 @@ body {
 .red-shadow {
   @apply transition-all duration-300 hover:shadow-lg hover:shadow-red-600/20;
 }
+
+
+
+/* Dashboard Table Scrollbar */
+/* 
+.overflow-x-auto::-webkit-scrollbar {
+    height: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(239,68,68,0.6);
+    border-radius: 999px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(239,68,68,0.9);
+} */

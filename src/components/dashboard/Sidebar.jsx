@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, FaUsers, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -23,8 +23,7 @@ export default function Sidebar() {
         if (!session?.user?.email)
             return;
 
-        const fetchProfile =
-            async () => {
+        const fetchProfile = async () => {
                 const res =
                     await fetch(
                         `http://localhost:5000/users/${session.user.email}`
@@ -170,6 +169,11 @@ export default function Sidebar() {
                 name: "Manage Forum Posts",
                 href: "/dashboard/manage-forum-posts",
                 icon: <FaComments />,
+            },
+            {
+                name: "Manage Users",
+                href: "/dashboard/manage-users",
+                icon: <FaUsers />
             }
         );
     }
