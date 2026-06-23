@@ -14,6 +14,7 @@ const ManageForumPostsPage = () => {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState("all");
 
     useEffect(() => {
 
@@ -30,8 +31,21 @@ const ManageForumPostsPage = () => {
                     const data =
                         await res.json();
 
-                    setPosts(data);
-                    console.log(posts);
+                    const sortedPosts =
+                        data.sort(
+                            (a, b) =>
+                                new Date(
+                                    b.createdAt
+                                ) -
+                                new Date(
+                                    a.createdAt
+                                )
+                        );
+
+                    setPosts(
+                        sortedPosts
+                    );
+                    // console.log(posts);
 
                 } catch (error) {
 
@@ -104,6 +118,32 @@ const ManageForumPostsPage = () => {
             }
         };
 
+    // Total Forum Posts
+    const totalPosts = posts.length;
+
+    // Unique Authors
+    const activeAuthors =new Set(
+            posts.map(
+                (post) =>
+                    post.authorEmail
+            )
+        ).size;
+
+    // Community Activity
+    const totalActivity =
+        posts.reduce(
+            (
+                total,
+                post
+            ) =>
+                total +
+                (post.likes || 0) +
+                (post.dislikes || 0),
+            0
+        );
+
+
+
     return (
         <div className="relative min-h-screen overflow-hidden p-5">
 
@@ -167,6 +207,60 @@ const ManageForumPostsPage = () => {
 
                 </motion.div>
 
+                <div className="mb-6 flex flex-wrap gap-3">
+
+                    <button
+                        onClick={() =>
+                            setFilter("all")
+                        }
+                        className={`rounded-xl px-4 py-2 text-sm ${filter === "all"
+                                ? "bg-red-600 text-white"
+                                : "bg-white/5 text-gray-400"
+                            }`}
+                    >
+                        All
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setFilter("pending")
+                        }
+                        className={`rounded-xl px-4 py-2 text-sm ${filter === "pending"
+                                ? "bg-yellow-600 text-white"
+                                : "bg-white/5 text-gray-400"
+                            }`}
+                    >
+                        Pending
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setFilter("approved")
+                        }
+                        className={`rounded-xl px-4 py-2 text-sm ${filter === "approved"
+                                ? "bg-green-600 text-white"
+                                : "bg-white/5 text-gray-400"
+                            }`}
+                    >
+                        Approved
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setFilter("rejected")
+                        }
+                        className={`rounded-xl px-4 py-2 text-sm ${filter === "rejected"
+                                ? "bg-red-600 text-white"
+                                : "bg-white/5 text-gray-400"
+                            }`}
+                    >
+                        Rejected
+                    </button>
+
+                </div>
+
+
+
                 {/* Stats */}
 
                 <div className="mb-8 grid gap-6 md:grid-cols-3">
@@ -184,7 +278,7 @@ const ManageForumPostsPage = () => {
                         </h3>
 
                         <h2 className="mt-2 text-4xl font-bold">
-                            0
+                            {totalPosts}
                         </h2>
                     </motion.div>
 
@@ -201,7 +295,7 @@ const ManageForumPostsPage = () => {
                         </h3>
 
                         <h2 className="mt-2 text-4xl font-bold">
-                            0
+                            {activeAuthors}
                         </h2>
                     </motion.div>
 
@@ -218,13 +312,13 @@ const ManageForumPostsPage = () => {
                         </h3>
 
                         <h2 className="mt-2 text-4xl font-bold">
-                            0
+                            {totalActivity}
                         </h2>
                     </motion.div>
 
                 </div>
 
-                {/* Posts Table */}
+                {/* Posts Grid */}
 
                 <motion.div
                     initial={{
@@ -235,68 +329,134 @@ const ManageForumPostsPage = () => {
                         opacity: 1,
                         y: 0,
                     }}
-                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
                 >
 
-                    <div className="border-b border-white/10 p-6">
+                    <div className="mb-6">
 
                         <h2 className="text-2xl font-bold">
                             Community Posts
                         </h2>
 
                         <p className="mt-2 text-gray-400">
-                            View and moderate all
-                            community content.
+                            Review and moderate all community discussions.
                         </p>
 
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-                        <table className="table">
+                        {posts.map(
+                            (
+                                post,
+                                index
+                            ) => (
 
-                            <thead>
+                                <motion.div
+                                    key={post._id}
+                                    initial={{
+                                        opacity: 0,
+                                        y: 20,
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
+                                    transition={{
+                                        delay:
+                                            index *
+                                            0.03,
+                                    }}
+                                    whileHover={{
+                                        y: -5,
+                                    }}
+                                    className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
+                                >
 
-                                {posts.map((post) => (
+                                    {/* Image */}
 
-                                    <tr key={post._id}>
+                                    <div className="relative h-48 overflow-hidden">
 
-                                        <td>
+                                        <img
+                                            src={post.image}
+                                            alt={post.title}
+                                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                        />
+
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+
+                                    </div>
+
+                                    {/* Content */}
+
+                                    <div className="p-5">
+
+                                        <h3 className="line-clamp-2 text-lg font-semibold text-white">
+
                                             {post.title}
-                                        </td>
 
-                                        <td>
-                                            {post.authorName}
-                                        </td>
+                                        </h3>
 
-                                        <td>
-                                            {new Date(
-                                                post.createdAt
-                                            ).toLocaleDateString()}
-                                        </td>
+                                        <p className="mt-3 line-clamp-3 text-sm text-gray-400">
 
-                                        <td>
+                                            {post.description}
 
-                                            <button
+                                        </p>
+
+                                        {/* Author */}
+
+                                        <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+
+                                            <p className="text-sm font-medium">
+
+                                                {post.authorName}
+
+                                            </p>
+
+                                            <p className="text-xs text-gray-500">
+
+                                                {post.authorEmail}
+
+                                            </p>
+
+                                        </div>
+
+                                        {/* Footer */}
+
+                                        <div className="mt-5 flex items-center justify-between">
+
+                                            <span className="text-xs text-gray-500">
+
+                                                {new Date(
+                                                    post.createdAt
+                                                ).toLocaleDateString()}
+
+                                            </span>
+
+                                            <motion.button
+                                                whileHover={{
+                                                    scale: 1.05,
+                                                }}
+                                                whileTap={{
+                                                    scale: 0.95,
+                                                }}
                                                 onClick={() =>
                                                     handleDelete(
                                                         post._id
                                                     )
                                                 }
-                                                className="btn btn-sm bg-red-600 text-white"
+                                                className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-600 hover:text-white"
                                             >
-                                                <FaTrash />
-                                            </button>
+                                                Delete
+                                            </motion.button>
 
-                                        </td>
+                                        </div>
 
-                                    </tr>
+                                    </div>
 
-                                ))}
+                                </motion.div>
 
-                            </thead>
-
-                        </table>
+                            )
+                        )}
 
                     </div>
 

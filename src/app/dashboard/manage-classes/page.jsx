@@ -12,7 +12,7 @@ const ManageClassesPage = () => {
     const [sortBy, setSortBy] = useState("latest");
     const [applications, setApplications] = useState([]);
 
-    
+
     const fetchClasses = async () => {
 
         try {
@@ -221,7 +221,7 @@ const ManageClassesPage = () => {
                 <h2 className="text-lg font-semibold text-white">
                     Classes List
                 </h2>
-
+                {/* filter */}
                 <select
                     value={sortBy}
                     onChange={(e) =>
@@ -286,7 +286,7 @@ const ManageClassesPage = () => {
                                     </p>
                                 </div>
 
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 backdrop-blur-md">
                                     <span
                                         className={`rounded-full px-4 py-2 text-center text-xs font-semibold ${item.status === "approved"
                                             ? "bg-green-500/10 text-green-400"
@@ -301,10 +301,12 @@ const ManageClassesPage = () => {
 
                                     {/* Approve reject btn */}
                                     {item.status === "pending" && (
-                                        <>
+
+                                        <div className="flex flex-col gap-2">
+
                                             <motion.button
                                                 whileHover={{
-                                                    scale: 1.03,
+                                                    scale: 1.02,
                                                 }}
                                                 whileTap={{
                                                     scale: 0.97,
@@ -315,14 +317,14 @@ const ManageClassesPage = () => {
                                                         "approved"
                                                     )
                                                 }
-                                                className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-2 text-sm font-medium text-green-400 transition-all hover:bg-green-500/20 hover:text-green-300"
+                                                className="group flex items-center justify-center gap-2 rounded-xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 to-green-500/10 px-4 py-3 text-sm font-semibold text-emerald-400 transition-all hover:from-emerald-500/20 hover:to-green-500/20"
                                             >
-                                                ✓ Approve
+                                                ✓ Approve Class
                                             </motion.button>
 
                                             <motion.button
                                                 whileHover={{
-                                                    scale: 1.03,
+                                                    scale: 1.02,
                                                 }}
                                                 whileTap={{
                                                     scale: 0.97,
@@ -333,18 +335,21 @@ const ManageClassesPage = () => {
                                                         "rejected"
                                                     )
                                                 }
-                                                className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
+                                                className="group flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-rose-500/10 px-4 py-3 text-sm font-semibold text-red-400 transition-all hover:from-red-500/20 hover:to-rose-500/20"
                                             >
-                                                ✕ Reject
+                                                ✕ Reject Class
                                             </motion.button>
-                                        </>
+
+                                        </div>
+
                                     )}
 
+                                    {/* For reject classes */}
                                     {item.status === "rejected" && (
 
                                         <motion.button
                                             whileHover={{
-                                                scale: 1.03,
+                                                scale: 1.02,
                                             }}
                                             whileTap={{
                                                 scale: 0.97,
@@ -354,9 +359,9 @@ const ManageClassesPage = () => {
                                                     item._id
                                                 )
                                             }
-                                            className="rounded-xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-rose-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:from-red-500/20 hover:to-rose-500/20"
+                                            className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-rose-500/10 px-4 py-3 text-sm font-semibold text-red-400 transition-all hover:from-red-500/20 hover:to-rose-500/20"
                                         >
-                                            🗑 Delete
+                                            🗑 Delete Class
                                         </motion.button>
 
                                     )}

@@ -3,17 +3,18 @@
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Swal from "sweetalert2";
+import { FaSearch } from "react-icons/fa";
 
 const AllTrainerApplicationsPage = () => {
-    const [applications, setApplications] =
-        useState([]);
+    const [applications, setApplications] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState("all");
+    const [search, setSearch] = useState("");
 
-    const [loading, setLoading] =
-        useState(true);
 
 
-    const updateApplicationStatus = async (id, status,
-        feedback = "") => {
+
+    const updateApplicationStatus = async (id, status, feedback = "") => {
         try {
             const res = await fetch(
                 `http://localhost:5000/trainer-applications/${id}`,
@@ -30,8 +31,8 @@ const AllTrainerApplicationsPage = () => {
                 }
             );
 
-            const data =
-                await res.json();
+            const data = await res.json();
+
 
             if (data.success) {
                 Swal.fire({
@@ -41,11 +42,25 @@ const AllTrainerApplicationsPage = () => {
                     showConfirmButton: false,
                 });
 
+                const sortedApplications =
+                    data.sort(
+                        (a, b) =>
+                            new Date(
+                                b.createdAt
+                            ) -
+                            new Date(
+                                a.createdAt
+                            )
+                    );
+
+                setApplications(
+                    sortedApplications
+                );
+
                 setApplications(
                     applications.map(
                         (application) =>
-                            application._id ===
-                                id
+                            application._id === id
                                 ? {
                                     ...application,
                                     status,
@@ -96,14 +111,179 @@ const AllTrainerApplicationsPage = () => {
         return <LoadingSpinner />;
     }
 
+    // stats
+
+    const totalApplications = applications.length;
+
+    const pendingApplications = applications.filter(
+        (item) =>
+            item.status ===
+            "pending"
+    ).length;
+
+    const approvedApplications = applications.filter(
+        (item) =>
+            item.status ===
+            "approved"
+    ).length;
+
+    const rejectedApplications = applications.filter(
+        (item) =>
+            item.status ===
+            "rejected"
+    ).length;
+
+    // Filtered Data
+    const filteredApplications = applications.filter(
+
+        (item) => {
+
+            const matchesStatus =
+                filter ===
+                    "all"
+                    ? true
+                    : item.status ===
+                    filter;
+
+            const matchesSearch =
+                item.name
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    ) ||
+                item.email
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    );
+
+            return (
+                matchesStatus &&
+                matchesSearch
+            );
+
+        }
+    );
+    console.log(
+        applications[0]
+    );
+
     return (
         <div className="p-5">
             <h1 className="heading-font mb-8 text-4xl">
                 Trainer Applications
             </h1>
 
+            {/* Dynamic stats card */}
+            <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+                {/* card-1 */}
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+
+                    <h3 className="text-gray-400">
+                        Total Applications
+                    </h3>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                        {totalApplications}
+                    </h2>
+                </div>
+
+                {/* card-2 */}
+                <div className="rounded-3xl border border-yellow-500/20 bg-yellow-500/5 p-6">
+
+                    <h3 className="text-yellow-400">
+                        Pending
+                    </h3>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                        {pendingApplications}
+                    </h2>
+
+                </div>
+
+                {/* card-3 */}
+                <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-6">
+
+                    <h3 className="text-green-400">
+                        Approved
+                    </h3>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                        {approvedApplications}
+                    </h2>
+
+                </div>
+
+                {/* card-4 */}
+                <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6">
+
+                    <h3 className="text-red-400">
+                        Rejected
+                    </h3>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                        {rejectedApplications}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            {/* Search + Filter */}
+            <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+                {/* Search */}
+                <div className="relative w-full lg:max-w-sm">
+                    <input
+                        type="text"
+                        placeholder="Search by trainer name or email..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-sm text-white outline-none backdrop-blur-xl"
+                    />
+
+                </div>
+
+
+                {/* Filters */}
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+
+                    {[
+                        "all",
+                        "pending",
+                        "approved",
+                        "rejected",
+                    ].map(
+                        (status) => (
+
+                            <button
+                                key={status}
+                                onClick={() =>
+                                    setFilter(status)
+                                }
+                                className={`rounded-xl px-4 py-3 text-center text-sm font-medium capitalize transition-all ${filter === status
+                                        ? "bg-red-600 text-white"
+                                        : "border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10"
+                                    }`}
+                            >
+                                {status}
+                            </button>
+
+                        )
+                    )}
+
+                </div>
+
+            </div>
+
             <div className="grid gap-5">
-                {applications.map((application) => (
+                {filteredApplications.map((application) => (
                     <div
                         key={application._id}
                         className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
