@@ -8,7 +8,7 @@ import { MdEmail, MdLocationOn } from "react-icons/md";
 
 export default function Footer() {
     return (
-        <footer className="mt-20 border-t border-white/10 bg-[var(--card)]">
+        <footer className="border-t border-white/10 bg-[var(--card)]">
             {/* Main Footer */}
             <div className="section-container py-14">
                 <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">

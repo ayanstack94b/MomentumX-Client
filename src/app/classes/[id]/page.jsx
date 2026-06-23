@@ -8,6 +8,7 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 
 const ClassDetailsPage = () => {
     const { id } = useParams();
@@ -26,7 +27,7 @@ const ClassDetailsPage = () => {
     console.log(classData);
     console.log(loading);
 
-    
+
     useEffect(() => {
 
         const fetchClass = async () => {
@@ -205,14 +206,10 @@ const ClassDetailsPage = () => {
         return <LoadingSpinner />;
     }
 
-    if (!classData) {
-        return (
-            <div className="p-10 text-center">
-                Class Not Found
-            </div>
-        );
+    if (!loading && !classData) {
+        notFound();
     }
-    console.log("Rendering:", classData);
+    // console.log("Rendering:", classData);
 
 
     return (
