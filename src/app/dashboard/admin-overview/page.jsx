@@ -22,14 +22,9 @@ const AdminOverviewPage = () => {
 
     const [recentUsers, setRecentUsers] = useState([]);
     const [recentPosts, setRecentPosts] = useState([]);
-    console.log(
-        JSON.stringify(
-            recentPosts[0],
-            null,
-            2
-        )
-    );
     const [loading, setLoading] = useState(true);
+
+    
     useEffect(() => {
 
         // Dashboard Stats
@@ -40,9 +35,7 @@ const AdminOverviewPage = () => {
                 res.json()
             )
             .then((data) => {
-
                 setStats(data);
-
             });
 
         // Recent Users
@@ -64,7 +57,7 @@ const AdminOverviewPage = () => {
 
         // Recent Forum Posts
         fetch(
-            "http://localhost:5000/forums"
+            "http://localhost:5000/forums?page=1&limit=5"
         )
             .then((res) =>
                 res.json()
@@ -72,10 +65,15 @@ const AdminOverviewPage = () => {
             .then((data) => {
 
                 setRecentPosts(
-                    data
-                        .slice(-5)
-                        .reverse()
+                    data.forums
                 );
+
+                setLoading(false);
+
+            })
+            .catch((error) => {
+
+                console.error(error);
 
                 setLoading(false);
 

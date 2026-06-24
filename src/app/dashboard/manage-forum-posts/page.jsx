@@ -28,11 +28,10 @@ const ManageForumPostsPage = () => {
                             "http://localhost:5000/forums"
                         );
 
-                    const data =
-                        await res.json();
+                    const data = await res.json();
 
                     const sortedPosts =
-                        data.sort(
+                        data.forums.sort(
                             (a, b) =>
                                 new Date(
                                     b.createdAt
