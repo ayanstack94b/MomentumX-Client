@@ -7,44 +7,42 @@ import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import ApplicationStatusCard from "@/components/dashboard/ApplicationStatusCard";
+import Link from "next/link";
+import { FaExclamationTriangle } from "react-icons/fa";
+
+
 
 const BecomeATrainerPage = () => {
     const { data: session } = authClient.useSession();
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-
     const [submitting, setSubmitting] = useState(false);
-
+    const [userData, setUserData] = useState(null);
     const [application, setApplication] = useState(null);
 
 
     useEffect(() => {
+
         if (!session?.user?.email)
             return;
 
-        const fetchApplication =
+        const fetchUser =
             async () => {
-                try {
-                    const res =
-                        await fetch(
-                            `http://localhost:5000/trainer-applications/${session.user.email}`
-                        );
 
-                    if (!res.ok)
-                        return;
-
-                    const data =
-                        await res.json();
-
-                    setApplication(
-                        data
+                const res =
+                    await fetch(
+                        `http://localhost:5000/users/${session.user.email}`
                     );
-                } catch (error) {
-                    console.error(error);
-                }
+
+                const data =
+                    await res.json();
+
+                setUserData(data);
+
             };
 
-        fetchApplication();
+        fetchUser();
+
     }, [session]);
 
     const handleSubmit = async (e) => {
@@ -52,7 +50,32 @@ const BecomeATrainerPage = () => {
 
         setLoading(true);
 
+    
+
+
         const form = e.target;
+
+        const userRes = await fetch(
+            `http://localhost:5000/users/${session.user.email}`
+        );
+
+        const user = await userRes.json();
+
+        if (user.role === "admin") {
+            return Swal.fire({
+                icon: "error",
+                title: "Access Denied",
+                text: "Admins cannot apply as trainers.",
+            });
+        }
+
+        if (user.status === "blocked") {
+            return Swal.fire({
+                icon: "error",
+                title: "Account Blocked",
+                text: "Blocked users cannot apply as trainers.",
+            });
+        }
 
         const applicationData = {
             name:
@@ -118,6 +141,41 @@ const BecomeATrainerPage = () => {
     if (loading) {
         return <LoadingSpinner />;
     }
+   
+    if (userData?.role === "admin") {
+        return (
+            <div className="flex min-h-[70vh] items-center justify-center p-5">
+                <div className="max-w-lg rounded-3xl border border-red-500/20 bg-red-500/5 p-10 text-center backdrop-blur-xl">
+
+                    <div className="mb-5 flex justify-center">
+                        <div className="rounded-full border border-red-500/20 bg-red-500/10 p-5">
+                            <FaExclamationTriangle
+                                className="text-5xl text-red-500"
+                            />
+                        </div>
+                    </div>
+
+                    <h2 className="heading-font text-4xl text-red-500">
+                        Access Denied
+                    </h2>
+
+                    <p className="mt-4 text-gray-400">
+                        Admin accounts cannot apply to become a trainer.
+                    </p>
+
+                    <Link
+                        href="/dashboard/admin-overview"
+                        className="btn mt-8 border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                    >
+                        Back To Dashboard
+                    </Link>
+
+                </div>
+            </div>
+        );
+    }
+
+
 
     if (
         application &&
@@ -182,6 +240,8 @@ const BecomeATrainerPage = () => {
                     application for
                     review.
                 </p>
+
+                
 
                 <form
                     onSubmit={

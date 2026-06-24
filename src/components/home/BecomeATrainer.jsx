@@ -15,21 +15,27 @@ const BecomeATrainer = () => {
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-
+    const [userData, setUserData] = useState(null);
     const [application, setApplication] = useState(null);
-    
+
     const email = session?.user?.email;
 
 
-    if (
-        application &&
-        application.status !== "rejected"
-    ) {
-        router.push(
-            "/dashboard/trainer-status"
-        );
-    }
+    useEffect(() => {
 
+        if (
+            application &&
+            application.status !==
+            "rejected"
+        ) {
+            router.push(
+                "/dashboard/trainer-status"
+            );
+        }
+
+    }, [application, router]);
+
+    
     useEffect(() => {
         if (!email) return;
 
@@ -38,7 +44,7 @@ const BecomeATrainer = () => {
                 const res = await fetch(
                     `http://localhost:5000/trainer-applications/${email}`
                 );
-                
+
                 const data = await res.json();
 
                 console.log("Application:", data);
@@ -54,8 +60,72 @@ const BecomeATrainer = () => {
         fetchApplication();
     }, [email]);
 
+    // users email fetch
+    useEffect(() => {
+
+        if (!email) return;
+
+        const fetchUser =
+            async () => {
+
+                try {
+
+                    const res =
+                        await fetch(
+                            `http://localhost:5000/users/${email}`
+                        );
+
+                    const data =
+                        await res.json();
+
+                    setUserData(
+                        data
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                }
+
+            };
+
+        fetchUser();
+
+    }, [email]);
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (
+            userData?.role ===
+            "admin"
+        ) {
+            return Swal.fire({
+                icon: "error",
+                title:
+                    "Access Denied",
+                text:
+                    "Admins cannot apply as trainers.",
+            });
+        }
+
+        if (
+            userData?.status ===
+            "blocked"
+        ) {
+            return Swal.fire({
+                icon: "error",
+                title:
+                    "Account Blocked",
+                text:
+                    "Blocked users cannot apply as trainers.",
+            });
+        }
+
 
         setSubmitting(true);
 
