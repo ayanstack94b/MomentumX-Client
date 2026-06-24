@@ -7,7 +7,8 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function PrivateRoute({ children }) {
     const { data: session, isPending } = authClient.useSession();
-
+    console.log("SESSION:", session);
+    console.log("PENDING:", isPending);
     const router = useRouter();
 
     useEffect(() => {
