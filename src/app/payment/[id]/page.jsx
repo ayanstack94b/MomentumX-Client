@@ -116,7 +116,17 @@ const PaymentPage = () => {
 
                 const result =
                     await res.json();
+                if (!res.ok) {
 
+                    return Swal.fire({
+                        icon: "error",
+                        title:
+                            "Booking Failed",
+                        text:
+                            result.message,
+                    });
+
+                }
                 if (
                     result.insertedId
                 ) {

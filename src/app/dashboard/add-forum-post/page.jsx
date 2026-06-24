@@ -37,13 +37,7 @@ export default function AddForumPostPage() {
     ];
 
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        watch,
-        formState: { errors },
-    } = useForm();
+    const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
     const selectedImage = watch("image");
 
     const onSubmit = async (data) => {
@@ -74,28 +68,37 @@ export default function AddForumPostPage() {
 
         try {
 
-            const res =
-                await fetch(
-                    "http://localhost:5000/forums",
+            const res = await fetch("http://localhost:5000/forums",
+                {
+                    method:
+                        "POST",
+
+                    headers:
                     {
-                        method:
-                            "POST",
+                        "Content-Type":
+                            "application/json",
+                    },
 
-                        headers:
-                        {
-                            "Content-Type":
-                                "application/json",
-                        },
-
-                        body:
-                            JSON.stringify(
-                                forumData
-                            ),
-                    }
-                );
-
+                    body:
+                        JSON.stringify(
+                            forumData
+                        ),
+                }
+            );
             const result =
                 await res.json();
+
+            if (!res.ok) {
+
+                return Swal.fire({
+                    icon: "error",
+                    title:
+                        "Account Blocked",
+                    text:
+                        result.message,
+                });
+
+            }
 
             if (
                 result.insertedId
@@ -110,6 +113,7 @@ export default function AddForumPostPage() {
                 reset();
 
                 router.push("/forum");
+
             }
 
         } catch (error) {

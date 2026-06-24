@@ -35,11 +35,12 @@ const MyForumPostsPage = () => {
 
                 const data = await res.json();
 
-                const myPosts = data.filter(
-                    (post) =>
-                        post.authorEmail ===
-                        session.user.email
-                );
+                const myPosts =
+                    data.forums.filter(
+                        (post) =>
+                            post.authorEmail ===
+                            session?.user?.email
+                    );
                 setPosts(myPosts);
 
             } catch (error) {

@@ -14,12 +14,12 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 const BecomeATrainerPage = () => {
     const { data: session } = authClient.useSession();
-    const router = useRouter()
+    
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [userData, setUserData] = useState(null);
     const [application, setApplication] = useState(null);
-
+    const router = useRouter()
 
     useEffect(() => {
 
@@ -50,9 +50,6 @@ const BecomeATrainerPage = () => {
 
         setLoading(true);
 
-    
-
-
         const form = e.target;
 
         const userRes = await fetch(
@@ -75,6 +72,7 @@ const BecomeATrainerPage = () => {
                 title: "Account Blocked",
                 text: "Blocked users cannot apply as trainers.",
             });
+
         }
 
         const applicationData = {
