@@ -20,7 +20,7 @@ export default function Navbar() {
 
     // session data of current user
     const { data: session, isPending } = authClient.useSession();
-    // console.log("Session from navbar",session, isPending);
+    console.log("SESSION:", session);
 
 
     // Navbar visibility state

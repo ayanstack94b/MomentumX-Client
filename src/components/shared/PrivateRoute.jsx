@@ -12,7 +12,9 @@ export default function PrivateRoute({ children }) {
 
     useEffect(() => {
         if (!isPending && !session) {
-            router.push("/login");
+            // router.push("/login");
+            console.log("PUSHING TO DASHBOARD");
+            window.location.href = "/dashboard";
         }
     }, [session, isPending, router]);
 

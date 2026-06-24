@@ -17,6 +17,8 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const router = useRouter();
+
+
     const onSubmit = async (data) => {
         try {
             const { data: userData, error } =
@@ -43,7 +45,7 @@ const LoginPage = () => {
                 timer: 1500,
                 showConfirmButton: false,
             });
-
+            console.log("LOGIN RESULT:", userData);
             router.push("/dashboard");
         } catch (error) {
             Swal.fire({
