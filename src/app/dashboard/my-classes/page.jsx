@@ -13,6 +13,9 @@ const MyClassesPage = () => {
 
     const [classes, setClasses] = useState([])
     const [loading, setLoading] = useState(true);
+    const [selectedClass, setSelectedClass] = useState(null);
+    const [members, setMembers] = useState([]);
+
 
     useEffect(() => {
         if (!email) return;
@@ -85,6 +88,37 @@ const MyClassesPage = () => {
             </div>
         );
     }
+
+    const handleViewMembers = async (classId) => {
+            try {
+                const res =
+                    await fetch(
+                        `http://localhost:5000/bookings/class/${classId}`
+                    );
+
+                const data =
+                    await res.json();
+
+                setMembers(data);
+
+                setSelectedClass(
+                    classId
+                );
+
+                document
+                    .getElementById(
+                        "members_modal"
+                    )
+                    ?.showModal();
+            } catch (
+            error
+            ) {
+                console.error(
+                    error
+                );
+            }
+        };
+
 
     return (
         <motion.div
@@ -185,10 +219,10 @@ const MyClassesPage = () => {
                                     
                                 </div>
 
-                                <div className="mt-5 flex gap-3">
+                                <div className="mt-5 grid grid-cols-2 gap-3">
                                     <Link
                                         href={`/dashboard/update-class/${item._id}`}
-                                        className="btn btn-sm flex-1 bg-red-600 text-white border-none hover:bg-red-700"
+                                        className="btn btn-sm bg-red-600 text-white border-none hover:bg-red-700"
                                     >
                                         Update
                                     </Link>
@@ -207,12 +241,71 @@ const MyClassesPage = () => {
                                             stiffness: 400,
                                             damping: 15,
                                         }}
-                                        className="btn btn-sm flex-1 border border-red-500 bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white"
+                                        className="btn btn-sm border border-red-500 bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white"
                                     >
                                         Delete
                                     </motion.button>
 
+                                    <button
+                                        onClick={() => handleViewMembers(item._id)}
+                                        className="btn btn-sm col-span-2 border border-blue-500 bg-blue-500/10 text-blue-400 hover:bg-blue-600 hover:text-white"
+                                    >
+                                        View Members
+                                    </button>
+
                                 </div>
+
+                                <dialog
+                                    id="members_modal"
+                                    className="modal"
+                                >
+                                    <div className="modal-box max-w-2xl bg-slate-900 border border-white/10">
+                                        <h3 className="text-2xl font-bold mb-5">
+                                            Enrolled Members
+                                        </h3>
+
+                                        {members.length === 0 ? (
+                                            <p className="text-gray-400">
+                                                No members enrolled yet.
+                                            </p>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {members.map(
+                                                    (
+                                                        member,
+                                                        index
+                                                    ) => (
+                                                        <div
+                                                            key={index}
+                                                            className="rounded-xl border border-white/10 bg-white/5 p-4"
+                                                        >
+                                                            <p className="font-semibold">
+                                                                {
+                                                                    member.memberName
+                                                                }
+                                                            </p>
+
+                                                            <p className="text-sm text-gray-400">
+                                                                {
+                                                                    member.memberEmail
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="modal-action">
+                                            <form method="dialog">
+                                                <button className="btn">
+                                                    Close
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </dialog>
+
                             </div>
                         </motion.div>
                     ))}

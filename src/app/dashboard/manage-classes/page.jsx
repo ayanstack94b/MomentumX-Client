@@ -63,37 +63,35 @@ const ManageClassesPage = () => {
 
     const updateStatus = async (id, status) => {
         try {
-            const res =
-                await fetch(
-                    `http://localhost:5000/classes/${id}`,
-                    {
-                        method:
-                            "DELETE",
 
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
+            console.log("ID:", id);
+            console.log("STATUS:", status);
 
-                        body: JSON.stringify(
-                            {
-                                status,
-                            }
-                        ),
-                    }
-                );
+            const res = await fetch(
+                `http://localhost:5000/classes/${id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+                    body: JSON.stringify({
+                        status,
+                    }),
+                }
+            );
 
             const result =
                 await res.json();
 
+            console.log("RESULT:", result);
+
             if (
-                result.modifiedCount >
-                0
+                result.modifiedCount > 0
             ) {
                 Swal.fire({
                     icon: "success",
-                    title:
-                        "Updated",
+                    title: "Updated",
                 });
 
                 fetchClasses();
