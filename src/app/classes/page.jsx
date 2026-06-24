@@ -24,7 +24,7 @@ const ClassesPage = () => {
         const fetchClasses = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/classes?search=${search}&category=${category}&page=${page}&limit=6`
+                    `${process.env.NEXT_PUBLIC_API_URL}/classes?search=${search}&category=${category}&page=${page}&limit=6`
                 )
 
                 const data = await res.json();

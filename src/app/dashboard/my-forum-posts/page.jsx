@@ -30,7 +30,7 @@ const MyForumPostsPage = () => {
             try {
 
                 const res = await fetch(
-                    "http://localhost:5000/forums"
+                    `${process.env.NEXT_PUBLIC_API_URL}/forums`
                 );
 
                 const data = await res.json();
@@ -128,7 +128,7 @@ const MyForumPostsPage = () => {
 
             const res =
                 await fetch(
-                    `http://localhost:5000/forums/${id}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`,
                     {
                         method:
                             "DELETE",

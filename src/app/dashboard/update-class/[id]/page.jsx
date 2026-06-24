@@ -80,7 +80,7 @@ const UpdateClassPage = () => {
                 console.log("Fetching:", id);
 
                 const res = await fetch(
-                    `http://localhost:5000/classes/${id}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`
                 );
 
                 console.log("Response:", res);
@@ -106,7 +106,7 @@ const UpdateClassPage = () => {
 
     const onSubmit = async (data) => {
         try {
-            const res = await fetch(`http://localhost:5000/classes/${id}`,
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
                 {
                     method: "PATCH",
                     headers: {

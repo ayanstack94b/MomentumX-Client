@@ -20,7 +20,7 @@ const FeaturedClasses = () => {
 
                     const res =
                         await fetch(
-                            "http://localhost:5000/classes"
+                            `${process.env.NEXT_PUBLIC_API_URL}/classes`
                         );
 
                     const data =

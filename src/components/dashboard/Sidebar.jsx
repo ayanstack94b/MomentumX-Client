@@ -26,7 +26,7 @@ export default function Sidebar() {
         const fetchProfile = async () => {
             const res =
                 await fetch(
-                    `http://localhost:5000/users/${session.user.email}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
                 );
 
             if (!res.ok) {

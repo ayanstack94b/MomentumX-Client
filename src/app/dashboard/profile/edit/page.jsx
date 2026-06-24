@@ -32,7 +32,7 @@ export default function EditProfilePage() {
         }
         try {
             const response = await fetch(
-                `http://localhost:5000/users/${profile._id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/${profile._id}`,
                 {
                     method: "PATCH",
                     headers: {
@@ -87,7 +87,7 @@ export default function EditProfilePage() {
         const fetchProfile = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/users/${email}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/users/${email}`
                 );
 
                 const data = await res.json();

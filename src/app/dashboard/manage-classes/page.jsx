@@ -19,7 +19,7 @@ const ManageClassesPage = () => {
 
             const res =
                 await fetch(
-                    "http://localhost:5000/admin/classes"
+                    `${process.env.NEXT_PUBLIC_API_URL}/admin/classes`
                 );
 
             const data =
@@ -68,7 +68,7 @@ const ManageClassesPage = () => {
             console.log("STATUS:", status);
 
             const res = await fetch(
-                `http://localhost:5000/classes/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
                 {
                     method: "PATCH",
                     headers: {
@@ -131,7 +131,7 @@ const ManageClassesPage = () => {
 
             const res =
                 await fetch(
-                    `http://localhost:5000/classes/${id}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
                     {
                         method:
                             "DELETE",

@@ -35,14 +35,14 @@ const BecomeATrainer = () => {
 
     }, [application, router]);
 
-    
+
     useEffect(() => {
         if (!email) return;
 
         const fetchApplication = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/trainer-applications/${email}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${email}`
                 );
 
                 const data = await res.json();
@@ -72,7 +72,7 @@ const BecomeATrainer = () => {
 
                     const res =
                         await fetch(
-                            `http://localhost:5000/users/${email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/users/${email}`
                         );
 
                     const data =
@@ -158,7 +158,7 @@ const BecomeATrainer = () => {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/trainer-applications",
+                `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`,
                 {
                     method: "POST",
                     headers: {

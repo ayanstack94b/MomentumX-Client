@@ -23,7 +23,7 @@ const MyClassesPage = () => {
         const fetchClasses = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/classes/trainer/${email}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/classes/trainer/${email}`
                 );
 
                 const data = await res.json();
@@ -53,7 +53,7 @@ const MyClassesPage = () => {
 
         try {
             const res = await fetch(
-                `http://localhost:5000/classes/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
                 {
                     method: "DELETE",
                 }
@@ -93,7 +93,7 @@ const MyClassesPage = () => {
             try {
                 const res =
                     await fetch(
-                        `http://localhost:5000/bookings/class/${classId}`
+                        `${process.env.NEXT_PUBLIC_API_URL}/bookings/class/${classId}`
                     );
 
                 const data =

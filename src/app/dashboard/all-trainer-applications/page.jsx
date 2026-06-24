@@ -11,13 +11,10 @@ const AllTrainerApplicationsPage = () => {
     const [filter, setFilter] = useState("all");
     const [search, setSearch] = useState("");
 
-
-
-
     const updateApplicationStatus = async (id, status, feedback = "") => {
         try {
             const res = await fetch(
-                `http://localhost:5000/trainer-applications/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${id}`,
                 {
                     method: "PATCH",
                     headers: {
@@ -41,21 +38,6 @@ const AllTrainerApplicationsPage = () => {
                     timer: 1500,
                     showConfirmButton: false,
                 });
-
-                const sortedApplications =
-                    data.sort(
-                        (a, b) =>
-                            new Date(
-                                b.createdAt
-                            ) -
-                            new Date(
-                                a.createdAt
-                            )
-                    );
-
-                setApplications(
-                    sortedApplications
-                );
 
                 setApplications(
                     applications.map(
@@ -81,14 +63,13 @@ const AllTrainerApplicationsPage = () => {
     };
 
 
-
     useEffect(() => {
         const fetchApplications =
             async () => {
                 try {
                     const res =
                         await fetch(
-                            "http://localhost:5000/trainer-applications"
+                            `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`
                         );
 
                     const data =
@@ -199,7 +180,7 @@ const AllTrainerApplicationsPage = () => {
 
             const res =
                 await fetch(
-                    `http://localhost:5000/trainer-applications/${id}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${id}`,
                     {
                         method:
                             "DELETE",

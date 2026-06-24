@@ -31,7 +31,7 @@ const BecomeATrainerPage = () => {
 
                 const res =
                     await fetch(
-                        `http://localhost:5000/users/${session.user.email}`
+                        `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
                     );
 
                 const data =
@@ -53,7 +53,7 @@ const BecomeATrainerPage = () => {
         const form = e.target;
 
         const userRes = await fetch(
-            `http://localhost:5000/users/${session.user.email}`
+            `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
         );
 
         const user = await userRes.json();
@@ -99,7 +99,7 @@ const BecomeATrainerPage = () => {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/trainer-applications",
+                `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`,
                 {
                     method: "POST",
                     headers: {

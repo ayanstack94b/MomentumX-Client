@@ -29,7 +29,7 @@ const TrainerStatusPage = () => {
                 try {
                     const res =
                         await fetch(
-                            `http://localhost:5000/trainer-applications/${email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${email}`
                         );
                     console.log(
                         "Status:",

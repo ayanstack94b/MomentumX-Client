@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const latestPostsData = [
     {
@@ -48,6 +49,38 @@ const latestPostsData = [
 ];
 
 const LatestPosts = () => {
+
+    const [latestPosts, setLatestPosts] = useState([]);
+
+    useEffect(() => {
+        const fetchLatestPosts =
+            async () => {
+                try {
+                    const res =
+                        await fetch(
+                            `${process.env.NEXT_PUBLIC_API_URL}/forums`
+                        );
+
+                    const data =
+                        await res.json();
+
+                    setLatestPosts(
+                        data.forums?.slice(
+                            0,
+                            4
+                        ) || []
+                    );
+                } catch (error) {
+                    console.error(
+                        error
+                    );
+                }
+            };
+
+        fetchLatestPosts();
+    }, []);
+
+
     return (
         <section className="py-24">
             <div className="section-container">
@@ -70,9 +103,9 @@ const LatestPosts = () => {
 
                 {/* Posts Grid */}
                 <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-                    {latestPostsData.map((item) => (
+                    {latestPosts.map((item) => (
                         <motion.article
-                            key={item.id}
+                            key={item._id}
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.2 }}
@@ -84,7 +117,13 @@ const LatestPosts = () => {
                             {/* Image */}
                             <div className="relative h-52 overflow-hidden">
                                 <Image
-                                    src={item.image}
+                                    src={
+                                        item.image?.startsWith(
+                                            "http"
+                                        )
+                                            ? item.image
+                                            : "/images/forum-placeholder.jpg"
+                                    }
                                     alt={item.title}
                                     fill
                                     sizes="(max-width:768px) 100vw, (max-width:1280px) 50vw, 25vw"
@@ -92,14 +131,14 @@ const LatestPosts = () => {
                                 />
 
                                 <div className="absolute left-4 top-4 rounded-full bg-red-600 px-3 py-1 text-xs font-medium">
-                                    {item.category}
+                                    {item.category || "Fitness"}
                                 </div>
                             </div>
 
                             {/* Content */}
                             <div className="p-6">
                                 <p className="mb-3 text-xs uppercase tracking-wider text-red-400">
-                                    By {item.author}
+                                    By {item.authorName}
                                 </p>
 
                                 <h3 className="heading-font line-clamp-2 text-2xl">
@@ -111,7 +150,7 @@ const LatestPosts = () => {
                                 </p>
 
                                 <Link
-                                    href={`/forum/${item.id}`}
+                                    href={`/forum/${item._id}`}
                                     className="mt-6 inline-flex items-center gap-2 text-red-500 transition hover:text-red-400"
                                 >
                                     Read More →

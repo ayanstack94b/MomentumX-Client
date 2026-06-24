@@ -33,7 +33,7 @@ const ClassDetailsPage = () => {
         const fetchClass = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/classes/${id}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`
                 );
 
                 const data = await res.json();
@@ -69,7 +69,7 @@ const ClassDetailsPage = () => {
                 try {
                     const res =
                         await fetch(
-                            `http://localhost:5000/bookings/check?email=${session.user.email}&classId=${classData._id}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/check?email=${session.user.email}&classId=${classData._id}`
                         );
 
                     const data =
@@ -152,7 +152,7 @@ const ClassDetailsPage = () => {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/favorites",
+                `${process.env.NEXT_PUBLIC_API_URL}/favorites`,
                 {
                     method: "POST",
 

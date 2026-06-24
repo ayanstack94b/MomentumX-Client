@@ -16,9 +16,11 @@ import {
 export default function DashboardPage() {
 
     const [users, setUsers] = useState([]);
-    const [forums, setForums] = useState([]);
     const [classes, setClasses] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [forums, setForums] = useState({ total: 0, forums: [] });
+
+
 
     // fetching all needed data
     useEffect(() => {
@@ -35,16 +37,16 @@ export default function DashboardPage() {
                         applicationsRes,
                     ] = await Promise.all([
                         fetch(
-                            "http://localhost:5000/users"
+                            `${process.env.NEXT_PUBLIC_API_URL}/users`
                         ),
                         fetch(
-                            "http://localhost:5000/forums"
+                            `${process.env.NEXT_PUBLIC_API_URL}/forums`
                         ),
                         fetch(
-                            "http://localhost:5000/classes"
+                            `${process.env.NEXT_PUBLIC_API_URL}/classes`
                         ),
                         fetch(
-                            "http://localhost:5000/trainer-applications"
+                            `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`
                         ),
                     ]);
 
@@ -90,10 +92,18 @@ export default function DashboardPage() {
 
     }, []);
 
+    console.log("USERS:", users);
+    console.log("FORUMS:", forums);
+    console.log("CLASSES:", classes);
+    console.log(typeof users);
+    console.log(typeof forums);
+    console.log(typeof classes);
+
+
     // Real stats
     const totalUsers = users.length;
 
-    const totalPosts = forums.length;
+    const totalPosts = forums?.length || 0;
 
     const totalClasses = classes.length;
 

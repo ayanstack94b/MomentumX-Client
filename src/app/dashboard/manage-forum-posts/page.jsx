@@ -15,6 +15,7 @@ const ManageForumPostsPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
+    const [filterBy, setFilterBy] = useState("latest");
 
     useEffect(() => {
 
@@ -25,7 +26,7 @@ const ManageForumPostsPage = () => {
 
                     const res =
                         await fetch(
-                            "http://localhost:5000/forums"
+                            `${process.env.NEXT_PUBLIC_API_URL}/forums`
                         );
 
                     const data = await res.json();
@@ -63,70 +64,70 @@ const ManageForumPostsPage = () => {
 
     const handleDelete = async (id) => {
 
-            const result =
-                await Swal.fire({
-                    title:
-                        "Delete Post?",
-                    text:
-                        "This action cannot be undone.",
-                    icon:
-                        "warning",
-                    showCancelButton:
-                        true,
-                });
+        const result =
+            await Swal.fire({
+                title:
+                    "Delete Post?",
+                text:
+                    "This action cannot be undone.",
+                icon:
+                    "warning",
+                showCancelButton:
+                    true,
+            });
 
-            if (
-                !result.isConfirmed
-            ) {
-                return;
-            }
+        if (
+            !result.isConfirmed
+        ) {
+            return;
+        }
 
-            const res =
-                await fetch(
-                    `http://localhost:5000/forums/${id}`,
-                    {
-                        method:
-                            "DELETE",
-                    }
-                );
+        const res =
+            await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`,
+                {
+                    method:
+                        "DELETE",
+                }
+            );
 
-            const data =
-                await res.json();
+        const data =
+            await res.json();
 
-            if (
-                data.deletedCount >
-                0
-            ) {
+        if (
+            data.deletedCount >
+            0
+        ) {
 
-                setPosts(
-                    posts.filter(
-                        (
-                            post
-                        ) =>
-                            post._id !==
-                            id
-                    )
-                );
+            setPosts(
+                posts.filter(
+                    (
+                        post
+                    ) =>
+                        post._id !==
+                        id
+                )
+            );
 
-                Swal.fire({
-                    icon:
-                        "success",
-                    title:
-                        "Post Deleted",
-                });
-            }
-        };
+            Swal.fire({
+                icon:
+                    "success",
+                title:
+                    "Post Deleted",
+            });
+        }
+    };
 
     // Total Forum Posts
     const totalPosts = posts.length;
 
     // Unique Authors
-    const activeAuthors =new Set(
-            posts.map(
-                (post) =>
-                    post.authorEmail
-            )
-        ).size;
+    const activeAuthors = new Set(
+        posts.map(
+            (post) =>
+                post.authorEmail
+        )
+    ).size;
 
     // Community Activity
     const totalActivity =
@@ -140,6 +141,15 @@ const ManageForumPostsPage = () => {
                 (post.dislikes || 0),
             0
         );
+
+    const sortedPosts = [...posts].sort(
+        (a, b) =>
+            filterBy === "latest"
+                ? new Date(b.createdAt) -
+                new Date(a.createdAt)
+                : new Date(a.createdAt) -
+                new Date(b.createdAt)
+    );
 
 
 
@@ -205,63 +215,10 @@ const ManageForumPostsPage = () => {
                     </p>
 
                 </motion.div>
-
-                <div className="mb-6 flex flex-wrap gap-3">
-
-                    <button
-                        onClick={() =>
-                            setFilter("all")
-                        }
-                        className={`rounded-xl px-4 py-2 text-sm ${filter === "all"
-                                ? "bg-red-600 text-white"
-                                : "bg-white/5 text-gray-400"
-                            }`}
-                    >
-                        All
-                    </button>
-
-                    <button
-                        onClick={() =>
-                            setFilter("pending")
-                        }
-                        className={`rounded-xl px-4 py-2 text-sm ${filter === "pending"
-                                ? "bg-yellow-600 text-white"
-                                : "bg-white/5 text-gray-400"
-                            }`}
-                    >
-                        Pending
-                    </button>
-
-                    <button
-                        onClick={() =>
-                            setFilter("approved")
-                        }
-                        className={`rounded-xl px-4 py-2 text-sm ${filter === "approved"
-                                ? "bg-green-600 text-white"
-                                : "bg-white/5 text-gray-400"
-                            }`}
-                    >
-                        Approved
-                    </button>
-
-                    <button
-                        onClick={() =>
-                            setFilter("rejected")
-                        }
-                        className={`rounded-xl px-4 py-2 text-sm ${filter === "rejected"
-                                ? "bg-red-600 text-white"
-                                : "bg-white/5 text-gray-400"
-                            }`}
-                    >
-                        Rejected
-                    </button>
-
-                </div>
-
+             
 
 
                 {/* Stats */}
-
                 <div className="mb-8 grid gap-6 md:grid-cols-3">
 
                     <motion.div
@@ -317,6 +274,26 @@ const ManageForumPostsPage = () => {
 
                 </div>
 
+                {/* Filter div */}
+                <div className="mb-6 flex justify-end mr-6">
+                    <select
+                        value={filterBy}
+                        onChange={(e) =>
+                            setFilterBy(e.target.value)
+                        }
+                        className="rounded-xl border select select-bordered border-white/10 bg-slate-900 px-4 py-2"
+                    >
+                        <option value="latest">
+                            Latest Posts
+                        </option>
+
+                        <option value="oldest">
+                            Oldest Posts
+                        </option>
+                    </select>
+                </div>
+
+
                 {/* Posts Grid */}
 
                 <motion.div
@@ -344,7 +321,7 @@ const ManageForumPostsPage = () => {
 
                     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-                        {posts.map(
+                        {sortedPosts.map(
                             (
                                 post,
                                 index

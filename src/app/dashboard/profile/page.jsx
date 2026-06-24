@@ -23,7 +23,7 @@ export default function ProfilePage() {
         const fetchProfile = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/users/${email}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/users/${email}`
                 );
                 console.log("Status:", res.status);
                 console.log("OK:", res.ok);

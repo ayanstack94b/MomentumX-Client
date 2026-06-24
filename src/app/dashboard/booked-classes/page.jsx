@@ -24,7 +24,7 @@ const BookedClassesPage = () => {
                 try {
                     const res =
                         await fetch(
-                            `http://localhost:5000/bookings/${email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/${email}`
                         );
 
                     const data = await res.json();

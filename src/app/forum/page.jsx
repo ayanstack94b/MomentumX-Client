@@ -24,7 +24,7 @@ const ForumPage = () => {
 
                     const res =
                         await fetch(
-                            `http://localhost:5000/forums?page=${page}&limit=6`
+                            `${process.env.NEXT_PUBLIC_API_URL}/forums?page=${page}&limit=6`
                         );
 
                     const data =

@@ -37,6 +37,7 @@ export default function AddForumPostPage() {
     ];
 
 
+
     const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
     const selectedImage = watch("image");
 
@@ -45,19 +46,16 @@ export default function AddForumPostPage() {
         const forumData = {
             title:
                 data.title,
-
             image:
                 data.image,
-
             description:
                 data.description,
-
             authorName:
                 session?.user?.name,
-
             authorEmail:
                 session?.user?.email,
-
+            category:
+                data?.category || "Fitness",
             createdAt:
                 new Date().toISOString(),
 
@@ -68,7 +66,7 @@ export default function AddForumPostPage() {
 
         try {
 
-            const res = await fetch("http://localhost:5000/forums",
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forums`,
                 {
                     method:
                         "POST",
@@ -208,7 +206,6 @@ export default function AddForumPostPage() {
                 <div className="grid gap-8 lg:grid-cols-2">
 
                     {/* Preview Card */}
-
                     <motion.div
                         whileHover={{
                             y: -6,
@@ -273,7 +270,6 @@ export default function AddForumPostPage() {
                     </motion.div>
 
                     {/* Form Card */}
-
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
 
                         <h2 className="text-3xl font-bold">
@@ -311,8 +307,10 @@ export default function AddForumPostPage() {
                                 className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
                             >
                                 <option value="">
-                                    Select Forum Cover Image
+                                    Select a Cover Image
                                 </option>
+
+                                
 
                                 {forumImages.map(
                                     (
@@ -333,6 +331,36 @@ export default function AddForumPostPage() {
                                     )
                                 )}
                             </select>
+
+                            <select
+                                {...register("category")}
+                                 className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
+                            >
+                                <option value="">
+                                    Select category
+                                </option>
+                                <option value="Nutrition">
+                                    Nutrition
+                                </option>
+
+                                <option value="Workout Tips">
+                                    Workout Tips
+                                </option>
+
+                                <option value="Recovery">
+                                    Recovery
+                                </option>
+
+                                <option value="Strength Training">
+                                    Strength Training
+                                </option>
+
+                                <option value="Weight Loss">
+                                    Weight Loss
+                                </option>
+                                
+                            </select>
+                            
 
                             <textarea
                                 rows={10}

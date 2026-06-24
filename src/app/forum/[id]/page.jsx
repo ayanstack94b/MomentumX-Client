@@ -35,7 +35,7 @@ const ForumDetailsPage = () => {
 
                 const res =
                     await fetch(
-                        `http://localhost:5000/forums/${id}`
+                        `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`
                     );
 
                 const data =
@@ -75,7 +75,7 @@ const ForumDetailsPage = () => {
 
                     const res =
                         await fetch(
-                            `http://localhost:5000/forums/user/${session.user.email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/forums/user/${session.user.email}`
                         );
 
                     const data =
@@ -108,7 +108,7 @@ const ForumDetailsPage = () => {
 
                     const res =
                         await fetch(
-                            `http://localhost:5000/comments/${id}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/comments/${id}`
                         );
 
                     const data =
@@ -144,7 +144,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/forums/react/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/forums/react/${id}`,
                 {
                     method:
                         "PATCH",
@@ -173,7 +173,7 @@ const ForumDetailsPage = () => {
 
             const updated =
                 await fetch(
-                    `http://localhost:5000/forums/${id}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`
                 );
 
             const data =
@@ -221,7 +221,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                "http://localhost:5000/comments",
+                `${process.env.NEXT_PUBLIC_API_URL}/comments`,
                 {
                     method: "POST",
 
@@ -283,7 +283,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/comments/${commentId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
                 {
                     method:
                         "DELETE",
@@ -314,7 +314,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/comments/${commentId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
                 {
                     method: "PATCH",
 
@@ -402,7 +402,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/comments/reply/${commentId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/${commentId}`,
                 {
                     method:
                         "PATCH",
@@ -474,7 +474,7 @@ const ForumDetailsPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/comments/reply/delete/${commentId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/delete/${commentId}`,
                 {
                     method:
                         "PATCH",
@@ -545,7 +545,7 @@ const ForumDetailsPage = () => {
 
             const res =
                 await fetch(
-                    `http://localhost:5000/comments/reply/edit/${commentId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/edit/${commentId}`,
                     {
                         method:
                             "PATCH",

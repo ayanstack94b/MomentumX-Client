@@ -24,12 +24,12 @@ const AdminOverviewPage = () => {
     const [recentPosts, setRecentPosts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    
+
     useEffect(() => {
 
         // Dashboard Stats
         fetch(
-            "http://localhost:5000/admin/stats"
+            `${process.env.NEXT_PUBLIC_API_URL}/admin/stats`
         )
             .then((res) =>
                 res.json()
@@ -40,7 +40,7 @@ const AdminOverviewPage = () => {
 
         // Recent Users
         fetch(
-            "http://localhost:5000/users"
+            `${process.env.NEXT_PUBLIC_API_URL}/users`
         )
             .then((res) =>
                 res.json()
@@ -57,7 +57,7 @@ const AdminOverviewPage = () => {
 
         // Recent Forum Posts
         fetch(
-            "http://localhost:5000/forums?page=1&limit=5"
+            `${process.env.NEXT_PUBLIC_API_URL}/forums?page=1&limit=5`
         )
             .then((res) =>
                 res.json()

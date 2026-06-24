@@ -28,7 +28,7 @@ const FavoriteClassesPage = () => {
                 try {
                     const res =
                         await fetch(
-                            `http://localhost:5000/favorites/${email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/favorites/${email}`
                         );
 
                     const data =
@@ -67,7 +67,7 @@ const FavoriteClassesPage = () => {
             try {
                 const res =
                     await fetch(
-                        `http://localhost:5000/favorites/${id}`,
+                        `${process.env.NEXT_PUBLIC_API_URL}/favorites/${id}`,
                         {
                             method:
                                 "DELETE",

@@ -30,7 +30,7 @@ const ManageUsersPage = () => {
 
             const res =
                 await fetch(
-                    "http://localhost:5000/users"
+                    `${process.env.NEXT_PUBLIC_API_URL}/users`
                 );
 
             const data =
@@ -74,7 +74,7 @@ const ManageUsersPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/users/remove-admin/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/remove-admin/${id}`,
                 {
                     method:
                         "PATCH",
@@ -121,7 +121,7 @@ const ManageUsersPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/users/admin/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/admin/${id}`,
                 {
                     method:
                         "PATCH",
@@ -168,7 +168,7 @@ const ManageUsersPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/users/block/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/block/${id}`,
                 {
                     method:
                         "PATCH",
@@ -202,7 +202,7 @@ const ManageUsersPage = () => {
 
         const res =
             await fetch(
-                `http://localhost:5000/users/unblock/${id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/unblock/${id}`,
                 {
                     method:
                         "PATCH",

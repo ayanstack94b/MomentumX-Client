@@ -150,7 +150,7 @@ export default function AddClassPage() {
                 try {
                     const res =
                         await fetch(
-                            `http://localhost:5000/users/${session.user.email}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
                         );
 
                     if (!res.ok) {
@@ -222,7 +222,7 @@ export default function AddClassPage() {
 
 
             const res = await fetch(
-                "http://localhost:5000/classes",
+                `${process.env.NEXT_PUBLIC_API_URL}/classes`,
                 {
                     method: "POST",
                     headers: {
