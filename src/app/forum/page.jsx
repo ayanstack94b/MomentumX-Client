@@ -10,7 +10,10 @@ const ForumPage = () => {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedPosts, setExpandedPosts] =  useState({});
+    const [expandedPosts, setExpandedPosts] = useState({});
+    const [totalPages, setTotalPages] = useState(1);
+    const [page, setPage] = useState(1);
+    const [sortOrder, setSortOrder] = useState("latest");
 
     useEffect(() => {
 
@@ -21,13 +24,19 @@ const ForumPage = () => {
 
                     const res =
                         await fetch(
-                            "http://localhost:5000/forums"
+                            `http://localhost:5000/forums?page=${page}&limit=6`
                         );
 
                     const data =
                         await res.json();
 
-                    setPosts(data);
+                    setPosts(data.forums);
+
+                    setTotalPages(
+                        Math.ceil(
+                            data.total / 6
+                        )
+                    );
 
                 } catch (error) {
 
@@ -42,11 +51,30 @@ const ForumPage = () => {
 
         fetchPosts();
 
-    }, []);
+    }, [page]);
 
     if (loading) {
         return <LoadingSpinner />;
     }
+
+    const sortedPosts =  [...posts].sort(
+            (a, b) =>
+                sortOrder ===
+                    "latest"
+                    ? new Date(
+                        b.createdAt
+                    ) -
+                    new Date(
+                        a.createdAt
+                    )
+                    : new Date(
+                        a.createdAt
+                    ) -
+                    new Date(
+                        b.createdAt
+                    )
+        );
+
 
     return (
         <section className="relative overflow-hidden py-20">
@@ -138,67 +166,137 @@ const ForumPage = () => {
                     </div>
 
                 ) : (
+                    <>
+                        <div className="mb-8 flex justify-end">
 
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-
-                        {posts.map((post) => (
-
-                            <motion.div
-                                key={post._id}
-                                whileHover={{
-                                    y: -8,
-                                }}
-                                className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
+                            <select
+                                value={sortOrder}
+                                onChange={(e) =>
+                                    setSortOrder(
+                                        e.target.value
+                                    )
+                                }
+                                className="select border border-white/10 bg-slate-800"
                             >
+                                <option value="latest">
+                                    Latest Posts
+                                </option>
 
-                                <div className="relative h-56">
+                                <option value="oldest">
+                                    Oldest Posts
+                                </option>
+                            </select>
 
-                                    
-                                       <Image
-                                        src={
-                                            post.image?.startsWith("http")
-                                                ? post.image
-                                                : "/images/forum-placeholder.jpg"
-                                        }
-                                        alt={post.title}
-                                        fill
-                                        sizes="100vw"
-                                        className="object-cover"
-                                    />
+                        </div>
 
-                                </div>
 
-                                <div className="p-6">
+                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 
-                                    <h2 className="line-clamp-2 text-2xl font-bold">
-                                        {post.title}
-                                    </h2>
+                                {sortedPosts.map((post) => (
 
-                                    <p className="mt-2 text-sm text-red-400">
-                                        By {post.authorName}
-                                    </p>
+                                <motion.div
+                                    key={post._id}
+                                    whileHover={{
+                                        y: -8,
+                                    }}
+                                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
+                                >
 
-                                    <p className="line-clamp-4 text-gray-400">
-                                        {post.description}
-                                    </p>
-                                  
+                                    <div className="relative h-56">
 
-                                    <Link
-                                        href={`/forum/${post._id}`}
-                                        className="btn mt-6 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
-                                    >
-                                        Read More
-                                    </Link>
 
-                                </div>
+                                        <Image
+                                            src={
+                                                post.image?.startsWith("http")
+                                                    ? post.image
+                                                    : "/images/forum-placeholder.jpg"
+                                            }
+                                            alt={post.title}
+                                            fill
+                                            sizes="100vw"
+                                            className="object-cover"
+                                        />
 
-                            </motion.div>
+                                    </div>
 
-                        ))}
+                                    <div className="p-6">
 
-                    </div>
+                                        <h2 className="line-clamp-2 text-2xl font-bold">
+                                            {post.title}
+                                        </h2>
 
+                                        <p className="mt-2 text-sm text-red-400">
+                                            By {post.authorName}
+                                        </p>
+
+                                        <p className="line-clamp-4 text-gray-400">
+                                            {post.description}
+                                        </p>
+
+
+                                        <Link
+                                            href={`/forum/${post._id}`}
+                                            className="btn mt-6 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                                        >
+                                            Read More
+                                        </Link>
+
+                                    </div>
+
+                                </motion.div>
+
+                            ))}
+
+                        </div>
+                    </>
                 )}
+
+                <div className="mt-12 flex justify-center gap-2">
+
+                    <button
+                        onClick={() =>
+                            setPage(page - 1)
+                        }
+                        disabled={page === 1}
+                        className="btn"
+                    >
+                        Prev
+                    </button>
+
+                    {[...Array(totalPages)].map(
+                        (_, index) => (
+                            <button
+                                key={index}
+                                onClick={() =>
+                                    setPage(
+                                        index + 1
+                                    )
+                                }
+                                className={`btn ${page ===
+                                    index + 1
+                                    ? "bg-red-600 text-white"
+                                    : ""
+                                    }`}
+                            >
+                                {index + 1}
+                            </button>
+                        )
+                    )}
+
+                    <button
+                        onClick={() =>
+                            setPage(page + 1)
+                        }
+                        disabled={
+                            page ===
+                            totalPages
+                        }
+                        className="btn"
+                    >
+                        Next
+                    </button>
+
+                </div>
 
             </div>
 
