@@ -7,17 +7,19 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function PrivateRoute({ children }) {
     const { data: session, isPending } = authClient.useSession();
-    console.log("SESSION:", session);
-    console.log("PENDING:", isPending);
+   
     const router = useRouter();
 
     useEffect(() => {
-        if (!isPending && !session) {
-            // router.push("/login");
-            console.log("PUSHING TO DASHBOARD");
-            window.location.href = "/dashboard";
-        }
-    }, [session, isPending, router]);
+        // if (!isPending && !session) {
+        //     // router.push("/login");
+        //     // console.log("PUSHING TO DASHBOARD");
+        //     // window.location.href = "/dashboard";
+        // }
+
+        console.log("SESSION:", session);
+        console.log("PENDING:", isPending);
+    }, [session, isPending]);
 
     if (isPending) {
         return (
@@ -27,7 +29,14 @@ export default function PrivateRoute({ children }) {
         );
     }
 
-    if (!session) return null;
+    // if (!session) return null;
+    if (!session) {
+        return (
+            <div className="p-10 text-center">
+                No Session Found
+            </div>
+        );
+    }
 
     return children;
 }
