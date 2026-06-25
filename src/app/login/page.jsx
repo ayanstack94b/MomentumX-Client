@@ -47,6 +47,7 @@ const LoginPage = () => {
             });
             console.log("LOGIN RESULT:", userData);
             router.push("/dashboard");
+
         } catch (error) {
             Swal.fire({
                 icon: "error",
@@ -181,7 +182,7 @@ const LoginPage = () => {
                             <label className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                                 <input
                                     type="checkbox"
-                                    {...register("remember")}
+                                    {...register("rememberMe")}
                                     className="h-4 w-4 accent-red-500"
                                 />
                                 Remember Me

@@ -11,11 +11,11 @@ export default function PrivateRoute({ children }) {
     const router = useRouter();
 
     useEffect(() => {
-        // if (!isPending && !session) {
-        //     // router.push("/login");
-        //     // console.log("PUSHING TO DASHBOARD");
-        //     // window.location.href = "/dashboard";
-        // }
+        if (!isPending && !session) {
+            console.log("PUSHING TO DASHBOARD");
+            // window.location.href = "/dashboard";
+            router.push("/login");
+        }
 
         console.log("SESSION:", session);
         console.log("PENDING:", isPending);
