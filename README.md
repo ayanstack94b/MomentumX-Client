@@ -1,36 +1,170 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🏋️ MomentumX - Fitness & Gym Management Platform
 
-## Getting Started
+MomentumX is a full-stack fitness and gym management platform that connects members, trainers, and administrators through a secure role-based system. Users can discover fitness classes, book sessions, participate in community discussions, and manage their fitness journey, while trainers and administrators have dedicated dashboards to manage platform activities.
 
-First, run the development server:
+---
+
+## 🌐 Live Website
+
+**Live Site:** https://momentum-x-client.vercel.app/
+
+---
+
+## 👤 Admin Credentials (For Evaluation)
+
+**Email:** [ayondevs.94b@gmail.com](mailto:ayondevs.94b@gmail.com)
+
+**Password:** Password@123#
+
+---
+
+## 🔗 GitHub Repositories
+
+**Client:** https://github.com/yourusername/momentumx-client
+
+**Server:** https://github.com/yourusername/momentumx-server
+
+---
+
+# ✨ Key Features
+
+* 🔐 Secure authentication with Better Auth and JWT
+* 👥 Role-based dashboards for Members, Trainers, and Admins
+* 🏋️ Browse, search, and filter fitness classes
+* 💳 Class booking workflow with payment simulation
+* ❤️ Favorite classes management
+* 📝 Trainer application with Admin approval/rejection workflow
+* 💬 Community forum with posts, likes, dislikes, and comments
+* 👨‍💼 Admin dashboard for managing users, trainers, classes, and forum posts
+* 🚫 Soft block system restricting blocked users from performing protected actions
+* 📱 Fully responsive design for Mobile, Tablet, and Desktop
+* ⚡ Smooth UI animations powered by Framer Motion
+* 🎨 Modern glassmorphism-inspired interface with Tailwind CSS
+
+---
+
+# 🛠️ Tech Stack
+
+### Frontend
+
+* Next.js
+* React
+* Tailwind CSS
+* DaisyUI
+* Framer Motion
+* Axios
+* React Hook Form
+* TanStack Query
+* SweetAlert2
+
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Better Auth
+* JWT
+* CORS
+* dotenv
+
+---
+
+# 🚀 Core Functionalities
+
+### Member
+
+* Register & Login
+* Browse Fitness Classes
+* Book Classes
+* Save Favorite Classes
+* Apply as Trainer
+* Participate in Community Forum
+* Manage Profile
+
+### Trainer
+
+* Create & Manage Classes
+* View Enrolled Students
+* Create Community Posts
+* Manage Own Posts
+
+### Admin
+
+* Manage Users
+* Block / Unblock Users
+* Promote Users to Admin
+* Approve / Reject Trainer Applications
+* Manage Trainers
+* Approve / Reject / Delete Classes
+* Manage Community Forum Posts
+
+---
+
+# 🔒 Security Features
+
+* JWT Protected APIs
+* Better Auth Authentication
+* Role-Based Authorization
+* Protected Routes
+* Environment Variable Configuration
+* MongoDB Credential Protection
+* Soft Block Validation
+
+---
+
+# 📦 Installation
+
+### Clone the repositories
+
+```bash
+git clone <client-repository>
+git clone <server-repository>
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the client
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Start the server
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# ⚙️ Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+### Client
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_IMGBB_API_KEY=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Server
 
-## Deploy on Vercel
+```env
+PORT=5000
+DB_USER=
+DB_PASS=
+JWT_SECRET=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 👨‍💻 Developed By
+
+**Ayon Banerjee**
+
+If you find this project helpful, feel free to ⭐ the repositories.
