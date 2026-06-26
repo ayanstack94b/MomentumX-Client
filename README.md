@@ -12,7 +12,7 @@ MomentumX is a full-stack fitness and gym management platform that connects memb
 
 ## 👤 Admin Credentials (For Evaluation)
 
-**Email:** [ayondevs.94b@gmail.com](mailto:ayondevs.94b@gmail.com)
+**Email:** (mailto:admin@momentumx.com)
 
 **Password:** Password@123#
 
@@ -20,9 +20,9 @@ MomentumX is a full-stack fitness and gym management platform that connects memb
 
 ## 🔗 GitHub Repositories
 
-**Client:** https://github.com/yourusername/momentumx-client
+**Client:** https://github.com/ayanstack94b/MomentumX-Client
 
-**Server:** https://github.com/yourusername/momentumx-server
+**Server:** https://github.com/ayanstack94b/MomentumX-server
 
 ---
 
@@ -117,8 +117,8 @@ MomentumX is a full-stack fitness and gym management platform that connects memb
 ### Clone the repositories
 
 ```bash
-git clone <client-repository>
-git clone <server-repository>
+git clone <https://github.com/ayanstack94b/MomentumX-Client.git>
+git clone <https://github.com/ayanstack94b/MomentumX-server.git>
 ```
 
 ### Install dependencies
