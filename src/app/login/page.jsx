@@ -10,14 +10,14 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
-
-
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const router = useRouter();
-
+    const { login } = useAuth();
 
     const onSubmit = async (data) => {
         try {
@@ -38,22 +38,63 @@ const LoginPage = () => {
                 return;
             }
 
+            console.log("LOGIN RESULT:", userData);
+
+            // Generate JWT from backend
+            const jwtResponse = await axiosInstance.post("/jwt", {
+                email: userData.user.email,
+            });
+
+            // Save JWT
+            localStorage.setItem(
+                "momentumx-token",
+                jwtResponse.data.token
+            );
+
+            // Get full user from MongoDB (includes role)
+            const { data: profile } = await axiosInstance.get(
+                `/users/${userData.user.email}`
+            );
+
+            // Save full user in AuthContext
+            login(profile);
+
             await Swal.fire({
                 icon: "success",
                 title: "Login Successful",
-                text: `Welcome back ${userData.user.name}`,
+                text: `Welcome back ${profile.name}`,
                 timer: 1500,
                 showConfirmButton: false,
             });
-            console.log("LOGIN RESULT:", userData);
-            router.push("/dashboard");
+
+            if (profile.role === "admin") {
+                router.push("/dashboard/admin-overview");
+            } 
+            else {
+                router.push("/dashboard");
+            }
 
         } catch (error) {
+
+            let message = "Something went wrong. Please try again.";
+
+            if (error.response?.status === 404) {
+                message = "No account found with this email.";
+            } else if (error.response?.status === 401) {
+                message = "Incorrect email or password.";
+            } else if (
+                error.message?.toLowerCase().includes("credential") ||
+                error.message?.toLowerCase().includes("invalid")
+            ) {
+                message = "Incorrect email or password.";
+            }
+
             Swal.fire({
                 icon: "error",
-                title: "Something went wrong",
-                text: error.message,
+                title: "Login Failed",
+                text: message,
             });
+
         }
     };
 

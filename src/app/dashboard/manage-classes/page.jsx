@@ -4,62 +4,46 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { motion } from "framer-motion";
+import axiosInstance from "@/lib/axios";
+import { useAuth } from "@/context/AuthContext";
 
 
 const ManageClassesPage = () => {
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState("latest");
-    const [applications, setApplications] = useState([]);
+    const { user } = useAuth();
 
 
     const fetchClasses = async () => {
-
         try {
-
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/admin/classes`
-                );
-
-            const data =
-                await res.json();
+            const { data: classesData } =
+                await axiosInstance.get("/admin/classes");
 
             const sortedClasses =
-                data.sort(
+                classesData.sort(
                     (a, b) =>
-                        new Date(
-                            b.createdAt
-                        ) -
-                        new Date(
-                            a.createdAt
-                        )
+                        new Date(b.createdAt) -
+                        new Date(a.createdAt)
                 );
 
-            setClasses(
-                sortedClasses
-            );
-
+            setClasses(sortedClasses);
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setLoading(false);
-
         }
-
     };
 
 
     useEffect(() => {
+        if (!user || user.role !== "admin") return;
         const loadData = async () => {
             await fetchClasses();
         };
 
         loadData();
-    }, []);
+    }, [user]);
 
     const updateStatus = async (id, status) => {
         try {
@@ -67,28 +51,15 @@ const ManageClassesPage = () => {
             console.log("ID:", id);
             console.log("STATUS:", status);
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
+            const { data: updateResult } = await axiosInstance.patch(
+                `/classes/${id}`,
                 {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        status,
-                    }),
+                    status,
                 }
             );
+            console.log("RESULT:", updateResult);
 
-            const result =
-                await res.json();
-
-            console.log("RESULT:", result);
-
-            if (
-                result.modifiedCount > 0
-            ) {
+            if (updateResult.modifiedCount > 0) {
                 Swal.fire({
                     icon: "success",
                     title: "Updated",
@@ -128,55 +99,28 @@ const ManageClassesPage = () => {
             return;
 
         try {
-
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
-                    {
-                        method:
-                            "DELETE",
-                    }
-                );
-
-            const data = await res.json();
-
-            console.log(data);
-
-
-            if (
-                data.deletedCount > 0
-            ) {
-
-                setApplications(
-                    (prev) => prev.filter((item) => item._id !== id)
-                );
-                console.log(item);
-
-                Swal.fire({
-                    icon:
-                        "success",
-                    title:
-                        "Deleted",
-                    text:
-                        "Application removed successfully.",
-                    timer:
-                        1500,
-                    showConfirmButton:
-                        false,
-                });
-
-            }
-
-        } catch (
-        error
-        ) {
-
-            console.error(
-                error
+            const { data: deleteResult } = await axiosInstance.delete(
+                `/admin/classes/${id}`
             );
 
-        }
+            console.log(deleteResult);
 
+            if (deleteResult.deletedCount > 0) {
+                setClasses((prev) =>
+                    prev.filter((item) => item._id !== id)
+                );
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Deleted",
+                    text: "Class removed successfully.",
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            }
+        } catch (
+        error
+        ) { console.error(error); }
     };
 
     if (loading)

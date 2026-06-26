@@ -3,20 +3,21 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 
 export default function EditProfilePage() {
 
-    const { data: session, isPending } = authClient.useSession();
+    const { user, loading } = useAuth();
 
     const [profile, setProfile] = useState(null);
     const [loadingProfile, setLoadingProfile] = useState(true);
-    const email = session?.user?.email?.toLowerCase();
+    const email = user?.email?.toLowerCase();
     const router = useRouter();
 
     const onSubmit = async (data) => {
@@ -31,25 +32,16 @@ export default function EditProfilePage() {
             return;
         }
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/${profile._id}`,
+            const { data: result } = await axiosInstance.patch(
+                `/users/${profile._id}`,
                 {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name: data.name,
-                        image: data.image,
-                        phone: data.phone,
-                        location: data.location,
-                        bio: data.bio,
-                    }),
+                    name: data.name,
+                    image: data.image,
+                    phone: data.phone,
+                    location: data.location,
+                    bio: data.bio,
                 }
             );
-
-            const result = await response.json();
-
             if (result.modifiedCount > 0) {
                 await Swal.fire({
                     icon: "success",
@@ -86,11 +78,9 @@ export default function EditProfilePage() {
 
         const fetchProfile = async () => {
             try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/users/${email}`
+                const { data } = await axiosInstance.get(
+                    `/users/${email}`
                 );
-
-                const data = await res.json();
 
                 setProfile(data);
                 reset(data);
@@ -105,7 +95,7 @@ export default function EditProfilePage() {
     }, [email, reset]);
 
 
-    if (isPending || loadingProfile || !profile) {
+    if (loading || loadingProfile || !profile) {
         return <LoadingSpinner />;
     }
 

@@ -4,34 +4,27 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
+import axiosInstance from "@/lib/axios";
+import { useAuth } from "@/context/AuthContext";
 
 const AllTrainerApplicationsPage = () => {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
     const [search, setSearch] = useState("");
-
+    const { user } = useAuth();
     const updateApplicationStatus = async (id, status, feedback = "") => {
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${id}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
+            const { data: updateResult } =
+                await axiosInstance.patch(
+                    `/trainer-applications/${id}`,
+                    {
                         status,
                         feedback,
-                    }),
-                }
-            );
+                    }
+                );
 
-            const data = await res.json();
-
-
-            if (data.success) {
+            if (updateResult.success) {
                 Swal.fire({
                     icon: "success",
                     title: `Application ${status}`,
@@ -39,15 +32,15 @@ const AllTrainerApplicationsPage = () => {
                     showConfirmButton: false,
                 });
 
-                setApplications(
-                    applications.map(
-                        (application) =>
-                            application._id === id
-                                ? {
-                                    ...application,
-                                    status,
-                                }
-                                : application
+                setApplications((prev) =>
+                    prev.map((application) =>
+                        application._id === id
+                            ? {
+                                ...application,
+                                status,
+                                feedback,
+                            }
+                            : application
                     )
                 );
             }
@@ -64,29 +57,25 @@ const AllTrainerApplicationsPage = () => {
 
 
     useEffect(() => {
-        const fetchApplications =
-            async () => {
-                try {
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`
-                        );
+        if (!user || user.role !== "admin") return;
 
-                    const data =
-                        await res.json();
-
-                    setApplications(
-                        data
+        const fetchApplications = async () => {
+            try {
+                const { data: applicationsData } =
+                    await axiosInstance.get(
+                        "/trainer-applications"
                     );
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    setLoading(false);
-                }
-            };
+
+                setApplications(applicationsData);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         fetchApplications();
-    }, []);
+    }, [user]);
 
     if (loading) {
         return <LoadingSpinner />;
@@ -152,8 +141,7 @@ const AllTrainerApplicationsPage = () => {
     // Handle delete 
     const handleDeleteApplication = async (id) => {
 
-        const result =
-            await Swal.fire({
+        const result = await Swal.fire({
                 title:
                     "Delete Application?",
                 text:
@@ -177,62 +165,41 @@ const AllTrainerApplicationsPage = () => {
         }
 
         try {
-
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications/${id}`,
-                    {
-                        method:
-                            "DELETE",
-                    }
+            const { data: deleteResult } =
+                await axiosInstance.delete(
+                    `/trainer-applications/${id}`
                 );
 
-            const data =
-                await res.json();
+            if (deleteResult.deletedCount > 0) {
 
-            if (
-                data.deletedCount >
-                0
-            ) {
-
-                setApplications(
-                    (
-                        prev
-                    ) =>
-                        prev.filter(
-                            (
-                                item
-                            ) =>
-                                item._id !==
-                                id
-                        )
+                setApplications((prev) =>
+                    prev.filter(
+                        (item) => item._id !== id
+                    )
                 );
 
                 Swal.fire({
-                    icon:
-                        "success",
-                    title:
-                        "Application Deleted",
-                    timer:
-                        1500,
-                    showConfirmButton:
-                        false,
+                    icon: "success",
+                    title: "Application Deleted",
+                    timer: 1500,
+                    showConfirmButton: false,
                 });
-
             }
 
-        } catch (
-        error
-        ) {
+        } catch (error) {
 
-            console.error(
-                error
-            );
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Delete Failed",
+                text:
+                    error.response?.data?.message ||
+                    "Something went wrong.",
+            });
 
         }
-
-    };
-
+    }
 
     return (
         <div className="p-5">

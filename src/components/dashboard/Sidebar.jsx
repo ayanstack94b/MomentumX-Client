@@ -9,38 +9,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { GrStatusUnknown } from "react-icons/gr";
-
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [profile, setProfile] = useState(null);
-    const { data: session } = authClient.useSession();
+    const { user, loading } = useAuth();
 
     useEffect(() => {
-        // if (!email) return;
-        if (!session?.user?.email)
+
+        if (!user?.email)
             return;
 
         const fetchProfile = async () => {
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
-                );
-
-            if (!res.ok) {
-                return;
-            }
-
-            const data =
-                await res.json();
+            const { data } = await axiosInstance.get(
+                `/users/${user.email}`
+            );
 
             setProfile(data);
         };
 
         fetchProfile();
-    }, [session]);
+    }, [user?.email]);
 
 
     const handleLogout = async () => {
@@ -158,6 +151,11 @@ export default function Sidebar() {
                 icon: <FaChartLine />,
             },
             {
+                name: "Manage Trainers",
+                href: "/dashboard/manage-trainers",
+                icon: <FaChartLine />,
+            },
+            {
                 name: "Manage Classes",
                 href: "/dashboard/manage-classes",
                 icon: <FaClipboardList />,
@@ -213,7 +211,7 @@ export default function Sidebar() {
                     ))}
                 </nav>
 
-                <div className="mt-auto p-4">
+                {/* <div className="mt-auto p-4">
                     <button
                         onClick={handleLogout}
                         className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition-all duration-300 hover:bg-red-700"
@@ -221,7 +219,7 @@ export default function Sidebar() {
                         <FaSignOutAlt />
                         Logout
                     </button>
-                </div>
+                </div> */}
             </aside>
             {/* Mobile Sidebar */}
             <button

@@ -2,6 +2,7 @@ import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import AuthProvider from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,9 +31,11 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} ${oswald.variable} h-full scroll-smooth`}
     >
       <body className="min-h-screen flex flex-col bg-[#0B0B0D] text-white">
-        <Navbar></Navbar>
-        <main className="flex-1 pt-24 pb-5">{children}</main>
-        <Footer></Footer>
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1 pt-24 pb-5">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import axiosInstance from "@/lib/axios";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
@@ -82,17 +83,9 @@ const ManageForumPostsPage = () => {
             return;
         }
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`,
-                {
-                    method:
-                        "DELETE",
-                }
-            );
-
-        const data =
-            await res.json();
+        const { data } = await axiosInstance.delete(
+            `/forums/${id}`
+        );
 
         if (
             data.deletedCount >

@@ -5,48 +5,48 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const latestPostsData = [
-    {
-        id: "post-001",
-        title: "5 Common Mistakes That Slow Muscle Growth",
-        author: "Alex Carter",
-        category: "Nutrition",
-        description:
-            "Discover the most common mistakes people make while trying to build muscle and how to avoid them.",
-        image:
-            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200",
-    },
-    {
-        id: "post-002",
-        title: "Why Recovery Is More Important Than Training",
-        author: "Sophia Reed",
-        category: "Recovery",
-        description:
-            "Learn how sleep, nutrition, and recovery can dramatically improve your fitness performance.",
-        image:
-            "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200",
-    },
-    {
-        id: "post-003",
-        title: "Beginner's Guide To Strength Training",
-        author: "Michael Stone",
-        category: "Strength",
-        description:
-            "Everything you need to know before starting your first strength training journey.",
-        image:
-            "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200",
-    },
-    {
-        id: "post-004",
-        title: "How HIIT Improves Fat Loss Efficiency",
-        author: "Emma Wilson",
-        category: "HIIT",
-        description:
-            "Understand why high intensity interval training remains one of the most effective fitness methods.",
-        image:
-            "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200",
-    },
-];
+// const latestPostsData = [
+//     {
+//         id: "post-001",
+//         title: "5 Common Mistakes That Slow Muscle Growth",
+//         author: "Alex Carter",
+//         category: "Nutrition",
+//         description:
+//             "Discover the most common mistakes people make while trying to build muscle and how to avoid them.",
+//         image:
+//             "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200",
+//     },
+//     {
+//         id: "post-002",
+//         title: "Why Recovery Is More Important Than Training",
+//         author: "Sophia Reed",
+//         category: "Recovery",
+//         description:
+//             "Learn how sleep, nutrition, and recovery can dramatically improve your fitness performance.",
+//         image:
+//             "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200",
+//     },
+//     {
+//         id: "post-003",
+//         title: "Beginner's Guide To Strength Training",
+//         author: "Michael Stone",
+//         category: "Strength",
+//         description:
+//             "Everything you need to know before starting your first strength training journey.",
+//         image:
+//             "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200",
+//     },
+//     {
+//         id: "post-004",
+//         title: "How HIIT Improves Fat Loss Efficiency",
+//         author: "Emma Wilson",
+//         category: "HIIT",
+//         description:
+//             "Understand why high intensity interval training remains one of the most effective fitness methods.",
+//         image:
+//             "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200",
+//     },
+// ];
 
 const LatestPosts = () => {
 

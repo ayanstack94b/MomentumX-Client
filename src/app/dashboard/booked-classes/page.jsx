@@ -5,15 +5,17 @@ import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const BookedClassesPage = () => {
-    const { data: session, isPending } = authClient.useSession();
-    const email = session?.user?.email;
+    const { user, loading: authLoading } = useAuth();
+    const email = user?.email;
 
-    
+
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
 
 
     useEffect(() => {
@@ -22,18 +24,15 @@ const BookedClassesPage = () => {
         const fetchBookings =
             async () => {
                 try {
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/${email}`
-                        );
-
-                    const data = await res.json();
+                    const { data } = await axiosInstance.get(
+                        `/bookings/${email}`
+                    );
 
                     setBookings(data);
                 } catch (error) {
                     console.error(error);
-                }
-                finally {
+                    setBookings([]);
+                } finally {
                     setLoading(false);
                 }
             };

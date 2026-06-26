@@ -2,22 +2,14 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import CountUp from "react-countup";
-import {
-    FaDumbbell,
-    FaHeart,
-    FaFire,
-    FaTrophy,
-    FaUsers,
-    FaComments,
-    FaChartLine,
-} from "react-icons/fa";
+import axiosInstance from "@/lib/axios";
+import { FaDumbbell, FaUsers, FaComments, FaChartLine } from "react-icons/fa";
 
 
 export default function DashboardPage() {
 
     const [users, setUsers] = useState([]);
     const [classes, setClasses] = useState([]);
-    const [applications, setApplications] = useState([]);
     const [forums, setForums] = useState({ total: 0, forums: [] });
 
 
@@ -25,68 +17,22 @@ export default function DashboardPage() {
     // fetching all needed data
     useEffect(() => {
 
-        const fetchDashboardData =
-            async () => {
+        const fetchDashboardData = async () => {
+            try {
+                const [forumsRes, classesRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/forums`),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`),
+                ]);
 
-                try {
+                const forumsData = await forumsRes.json();
+                const classesData = await classesRes.json();
 
-                    const [
-                        usersRes,
-                        forumsRes,
-                        classesRes,
-                        applicationsRes,
-                    ] = await Promise.all([
-                        fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/users`
-                        ),
-                        fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/forums`
-                        ),
-                        fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/classes`
-                        ),
-                        fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`
-                        ),
-                    ]);
-
-                    const usersData =
-                        await usersRes.json();
-
-                    const forumsData =
-                        await forumsRes.json();
-
-                    const classesData =
-                        await classesRes.json();
-
-                    const applicationsData =
-                        await applicationsRes.json();
-
-                    setUsers(
-                        usersData
-                    );
-
-                    setForums(
-                        forumsData
-                    );
-
-                    setClasses(
-                        classesData.classes
-                    );
-
-                    setApplications(
-                        applicationsData
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-                }
-
-            };
+                setForums(forumsData);
+                setClasses(classesData.classes);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
         fetchDashboardData();
 
@@ -101,9 +47,9 @@ export default function DashboardPage() {
 
 
     // Real stats
-    const totalUsers = users.length;
+    const totalUsers = 0;
 
-    const totalPosts = forums?.length || 0;
+    const totalPosts = forums.total || forums.forums?.length || 0;
 
     const totalClasses = classes.length;
 
@@ -343,10 +289,10 @@ export default function DashboardPage() {
                 transition={{
                     delay: 0.5,
                 }}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-red-500/20"
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/10 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-red-500/20"
             >
 
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-br from-red-500/5 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
 
                 <div className="relative z-10">
 

@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import axiosInstance from "@/lib/axios";
 import { motion } from "framer-motion";
-
-import {
-    FaUsers,
-    FaUserTie,
-    FaDumbbell,
-    FaComments,
-} from "react-icons/fa";
+import { useAuth } from "@/context/AuthContext";
+import {FaUsers,FaUserTie,FaDumbbell,FaComments} from "react-icons/fa";
+import AdminRoute from "@/components/shared/AdminRoute";
 
 const AdminOverviewPage = () => {
 
@@ -23,64 +19,43 @@ const AdminOverviewPage = () => {
     const [recentUsers, setRecentUsers] = useState([]);
     const [recentPosts, setRecentPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const { user } = useAuth();
 
     useEffect(() => {
+        if (!user || user.role !== "admin") return;
+        const fetchData = async () => {
+            try {
+                const [
+                    { data: statsData },
+                    { data: usersData },
+                    forumsRes,
+                ] = await Promise.all([
+                    axiosInstance.get("/admin/stats"),
+                    axiosInstance.get("/users"),
+                    fetch(
+                        `${process.env.NEXT_PUBLIC_API_URL}/forums?page=1&limit=5`
+                    ).then((res) => res.json()),
+                ]);
 
-        // Dashboard Stats
-        fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/admin/stats`
-        )
-            .then((res) =>
-                res.json()
-            )
-            .then((data) => {
-                setStats(data);
-            });
-
-        // Recent Users
-        fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users`
-        )
-            .then((res) =>
-                res.json()
-            )
-            .then((data) => {
+                setStats(statsData);
 
                 setRecentUsers(
-                    data
-                        .slice(-5)
-                        .reverse()
+                    usersData.slice(-5).reverse()
                 );
-
-            });
-
-        // Recent Forum Posts
-        fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/forums?page=1&limit=5`
-        )
-            .then((res) =>
-                res.json()
-            )
-            .then((data) => {
 
                 setRecentPosts(
-                    data.forums
+                    forumsRes.forums
                 );
-
-                setLoading(false);
-
-            })
-            .catch((error) => {
-
+            } catch (error) {
                 console.error(error);
-
+            } finally {
                 setLoading(false);
+            }
+        };
+        
 
-            });
-
-    }, []);
-
+        fetchData();
+    }, [user]);
     const cards = [
 
         {
@@ -119,17 +94,18 @@ const AdminOverviewPage = () => {
 
     return (
 
-        <motion.div
-            initial={{
-                opacity: 0,
-                y: 20,
-            }}
-            animate={{
-                opacity: 1,
-                y: 0,
-            }}
-            className="p-5"
-        >
+        <AdminRoute>
+            <motion.div
+                initial={{
+                    opacity: 0,
+                    y: 20,
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0,
+                }}
+                className="p-5"
+            >
 
             {/* Header */}
 
@@ -335,7 +311,8 @@ const AdminOverviewPage = () => {
 
             </div>
 
-        </motion.div>
+            </motion.div>
+        </AdminRoute>
 
     );
 

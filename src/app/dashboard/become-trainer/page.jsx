@@ -3,39 +3,35 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
-import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import ApplicationStatusCard from "@/components/dashboard/ApplicationStatusCard";
 import Link from "next/link";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 
 
 const BecomeATrainerPage = () => {
-    const { data: session } = authClient.useSession();
-    
+    const { user, loading: authLoading } = useAuth();
+
     const [loading, setLoading] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const [userData, setUserData] = useState(null);
     const [application, setApplication] = useState(null);
     const router = useRouter()
 
     useEffect(() => {
 
-        if (!session?.user?.email)
+        if (!user?.email)
             return;
 
         const fetchUser =
             async () => {
 
-                const res =
-                    await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
-                    );
-
-                const data =
-                    await res.json();
+                const { data } = await axiosInstance.get(
+                    `/users/${user.email}`
+                );
 
                 setUserData(data);
 
@@ -43,7 +39,7 @@ const BecomeATrainerPage = () => {
 
         fetchUser();
 
-    }, [session]);
+    }, [user.email]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -52,13 +48,11 @@ const BecomeATrainerPage = () => {
 
         const form = e.target;
 
-        const userRes = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
+        const { data: currentUser } = await axiosInstance.get(
+            `/users/${user.email}`
         );
 
-        const user = await userRes.json();
-
-        if (user.role === "admin") {
+        if (currentUser.role === "admin") {
             return Swal.fire({
                 icon: "error",
                 title: "Access Denied",
@@ -66,7 +60,7 @@ const BecomeATrainerPage = () => {
             });
         }
 
-        if (user.status === "blocked") {
+        if (currentUser.status === "blocked") {
             return Swal.fire({
                 icon: "error",
                 title: "Account Blocked",
@@ -76,12 +70,9 @@ const BecomeATrainerPage = () => {
         }
 
         const applicationData = {
-            name:
-                session?.user?.name,
-            email:
-                session?.user?.email,
-            image:
-                session?.user?.image,
+            name: currentUser.name,
+            email: currentUser.email,
+            image: currentUser.image,
 
             experience:
                 form.experience.value,
@@ -98,37 +89,32 @@ const BecomeATrainerPage = () => {
         };
 
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/trainer-applications`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify(
-                        applicationData
-                    ),
-                }
-            );
+            const { data: applicationResult } =
+                await axiosInstance.post(
+                    "/trainer-applications",
+                    applicationData
+                );
 
-            const data = await res.json();
-
-            if (data.insertedId) {
+            if (applicationResult.insertedId) {
                 await Swal.fire({
                     icon: "success",
                     title: "Application Submitted",
                     text: "Your trainer application is pending review.",
                 });
-                router.push("/dashboard/trainer-status");
+
+                router.push(
+                    "/dashboard/trainer-status"
+                );
             }
         } catch (error) {
             console.error(error);
 
             Swal.fire({
                 icon: "error",
-                title:
-                    "Submission Failed",
+                title: "Submission Failed",
+                text:
+                    error.response?.data?.message ||
+                    "Something went wrong.",
             });
         } finally {
             setLoading(false);
@@ -139,7 +125,7 @@ const BecomeATrainerPage = () => {
     if (loading) {
         return <LoadingSpinner />;
     }
-   
+
     if (userData?.role === "admin") {
         return (
             <div className="flex min-h-[70vh] items-center justify-center p-5">
@@ -239,7 +225,7 @@ const BecomeATrainerPage = () => {
                     review.
                 </p>
 
-                
+
 
                 <form
                     onSubmit={

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const FeaturedClasses = () => {
 
-    const [featuredClasses, setFeaturedClasses] =  useState([]);
+    const [featuredClasses, setFeaturedClasses] = useState([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -26,19 +26,15 @@ const FeaturedClasses = () => {
                     const data =
                         await res.json();
 
-                    const topClasses =
-                        data.classes
-                            .filter(
-                                (item) =>
-                                    item.status ===
-                                    "approved"
-                            )
-                            .sort(
-                                (a, b) =>
-                                    b.bookingCount -
-                                    a.bookingCount
-                            )
-                            .slice(0, 6);
+                    const topClasses = data.classes
+                        .filter((item) => item.status === "approved")
+                        .sort(
+                            (a, b) =>
+                                (b.bookingCount || 0) -
+                                (a.bookingCount || 0)
+                        )
+                        .slice(0, 6);
+
 
                     setFeaturedClasses(
                         topClasses

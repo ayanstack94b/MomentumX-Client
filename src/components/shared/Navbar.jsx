@@ -5,11 +5,11 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiOutlineMenuAlt3, HiOutlineX } from "react-icons/hi";
 import { TbBarbell } from "react-icons/tb";
-import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
 
@@ -18,9 +18,9 @@ export default function Navbar() {
     const router = useRouter();
 
 
-    // session data of current user
-    const { data: session, isPending } = authClient.useSession();
-    console.log("SESSION:", session);
+    // user data of current user
+    const { user, logout } = useAuth();
+    // console.log("USER:", user);
 
 
     // Navbar visibility state
@@ -28,28 +28,16 @@ export default function Navbar() {
     const [lastScrollY, setLastScrollY] = useState(0);
 
     const handleLogout = async () => {
-        try {
-            await authClient.signOut({
-                fetchOptions: {
-                    onSuccess: async () => {
-                        await Swal.fire({
-                            icon: "success",
-                            title: "Logged Out",
-                            timer: 1200,
-                            showConfirmButton: false,
-                        });
+        logout();
 
-                        router.push("/");
-                    },
-                },
-            });
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Logout Failed",
-                text: "Please try again.",
-            });
-        }
+        await Swal.fire({
+            icon: "success",
+            title: "Logged Out",
+            timer: 1200,
+            showConfirmButton: false,
+        });
+
+        router.push("/login");
     };
 
     // Navbar hide/show on scroll
@@ -80,7 +68,7 @@ export default function Navbar() {
         { name: "Community Forum", href: "/forum" },
     ];
 
-    if (session) {
+    if (user) {
         navLinks.push({
             name: "Dashboard",
             href: "/dashboard",
@@ -135,13 +123,86 @@ export default function Navbar() {
                     {/* Desktop Auth Buttons */}
 
                     <div className="hidden lg:flex items-center gap-3">
-                        {session ? (
+                        {user ? (
                             <>
-                                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                                    {session.image?.startsWith("http") ? (
+                                <motion.div
+                                    className="relative flex items-center gap-2 overflow-hidden rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 backdrop-blur-2xl"
+                                    animate={{
+                                        boxShadow:
+                                            user?.role === "admin"
+                                                ? [
+                                                    "0 0 0px rgba(239,68,68,.15)",
+                                                    "0 0 16px rgba(239,68,68,.35)",
+                                                    "0 0 0px rgba(239,68,68,.15)",
+                                                ]
+                                                : user?.role === "trainer"
+                                                    ? [
+                                                        "0 0 0px rgba(16,185,129,.15)",
+                                                        "0 0 16px rgba(16,185,129,.35)",
+                                                        "0 0 0px rgba(16,185,129,.15)",
+                                                    ]
+                                                    : [
+                                                        "0 0 0px rgba(59,130,246,.15)",
+                                                        "0 0 16px rgba(59,130,246,.35)",
+                                                        "0 0 0px rgba(59,130,246,.15)",
+                                                    ],
+                                    }}
+                                    transition={{
+                                        duration: 3,
+                                        repeat: Infinity,
+                                        ease: "easeInOut",
+                                    }}
+                                >
+                                    {/* Status Dot */}
+                                    <motion.div
+                                        className={`h-2 w-2 rounded-full ${user?.role === "admin"
+                                                ? "bg-red-400"
+                                                : user?.role === "trainer"
+                                                    ? "bg-emerald-400"
+                                                    : "bg-sky-400"
+                                            }`}
+                                        animate={{
+                                            scale: [1, 1.4, 1],
+                                            opacity: [0.7, 1, 0.7],
+                                        }}
+                                        transition={{
+                                            duration: 2,
+                                            repeat: Infinity,
+                                        }}
+                                    />
+
+                                    <span
+                                        className={`text-[11px] font-medium capitalize tracking-wide ${user?.role === "admin"
+                                                ? "text-red-300"
+                                                : user?.role === "trainer"
+                                                    ? "text-emerald-300"
+                                                    : "text-sky-300"
+                                            }`}
+                                    >
+                                        {user?.role}
+                                    </span>
+
+                                    {/* Moving Glass Reflection */}
+                                    <motion.div
+                                        className="absolute inset-y-0 -left-10 w-6 -skew-x-12 bg-white/15 blur-md"
+                                        animate={{
+                                            x: [-30, 140],
+                                        }}
+                                        transition={{
+                                            duration: 2.5,
+                                            repeat: Infinity,
+                                            repeatDelay: 3,
+                                            ease: "easeInOut",
+                                        }}
+                                    />
+                                </motion.div>
+
+
+                                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 ">
+                                    {user.image?.startsWith("http") ? (
                                         <Image
-                                            src={session?.user?.image}
-                                            alt={session?.user?.name}
+                                            src={user?.image}
+                                            alt={user?.name}
                                             width={40}
                                             height={40}
                                             className="h-10 w-10 rounded-full object-cover"
@@ -152,11 +213,11 @@ export default function Navbar() {
 
                                     <div className="flex flex-col">
                                         <span className="text-sm font-medium">
-                                            {session.user.name}
+                                            {user?.name}
                                         </span>
 
                                         <span className="text-xs text-[var(--text-secondary)]">
-                                            {session.user.email}
+                                            {user?.email}
                                         </span>
                                     </div>
                                 </div>
@@ -254,13 +315,13 @@ export default function Navbar() {
 
                             {/* Mobile Auth Buttons */}
                             <div className="px-8 mt-4">
-                                {session ? (
+                                {user ? (
                                     <div className="flex flex-col gap-4">
                                         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-                                            {session.user.image?.startsWith("http") ? (
+                                            {user?.image?.startsWith("http") ? (
                                                 <Image
-                                                    src={session?.user?.image}
-                                                    alt={session?.user?.name}
+                                                    src={user?.image}
+                                                    alt={user?.name}
                                                     width={50}
                                                     height={50}
                                                     className="h-12 w-12 rounded-full object-cover"
@@ -271,11 +332,11 @@ export default function Navbar() {
 
                                             <div className="flex flex-col overflow-hidden">
                                                 <span className="font-medium truncate">
-                                                    {session.user.name}
+                                                    {user?.name}
                                                 </span>
 
                                                 <span className="text-sm text-[var(--text-secondary)] truncate">
-                                                    {session.user.email}
+                                                    {user?.email}
                                                 </span>
                                             </div>
                                         </div>

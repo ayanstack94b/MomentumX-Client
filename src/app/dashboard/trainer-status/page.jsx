@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 const TrainerStatusPage = () => {
-    const { data: session } =
-        authClient.useSession();
+    const { user } = useAuth();
 
     const [loading, setLoading] =
         useState(true);
@@ -17,8 +17,8 @@ const TrainerStatusPage = () => {
         useState(null);
 
     useEffect(() => {
-        console.log("Session:", session);
-        const email = session?.user?.email;
+
+        const email = user?.email;
 
 
         console.log("Email:", email);
@@ -60,7 +60,7 @@ const TrainerStatusPage = () => {
             };
 
         fetchApplication();
-    }, [session]);
+    }, [user?.email]);
 
     if (loading) {
         return <LoadingSpinner />;

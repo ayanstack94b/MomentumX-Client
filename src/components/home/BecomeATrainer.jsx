@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
-import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 
 const BecomeATrainer = () => {
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
 
     const router = useRouter();
 
@@ -18,7 +18,7 @@ const BecomeATrainer = () => {
     const [userData, setUserData] = useState(null);
     const [application, setApplication] = useState(null);
 
-    const email = session?.user?.email;
+    const email = user?.email;
 
 
     useEffect(() => {
@@ -133,13 +133,13 @@ const BecomeATrainer = () => {
 
         const applicationData = {
             name:
-                session?.user?.name,
+                user?.name,
 
             email:
-                session?.user?.email,
+               user?.email,
 
             image:
-                session?.user?.image,
+                user?.image,
 
             experience:
                 form.experience.value,

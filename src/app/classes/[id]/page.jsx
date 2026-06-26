@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const ClassDetailsPage = () => {
     const { id } = useParams();
@@ -17,15 +17,11 @@ const ClassDetailsPage = () => {
     const [classData, setClassData] = useState(null);
     const [alreadyBooked, setAlreadyBooked] = useState(false);
 
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
 
-    const memberName = session?.user?.name;
-
-    const memberEmail = session?.user?.email;
-
-    console.log(id);
-    console.log(classData);
-    console.log(loading);
+    // console.log(id);
+    // console.log(classData);
+    // console.log(loading);
 
 
     useEffect(() => {
@@ -60,7 +56,7 @@ const ClassDetailsPage = () => {
             async () => {
 
                 if (
-                    !session?.user?.email ||
+                    !user?.email ||
                     !classData?._id
                 ) {
                     return;
@@ -69,7 +65,7 @@ const ClassDetailsPage = () => {
                 try {
                     const res =
                         await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/check?email=${session.user.email}&classId=${classData._id}`
+                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/check?email=${user?.email}&classId=${classData._id}`
                         );
 
                     const data =
@@ -86,14 +82,14 @@ const ClassDetailsPage = () => {
         checkBooking();
 
     }, [
-        session?.user?.email,
+        user?.email,
         classData?._id,
     ]);
 
 
     const handleBooking = async () => {
 
-        if (!session?.user) {
+        if (!user) {
             Swal.fire({
                 icon: "warning",
                 title: "Login Required",
@@ -113,7 +109,7 @@ const ClassDetailsPage = () => {
         );
     };
     const handleFavorite = async () => {
-        if (!session?.user) {
+        if (!user) {
             Swal.fire({
                 icon: "warning",
                 title: "Login Required",
@@ -144,7 +140,7 @@ const ClassDetailsPage = () => {
                 classData.price,
 
             userEmail:
-                session.user.email,
+                user.email,
 
             createdAt:
                 new Date().toISOString(),
@@ -258,7 +254,7 @@ const ClassDetailsPage = () => {
                             src={classData.image}
                             alt={classData.className}
                             fill
-                            sizes="100vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                             className="object-cover"
                         />
                     </div>
@@ -376,7 +372,7 @@ const ClassDetailsPage = () => {
                         >
                             {alreadyBooked
                                 ? "Already Booked"
-                                : session?.user
+                                : user
                                     ? "Book Now"
                                     : "Register To Book"}
                         </motion.button>

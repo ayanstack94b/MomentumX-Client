@@ -10,7 +10,6 @@ const ForumPage = () => {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedPosts, setExpandedPosts] = useState({});
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
     const [sortOrder, setSortOrder] = useState("latest");
@@ -213,7 +212,7 @@ const ForumPage = () => {
                                             }
                                             alt={post.title}
                                             fill
-                                            sizes="100vw"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                             className="object-cover"
                                         />
 

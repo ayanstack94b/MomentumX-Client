@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 export default function AddForumPostPage() {
 
     const router = useRouter();
 
-    const { data: session } = authClient.useSession();
+    const { user, loading } = useAuth();
 
     const forumImages = [
         {
@@ -51,9 +53,9 @@ export default function AddForumPostPage() {
             description:
                 data.description,
             authorName:
-                session?.user?.name,
+                user?.name,
             authorEmail:
-                session?.user?.email,
+                user?.email,
             category:
                 data?.category || "Fitness",
             createdAt:
@@ -66,37 +68,10 @@ export default function AddForumPostPage() {
 
         try {
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forums`,
-                {
-                    method:
-                        "POST",
-
-                    headers:
-                    {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body:
-                        JSON.stringify(
-                            forumData
-                        ),
-                }
+            const { data: result } = await axiosInstance.post(
+                "/forums",
+                forumData
             );
-            const result =
-                await res.json();
-
-            if (!res.ok) {
-
-                return Swal.fire({
-                    icon: "error",
-                    title:
-                        "Account Blocked",
-                    text:
-                        result.message,
-                });
-
-            }
 
             if (
                 result.insertedId
@@ -115,15 +90,12 @@ export default function AddForumPostPage() {
             }
 
         } catch (error) {
-
-            console.error(
-                error
-            );
+            console.error(error);
 
             Swal.fire({
                 icon: "error",
-                title:
-                    "Failed To Create Post",
+                title: "Failed To Create Post",
+                text: error.response?.data?.message || error.message,
             });
         }
     };
@@ -221,7 +193,7 @@ export default function AddForumPostPage() {
                                     src={selectedImage}
                                     alt="Forum Preview"
                                     fill
-                                    sizes="100vw"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                     className="object-cover"
                                 />
 
@@ -310,7 +282,7 @@ export default function AddForumPostPage() {
                                     Select a Cover Image
                                 </option>
 
-                                
+
 
                                 {forumImages.map(
                                     (
@@ -334,7 +306,7 @@ export default function AddForumPostPage() {
 
                             <select
                                 {...register("category")}
-                                 className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
+                                className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
                             >
                                 <option value="">
                                     Select category
@@ -358,9 +330,9 @@ export default function AddForumPostPage() {
                                 <option value="Weight Loss">
                                     Weight Loss
                                 </option>
-                                
+
                             </select>
-                            
+
 
                             <textarea
                                 rows={10}

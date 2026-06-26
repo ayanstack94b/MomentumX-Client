@@ -12,11 +12,6 @@ export default function BookClassPage() {
     const [loading, setLoading] = useState(true);
     const [totalClasses, setTotalClasses] = useState(0);
 
-    // console.log(JSON.stringify(classes, null, 2));
-    // console.log(Array.isArray(classes));
-    // console.log(classes);
-
-
     useEffect(() => {
         const fetchClasses = async () => {
             try {

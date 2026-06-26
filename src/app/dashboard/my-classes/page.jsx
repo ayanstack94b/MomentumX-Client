@@ -5,11 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Swal from 'sweetalert2';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import axiosInstance from '@/lib/axios';
 
 
 const MyClassesPage = () => {
-    const { data: session } = authClient.useSession();
-    const email = session?.user?.email;
+    const { user } = useAuth();
+    const email = user?.email;
 
     const [classes, setClasses] = useState([])
     const [loading, setLoading] = useState(true);
@@ -52,17 +54,12 @@ const MyClassesPage = () => {
         if (!result.isConfirmed) return;
 
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
-                {
-                    method: "DELETE",
-                }
+            const { data: deleteResult } = await axiosInstance.delete(
+                `/classes/${id}`
             );
 
-            const data = await res.json();
-
-            if (data.deletedCount > 0) {
-                Swal.fire({
+            if (deleteResult.deletedCount > 0) {
+                await Swal.fire({
                     icon: "success",
                     title: "Deleted",
                     timer: 1200,
@@ -77,6 +74,9 @@ const MyClassesPage = () => {
             Swal.fire({
                 icon: "error",
                 title: "Delete Failed",
+                text:
+                    error.response?.data?.message ||
+                    "Something went wrong.",
             });
         }
     };
@@ -90,34 +90,26 @@ const MyClassesPage = () => {
     }
 
     const handleViewMembers = async (classId) => {
-            try {
-                const res =
-                    await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/bookings/class/${classId}`
-                    );
+        try {
+            const { data: membersData } = await axiosInstance.get(
+                `/bookings/class/${classId}`
+            );
 
-                const data =
-                    await res.json();
+            console.log("Members:", membersData);
 
-                setMembers(data);
+            setMembers(
+                Array.isArray(membersData)
+                    ? membersData
+                    : []
+            );
+            document.getElementById("members_modal").showModal();
 
-                setSelectedClass(
-                    classId
-                );
+            // setSelectedClass(classId);
 
-                document
-                    .getElementById(
-                        "members_modal"
-                    )
-                    ?.showModal();
-            } catch (
-            error
-            ) {
-                console.error(
-                    error
-                );
-            }
-        };
+        } catch (error) {
+            console.log(error.response?.data);
+        }
+    };
 
 
     return (

@@ -1,27 +1,25 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 
 export default function PrivateRoute({ children }) {
-    const { data: session, isPending } = authClient.useSession();
+    const { user, loading } = useAuth();
    
     const router = useRouter();
 
     useEffect(() => {
-        if (!isPending && !session) {
-            console.log("PUSHING TO DASHBOARD");
-            // window.location.href = "/dashboard";
+        if (!loading && !user) {
             router.push("/login");
         }
 
-        console.log("SESSION:", session);
-        console.log("PENDING:", isPending);
-    }, [session, isPending]);
+        console.log(user);
+        console.log("LOADING:", loading);
 
-    if (isPending) {
+    }, [user, loading, router]);
+    if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <LoadingSpinner />
@@ -29,8 +27,8 @@ export default function PrivateRoute({ children }) {
         );
     }
 
-    // if (!session) return null;
-    if (!session) {
+    // if (!user) return null;
+    if (!user) {
         return (
             <div className="p-10 text-center">
                 No Session Found

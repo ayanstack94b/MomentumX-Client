@@ -5,14 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { FaRegPenToSquare, FaRegTrashCan } from "react-icons/fa6";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const ForumDetailsPage = () => {
     const { id } = useParams();
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState([]);
@@ -63,7 +64,7 @@ const ForumDetailsPage = () => {
     useEffect(() => {
 
         if (
-            !session?.user?.email
+            !user?.email
         ) {
             return;
         }
@@ -73,13 +74,11 @@ const ForumDetailsPage = () => {
 
                 try {
 
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/forums/user/${session.user.email}`
-                        );
+                    const { data } = await axiosInstance.get(
+                        `/forums/user/${user.email}`
+                    );
 
-                    const data =
-                        await res.json();
+                    setPosts(data);
 
                     setPosts(data);
 
@@ -97,7 +96,7 @@ const ForumDetailsPage = () => {
         fetchPosts();
 
     }, [
-        session?.user?.email,
+        user?.email,
     ]);
 
     useEffect(() => {
@@ -131,135 +130,107 @@ const ForumDetailsPage = () => {
 
 
     const handleReaction = async (type) => {
-
-        if (
-            !session?.user?.email
-        ) {
+        if (!user?.email) {
             return Swal.fire({
                 icon: "warning",
-                title:
-                    "Login Required",
+                title: "Login Required",
             });
         }
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/forums/react/${id}`,
+        try {
+            const { data: result } = await axiosInstance.patch(
+                `/forums/react/${id}`,
                 {
-                    method:
-                        "PATCH",
-
-                    headers:
-                    {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body:
-                        JSON.stringify(
-                            {
-                                email:
-                                    session
-                                        .user
-                                        .email,
-
-                                type,
-                            }
-                        ),
+                    email: user.email,
+                    type,
                 }
             );
 
-        if (res.ok) {
+            if (!result.success) {
+                return Swal.fire({
+                    icon: "warning",
+                    title: result.message,
+                });
+            }
 
-            const updated =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`
-                );
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`
+            );
 
-            const data =
-                await updated.json();
+            const data = await res.json();
 
             setPost(data);
+
+        } catch (error) {
+
+            Swal.fire({
+                icon: "warning",
+                title: "Already Reacted",
+                text:
+                    error.response?.data?.message ||
+                    "You have already reacted to this post.",
+            });
+
         }
     };
 
     const handleComment = async () => {
-
-        if (!session?.user) {
-
+        if (!user) {
             return Swal.fire({
                 icon: "warning",
-                title:
-                    "Login Required",
+                title: "Login Required",
             });
         }
 
         if (!commentText.trim()) {
-
             return Swal.fire({
                 icon: "warning",
-                title:
-                    "Write a comment first",
+                title: "Write a comment first",
             });
         }
 
         const commentData = {
             forumId: id,
-
-            userName:
-                session.user.name,
-
-            userEmail:
-                session.user.email,
-
-            comment:
-                commentText,
-
-            createdAt:
-                new Date().toISOString(),
+            userName: user?.name,
+            userEmail: user?.email,
+            comment: commentText,
+            createdAt: new Date().toISOString(),
         };
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/comments`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body: JSON.stringify(
-                        commentData
-                    ),
-                }
+        try {
+            const { data: result } = await axiosInstance.post(
+                "/comments",
+                commentData
             );
 
-        const data =
-            await res.json();
+            if (result.insertedId) {
+                setComments([
+                    {
+                        ...commentData,
+                        _id: result.insertedId,
+                    },
+                    ...comments,
+                ]);
 
-        if (data.insertedId) {
+                setCommentText("");
 
-            setComments([
-                {
-                    ...commentData,
-                    _id:
-                        data.insertedId,
-                },
-                ...comments,
-            ]);
-
-            setCommentText("");
-
+                Swal.fire({
+                    icon: "success",
+                    title: "Comment Added",
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+            }
+        } catch (error) {
             Swal.fire({
-                icon: "success",
-                title:
-                    "Comment Added",
-                timer: 1200,
-                showConfirmButton:
-                    false,
+                icon: "error",
+                title: "Action Restricted",
+                text:
+                    error.response?.data?.message ||
+                    "Unable to add comment.",
             });
+
+            console.error(error);
         }
     };
 
@@ -281,22 +252,11 @@ const ForumDetailsPage = () => {
             return;
         }
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
-                {
-                    method:
-                        "DELETE",
-                }
-            );
+        const { data: deleteResult } = await axiosInstance.delete(
+            `/comments/${commentId}`
+        );
 
-        const data =
-            await res.json();
-
-        if (
-            data.deletedCount >
-            0
-        ) {
+        if (deleteResult.deletedCount > 0) {
 
             setComments(
                 comments.filter(
@@ -312,31 +272,14 @@ const ForumDetailsPage = () => {
 
     const handleEditComment = async (commentId) => {
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
-                {
-                    method: "PATCH",
+        const { data: result } = await axiosInstance.patch(
+            `/comments/${commentId}`,
+            {
+                comment: editText,
+            }
+        );
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body: JSON.stringify({
-                        comment:
-                            editText,
-                    }),
-                }
-            );
-
-        const data =
-            await res.json();
-
-        if (
-            data.modifiedCount >
-            0
-        ) {
+        if (result.modifiedCount > 0) {
 
             setComments(
                 comments.map(
@@ -364,7 +307,7 @@ const ForumDetailsPage = () => {
         commentId
     ) => {
 
-        if (!session?.user) {
+        if (!user) {
 
             return Swal.fire({
                 icon: "warning",
@@ -387,11 +330,9 @@ const ForumDetailsPage = () => {
             _id:
                 crypto.randomUUID(),
 
-            userName:
-                session.user.name,
+            userName: user?.name,
 
-            userEmail:
-                session.user.email,
+            userEmail: user?.email,
 
             reply:
                 replyText,
@@ -400,32 +341,12 @@ const ForumDetailsPage = () => {
                 new Date().toISOString(),
         };
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/${commentId}`,
-                {
-                    method:
-                        "PATCH",
+        const { data: result } = await axiosInstance.patch(
+            `/comments/reply/${commentId}`,
+            replyData
+        );
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body:
-                        JSON.stringify(
-                            replyData
-                        ),
-                }
-            );
-
-        const data =
-            await res.json();
-
-        if (
-            data.modifiedCount >
-            0
-        ) {
+        if (result.modifiedCount > 0) {
 
             Swal.fire({
                 icon:
@@ -471,36 +392,14 @@ const ForumDetailsPage = () => {
         ) {
             return;
         }
+        const { data: deleteResult } = await axiosInstance.patch(
+            `/comments/reply/delete/${commentId}`,
+            {
+                replyId,
+            }
+        );
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/delete/${commentId}`,
-                {
-                    method:
-                        "PATCH",
-
-                    headers:
-                    {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body:
-                        JSON.stringify(
-                            {
-                                replyId,
-                            }
-                        ),
-                }
-            );
-
-        const data =
-            await res.json();
-
-        if (
-            data.modifiedCount >
-            0
-        ) {
+        if (result.modifiedCount > 0) {
 
             Swal.fire({
                 icon:
@@ -543,37 +442,15 @@ const ForumDetailsPage = () => {
                 return;
             }
 
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/comments/reply/edit/${commentId}`,
-                    {
-                        method:
-                            "PATCH",
+        const { data: result } = await axiosInstance.patch(
+            `/comments/reply/edit/${commentId}`,
+            {
+                replyId,
+                reply: editReplyText,
+            }
+        );
 
-                        headers:
-                        {
-                            "Content-Type":
-                                "application/json",
-                        },
-
-                        body:
-                            JSON.stringify(
-                                {
-                                    replyId,
-                                    reply:
-                                        editReplyText,
-                                }
-                            ),
-                    }
-                );
-
-            const data =
-                await res.json();
-
-            if (
-                data.modifiedCount >
-                0
-            ) {
+        if (result.modifiedCount > 0) {
 
                 Swal.fire({
                     icon:
@@ -663,7 +540,7 @@ const ForumDetailsPage = () => {
                             src={post.image}
                             alt={post.title}
                             fill
-                            sizes="100vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                             className="object-cover"
                         />
 
@@ -909,7 +786,7 @@ const ForumDetailsPage = () => {
                                                     )}
 
                                                     {comment.userEmail !==
-                                                        session?.user?.email && (
+                                                       user?.email && (
                                                             <button
                                                                 onClick={() =>
                                                                     setReplyingTo(
@@ -1096,7 +973,7 @@ const ForumDetailsPage = () => {
 
                                                                                 {/* Reply Actions */}
                                                                                 {reply.userEmail ===
-                                                                                    session?.user?.email && (
+                                                                                    user?.email && (
 
                                                                                         <div className="mt-2 flex gap-2">
 
@@ -1151,7 +1028,7 @@ const ForumDetailsPage = () => {
                                         )}
 
                                         {/* Show comment actions only for comment owner */}
-                                        {comment.userEmail === session?.user?.email && (
+                                        {comment.userEmail === user?.email && (
 
                                             <div className="mt-3 flex flex-wrap gap-2">
 

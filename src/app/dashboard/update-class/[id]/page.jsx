@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import axiosInstance from "@/lib/axios";
 
 const difficulties = [
     "Beginner",
@@ -77,21 +78,12 @@ const UpdateClassPage = () => {
     useEffect(() => {
         const fetchClass = async () => {
             try {
-                console.log("Fetching:", id);
-
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`
+                const { data: classDetails } = await axiosInstance.get(
+                    `/classes/update/${id}`
                 );
 
-                console.log("Response:", res);
-
-                const data = await res.json();
-
-                console.log("Data:", data);
-
-                setClassData(data);
-
-                reset(data);
+                setClassData(classDetails);
+                reset(classDetails);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -106,20 +98,12 @@ const UpdateClassPage = () => {
 
     const onSubmit = async (data) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${id}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify(data),
-                }
-                
-            );
-            // console.log("Data:", data, res);
+            const { _id, ...updateData } = data;
 
-            const result = await res.json();
+            const { data: result } = await axiosInstance.patch(
+                `/classes/update/${id}`,
+                updateData
+            );
 
             if (result.modifiedCount > 0) {
                 await Swal.fire({

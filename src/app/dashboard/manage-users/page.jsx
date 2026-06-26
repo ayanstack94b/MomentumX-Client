@@ -1,53 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { motion } from "framer-motion";
-
 import Swal from "sweetalert2";
-
-import Image from "next/image";
-
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const ManageUsersPage = () => {
-    const { data: session, status } = authClient.useSession();
-
+    const { user, loading: authLoading } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
-
-
     useEffect(() => {
-
+        if (!user || user.role !== "admin") return;
         fetchUsers();
 
-    }, []);
+    }, [user]);
 
     async function fetchUsers() {
-
         try {
+            const { data: usersData } =
+                await axiosInstance.get("/users");
 
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/users`
-                );
-
-            const data =
-                await res.json();
-
-            setUsers(data);
-
+            setUsers(usersData);
+            console.log(usersData);
         } catch (error) {
-
             console.error(error);
 
         } finally {
-
             setLoading(false);
-
         }
-    };
+    }
 
 
     const handleRemoveAdmin = async (id) => {
@@ -71,21 +54,23 @@ const ManageUsersPage = () => {
         ) {
             return;
         }
+        const { data: updateResult } = await axiosInstance.patch(
+            `/users/remove-admin/${id}`
+        );
+        console.log("UPDATE RESULT:", updateResult);
+        if (updateResult.modifiedCount > 0) {
+            Swal.fire({
+                icon: "success",
+                title: "Admin Removed",
+                timer: 1200,
+                showConfirmButton: false,
+            });
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/remove-admin/${id}`,
-                {
-                    method:
-                        "PATCH",
-                }
-            );
-
-        const data =
-            await res.json();
+            fetchUsers();
+        }
 
         if (
-            data.modifiedCount >
+            updateResult.modifiedCount >
             0
         ) {
 
@@ -119,32 +104,19 @@ const ManageUsersPage = () => {
         if (!result.isConfirmed)
             return;
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/admin/${id}`,
-                {
-                    method:
-                        "PATCH",
-                }
-            );
+        console.log("MAKE ADMIN ID:", id);
+        const { data: updateResult } = await axiosInstance.patch(
+            `/users/admin/${id}`
+        );
+        console.log("UPDATE RESULT:", updateResult);
 
-        const data =
-            await res.json();
-
-        if (
-            data.modifiedCount >
-            0
-        ) {
+        if (updateResult.modifiedCount > 0) {
 
             Swal.fire({
-                icon:
-                    "success",
-                title:
-                    "Admin Updated",
-                timer:
-                    1200,
-                showConfirmButton:
-                    false,
+                icon: "success",
+                title: "Admin Updated",
+                timer: 1200,
+                showConfirmButton: false,
             });
 
             fetchUsers();
@@ -166,20 +138,13 @@ const ManageUsersPage = () => {
         if (!result.isConfirmed)
             return;
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/block/${id}`,
-                {
-                    method:
-                        "PATCH",
-                }
-            );
-
-        const data =
-            await res.json();
+        const { data: updateResult } = await axiosInstance.patch(
+            `/users/block/${id}`
+        );
+        console.log("UPDATE RESULT:", updateResult);
 
         if (
-            data.modifiedCount >
+            updateResult.modifiedCount >
             0
         ) {
 
@@ -200,21 +165,14 @@ const ManageUsersPage = () => {
 
     const handleUnblockUser = async (id) => {
 
-        const res =
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/unblock/${id}`,
-                {
-                    method:
-                        "PATCH",
-                }
-            );
+        const { data: updateResult } = await axiosInstance.patch(
+            `/users/unblock/${id}`
+        );
 
-        const data =
-            await res.json();
+        console.log("UPDATE RESULT:", updateResult);
 
         if (
-            data.modifiedCount >
-            0
+            updateResult.modifiedCount > 0
         ) {
 
             Swal.fire({
@@ -327,9 +285,9 @@ const ManageUsersPage = () => {
                             </thead>
 
                             <tbody>
-                                {users.map((user, index) => (
+                                {users.map((member, index) => (
                                     <motion.tr
-                                        key={user._id}
+                                        key={member._id}
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{
@@ -342,13 +300,13 @@ const ManageUsersPage = () => {
                                         <td className="min-w-[300px]">
                                             <div className="flex items-center gap-4">
                                                 <img
-                                                    src={user.image}
-                                                    alt={user.name}
+                                                    src={member.image}
+                                                    alt={member.name}
                                                     className="h-11 w-11 rounded-full object-cover ring ring-white/10"
                                                 />
                                                 <div>
                                                     <h3 className="font-semibold text-white">
-                                                        {user.name}
+                                                        {member.name}
                                                     </h3>
                                                     <p className="text-xs text-gray-500">
                                                         Member Since
@@ -360,33 +318,33 @@ const ManageUsersPage = () => {
                                         {/* Email - Hidden on Small Devices */}
                                         <td className="min-w-87.5">
                                             <span className="text-xs sm:text-sm text-gray-400">
-                                                {user.email}
+                                                {member.email}
                                             </span>
                                         </td>
 
                                         {/* Role */}
                                         <td>
                                             <span
-                                                className={`rounded-full px-3 py-1 text-xs font-medium ${user.role === "admin"
+                                                className={`rounded-full px-3 py-1 text-xs font-medium ${member.role === "admin"
                                                     ? "border border-red-500/20 bg-red-500/10 text-red-400"
-                                                    : user.role === "trainer"
+                                                    : member.role === "trainer"
                                                         ? "border border-blue-500/20 bg-blue-500/10 text-blue-400"
                                                         : "border border-green-500/20 bg-green-500/10 text-green-400"
                                                     }`}
                                             >
-                                                {user.role}
+                                                {member.role}
                                             </span>
                                         </td>
 
                                         {/* Status */}
                                         <td>
                                             <span
-                                                className={`rounded-full px-3 py-1 text-xs font-medium ${user.status === "blocked"
+                                                className={`rounded-full px-3 py-1 text-xs font-medium ${member.status === "blocked"
                                                     ? "border border-red-500/20 bg-red-500/10 text-red-400"
                                                     : "border border-green-500/20 bg-green-500/10 text-green-400"
                                                     }`}
                                             >
-                                                {user.status}
+                                                {member.status}
                                             </span>
                                         </td>
 
@@ -395,14 +353,14 @@ const ManageUsersPage = () => {
                                             {/* Action Buttons */}
                                             <div className="flex flex-wrap gap-2">
                                                 {/* Prevent Admin From Managing Himself */}
-                                                {user.email !== session?.user?.email && (
+                                                {member.email !== user?.email && (
                                                     <>
                                                         {/* Admin Controls */}
-                                                        {user.role === "admin" ? (
+                                                        {member.role === "admin" ? (
                                                             <motion.button
                                                                 whileHover={{ scale: 1.05 }}
                                                                 whileTap={{ scale: 0.95 }}
-                                                                onClick={() => handleRemoveAdmin(user._id)}
+                                                                onClick={() => handleRemoveAdmin(member._id)}
                                                                 className="btn btn-xs btn-warning"
                                                             >
                                                                 Remove Admin
@@ -411,7 +369,7 @@ const ManageUsersPage = () => {
                                                             <motion.button
                                                                 whileHover={{ scale: 1.05 }}
                                                                 whileTap={{ scale: 0.95 }}
-                                                                onClick={() => handleMakeAdmin(user._id)}
+                                                                    onClick={() => handleMakeAdmin(member._id)}
                                                                 className="btn btn-xs btn-secondary"
                                                             >
                                                                 Make Admin
@@ -419,11 +377,11 @@ const ManageUsersPage = () => {
                                                         )}
 
                                                         {/* User Status Controls */}
-                                                        {user.status === "blocked" ? (
+                                                        {member.status === "blocked" ? (
                                                             <motion.button
                                                                 whileHover={{ scale: 1.05 }}
                                                                 whileTap={{ scale: 0.95 }}
-                                                                onClick={() => handleUnblockUser(user._id)}
+                                                                onClick={() => handleUnblockUser(member._id)}
                                                                 className="btn btn-xs btn-success"
                                                             >
                                                                 Unblock
@@ -432,7 +390,7 @@ const ManageUsersPage = () => {
                                                             <motion.button
                                                                 whileHover={{ scale: 1.05 }}
                                                                 whileTap={{ scale: 0.95 }}
-                                                                onClick={() => handleBlockUser(user._id)}
+                                                                    onClick={() => handleBlockUser(member._id)}
                                                                 className="btn btn-xs btn-error"
                                                             >
                                                                 Block

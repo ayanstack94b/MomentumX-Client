@@ -7,11 +7,13 @@ import { FaPlus, FaComments, FaTrash } from "react-icons/fa";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 
 const MyForumPostsPage = () => {
 
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ const MyForumPostsPage = () => {
 
         const fetchMyPosts = async () => {
 
-            if (!session?.user?.email) {
+            if (!user?.email) {
                 setLoading(false);
                 return;
             }
@@ -39,7 +41,7 @@ const MyForumPostsPage = () => {
                     data.forums.filter(
                         (post) =>
                             post.authorEmail ===
-                            session?.user?.email
+                            user?.email
                     );
                 setPosts(myPosts);
 
@@ -57,7 +59,7 @@ const MyForumPostsPage = () => {
 
         fetchMyPosts();
 
-    }, [session?.user?.email]);
+    }, [user?.email]);
 
     // Filter + Sort
     const filteredPosts = [...posts]
@@ -126,17 +128,9 @@ const MyForumPostsPage = () => {
 
         try {
 
-            const res =
-                await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/forums/${id}`,
-                    {
-                        method:
-                            "DELETE",
-                    }
-                );
-
-            const data =
-                await res.json();
+            const { data } = await axiosInstance.delete(
+                `/forums/${id}`
+            );
 
             if (
                 data.deletedCount >

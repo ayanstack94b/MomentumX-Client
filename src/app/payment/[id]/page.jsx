@@ -7,15 +7,17 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const PaymentPage = () => {
     const { id } = useParams();
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
     const router = useRouter();
     
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
-
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
         const fetchClass =
@@ -48,7 +50,23 @@ const PaymentPage = () => {
         }
     }, [id]);
 
+    useEffect(() => {
+        if (!user?.email) return;
 
+        const fetchProfile = async () => {
+            try {
+                const { data: profileData } = await axiosInstance.get(
+                    `/users/${user.email}`
+                );
+
+                setProfile(profileData);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchProfile();
+    }, [user?.email]);
 
     const handlePayment = async () => {
             const bookingData = {
@@ -76,13 +94,9 @@ const PaymentPage = () => {
                 category:
                     classData.category,
 
-                memberName:
-                    session?.user
-                        ?.name,
+                memberName: user?.name,
 
-                memberEmail:
-                    session?.user
-                        ?.email,
+                memberEmail: user?.email,
 
                 price:
                     classData.price,
@@ -95,41 +109,13 @@ const PaymentPage = () => {
             };
 
             try {
-                const res =
-                    await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/bookings`,
-                        {
-                            method:
-                                "POST",
-
-                            headers:
-                            {
-                                "Content-Type":
-                                    "application/json",
-                            },
-
-                            body: JSON.stringify(
-                                bookingData
-                            ),
-                        }
+               
+                    const { data: result } = await axiosInstance.post(
+                        "/bookings",
+                        bookingData
                     );
 
-                const result =
-                    await res.json();
-                if (!res.ok) {
-
-                    return Swal.fire({
-                        icon: "error",
-                        title:
-                            "Booking Failed",
-                        text:
-                            result.message,
-                    });
-
-                }
-                if (
-                    result.insertedId
-                ) {
+                    if (result.insertedId) {
                     await Swal.fire(
                         {
                             icon: "success",
@@ -146,17 +132,12 @@ const PaymentPage = () => {
                     );
                 }
             } catch (error) {
-                console.error(
-                    error
-                );
-
                 Swal.fire({
                     icon: "error",
-
-                    title:
-                        "Payment Failed",
-
-                    text: "Something went wrong.",
+                    title: "Booking Failed",
+                    text:
+                        error.response?.data?.message ||
+                        "Something went wrong.",
                 });
             }
         };
@@ -221,7 +202,7 @@ const PaymentPage = () => {
                                 classData.className
                             }
                             fill
-                            sizes="100vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                             className="object-cover"
                         />
                     </div>
@@ -296,21 +277,19 @@ const PaymentPage = () => {
                         </div>
 
                         <motion.button
-                            onClick={
-                                handlePayment
-                            }
+                            onClick={handlePayment}
+                            disabled={profile?.role !== "member"}
                             whileHover={{
-                                scale: 1.03,
+                                scale: profile?.role === "member" ? 1.03 : 1,
                             }}
                             whileTap={{
-                                scale: 0.97,
+                                scale: profile?.role === "member" ? 0.97 : 1,
                             }}
-                            className="btn mt-10 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                            className="btn mt-10 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            Pay ₹
-                            {
-                                classData.price
-                            }
+                            {profile?.role === "member"
+                                ? `Pay ₹${classData.price}`
+                                : "Only members can book classes"}
                         </motion.button>
                     </div>
                 </motion.div>

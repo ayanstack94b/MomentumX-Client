@@ -5,9 +5,11 @@ import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
-import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 const durations = [
     "30 Minutes",
@@ -136,29 +138,21 @@ export default function AddClassPage() {
     const [profile, setProfile] = useState(null);
     const [profileLoading, setProfileLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    const { data: session } = authClient.useSession();
+    const { user } = useAuth();
     const router = useRouter()
-    const trainerName = session?.user?.name;
-    const trainerEmail = session?.user?.email;
+    const trainerName = user?.name;
+    const trainerEmail = user?.email;
 
     useEffect(() => {
-        if (!session?.user?.email)
+        if (!user?.email)
             return;
 
         const fetchProfile =
             async () => {
                 try {
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.email}`
-                        );
-
-                    if (!res.ok) {
-                        return;
-                    }
-
-                    const data =
-                        await res.json();
+                    const { data } = await axiosInstance.get(
+                        `/users/${user.email}`
+                    );
 
                     setProfile(data);
                 } catch (error) {
@@ -171,7 +165,7 @@ export default function AddClassPage() {
             };
 
         fetchProfile();
-    }, [session]);
+    }, [user?.email]);
 
 
     const {
@@ -221,18 +215,10 @@ export default function AddClassPage() {
             };
 
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/classes`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(classData),
-                }
+            const { data: result } = await axiosInstance.post(
+                "/classes",
+                classData
             );
-
-            const result = await res.json();
 
             if (result.insertedId) {
                 await Swal.fire({
@@ -261,7 +247,7 @@ export default function AddClassPage() {
     if (profileLoading) {
         return (
             <div className="p-10">
-                Loading...
+                <LoadingSpinner />
             </div>
         );
     }
@@ -393,7 +379,7 @@ export default function AddClassPage() {
                                                 alt={selectedTemplate.className}
                                                 fill
                                                 priority
-                                                
+
                                                 sizes="(max-width: 768px) 100vw, 50vw"
                                                 className="object-cover"
                                             />

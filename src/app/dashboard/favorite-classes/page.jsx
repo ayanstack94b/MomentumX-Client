@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const FavoriteClassesPage = () => {
-    const { data: session } =
-        authClient.useSession();
+    const { user, loading: authLoading } = useAuth();
 
     const email =
-        session?.user?.email;
+        user?.email;
 
     const [favorites, setFavorites] =
         useState([]);
@@ -23,26 +23,19 @@ const FavoriteClassesPage = () => {
     useEffect(() => {
         if (!email) return;
 
-        const fetchFavorites =
-            async () => {
-                try {
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/favorites/${email}`
-                        );
+        const fetchFavorites = async () => {
+            try {
+                const { data } = await axiosInstance.get(
+                    `/favorites/${email}`
+                );
 
-                    const data =
-                        await res.json();
-
-                    setFavorites(data);
-                } catch (error) {
-                    console.error(
-                        error
-                    );
-                } finally {
-                    setLoading(false);
-                }
-            };
+                setFavorites(data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         fetchFavorites();
     }, [email]);

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
+
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -89,7 +90,8 @@ const RegisterPage = () => {
                 timer: 1500,
                 showConfirmButton: false,
             });
-            router.push("/dashboard");
+
+            router.push("/login");
 
         } catch (error) {
             Swal.fire({

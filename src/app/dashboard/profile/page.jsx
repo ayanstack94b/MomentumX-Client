@@ -7,30 +7,32 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaUserShield, FaPhone, FaMapMarkerAlt, FaEdit, FaUserCircle } from "react-icons/fa";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 
 export default function ProfilePage() {
-    const { data: session, isPending } = authClient.useSession();
+    const { user, loading } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loadingProfile, setLoadingProfile] = useState(true);
-
-    const user = session?.user;
-    const email = session?.user?.email;
+    const [application, setApplication] = useState(null);
+    const email = user?.email;
 
     useEffect(() => {
         if (!email) return;
 
         const fetchProfile = async () => {
             try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/users/${email}`
+                const { data } = await axiosInstance.get(
+                    `/users/${user?.email}`
                 );
-                console.log("Status:", res.status);
-                console.log("OK:", res.ok);
-
-                const data = await res.json();
 
                 setProfile(data);
+                const { data: applicationData } = await axiosInstance.get(
+                    `/trainer-applications/${user.email}`
+                );
+
+                setApplication(applicationData);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -48,7 +50,7 @@ export default function ProfilePage() {
     };
     // to prevent error while loading
 
-    if (isPending || loadingProfile) {
+    if (loading || loadingProfile) {
         return <LoadingSpinner />;
     }
 
@@ -69,18 +71,18 @@ export default function ProfilePage() {
                             <Image
                                 src={profile?.image}
                                 alt={profile?.name}
-                                width={140}
-                                height={140}
+                                width={150}
+                                height={100}
                                 priority
                                 className="rounded-full border-4 border-red-500 object-cover"
                             />
                         ) : (
-                                <div className="flex h-[140px] w-[140px] items-center justify-center rounded-full border-4 border-red-500 bg-white/5">
-                                    <FaUserCircle
-                                        className="text-red-500"
-                                        size={100}
-                                    />
-                                </div>
+                            <div className="flex h-[140px] w-[140px] items-center justify-center rounded-full border-4 border-red-500 bg-white/5">
+                                <FaUserCircle
+                                    className="text-red-500"
+                                    size={100}
+                                />
+                            </div>
                         )}
 
                         <div>
@@ -107,6 +109,72 @@ export default function ProfilePage() {
                                     {profile?.status}
                                 </span>
                             </div>
+
+
+                            {/* Trainer Application */}
+                            {profile.role === "member" && (
+                                <div className="mt-5">
+
+                             
+
+                                    {application?.status === "pending" && (
+                                        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+
+                                            <p className="font-semibold text-yellow-400">
+                                                Pending Review
+                                            </p>
+
+                                            <p className="mt-3 text-sm text-gray-300">
+                                                Your trainer application is currently under review.
+                                            </p>
+
+                                        </div>
+                                    )}
+
+                                    {application?.status === "approved" && (
+                                        <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
+
+                                            <p className="font-semibold text-green-400">
+                                                Application Approved
+                                            </p>
+
+                                            <p className="mt-3 text-sm text-gray-300">
+                                                Congratulations! You are now a certified trainer on MomentumX.
+                                            </p>
+
+                                        </div>
+                                    )}
+
+                                    {application?.status === "rejected" && (
+                                        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+
+                                            <p className="font-semibold text-red-400">
+                                                Application Rejected
+                                            </p>
+
+                                            <p className="mt-3 text-sm text-gray-300">
+                                                {application?.feedback ||
+                                                    "No feedback was provided by the administrator."}
+                                            </p>
+
+                                        </div>
+                                    )}
+
+                                    {!application && (
+                                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+
+                                            <p className="text-sm text-gray-400">
+                                                You haven't applied to become a trainer yet.
+                                            </p>
+
+                                        </div>
+                                    )}
+
+                                </div>
+                            )}
+
+
+
                         </div>
                     </div>
 
