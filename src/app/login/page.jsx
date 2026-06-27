@@ -110,7 +110,7 @@ const LoginPage = () => {
         try {
             await authClient.signIn.social({
                 provider: "google",
-                callbackURL: "http://localhost:3000/dashboard",
+                callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
             });
         } catch (error) {
             console.error(error);
