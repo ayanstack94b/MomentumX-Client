@@ -17,6 +17,8 @@ export default function AddForumPostPage() {
     const { user, loading } = useAuth();
     const fileInputRef = useRef(null);
 
+
+
     const forumImages = [
         {
             name: "Strength Training",
@@ -51,6 +53,17 @@ export default function AddForumPostPage() {
     const [uploadedImage, setUploadedImage] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [imageName, setImageName] = useState("");
+
+    // Disable Logic
+
+    const disableTemplate =
+        canUploadImage &&
+        Boolean(uploadedImage);
+
+    const disableUpload =
+        !canUploadImage ||
+        Boolean(selectedImage);
+
 
     useEffect(() => {
         console.log("Uploaded Image State:", uploadedImage);
@@ -154,7 +167,6 @@ export default function AddForumPostPage() {
                 throw new Error(
                     "Image upload failed."
                 );
-
             }
             // Save Uploaded Image URL
 
@@ -442,6 +454,7 @@ export default function AddForumPostPage() {
                                         </label>
 
                                         <select
+                                            disabled={disableTemplate}
                                             {...register("image")}
                                             className="select h-14 w-full border border-white/10 bg-slate-900 focus:border-red-500"
                                         >
@@ -492,9 +505,9 @@ export default function AddForumPostPage() {
                                                 handleImageUpload(file);
 
                                             }} ref={fileInputRef}
+                                                disabled={disableUpload}
                                                 type="file"
                                                 accept="image/*"
-                                                disabled={!canUploadImage}
                                                 className="hidden"
                                             />
                                         </label>
@@ -504,7 +517,7 @@ export default function AddForumPostPage() {
                                     </div>
 
                                 </div>
-                               
+
 
                             </div>
 
