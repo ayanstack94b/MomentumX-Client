@@ -108,12 +108,13 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            console.log(process.env.NEXT_PUBLIC_APP_URL);
+            console.log("APP URL:", process.env.NEXT_PUBLIC_APP_URL);
+
             await authClient.signIn.social({
                 provider: "google",
-                callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+                callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
             });
-           
+
         } catch (error) {
             console.error(error);
 
