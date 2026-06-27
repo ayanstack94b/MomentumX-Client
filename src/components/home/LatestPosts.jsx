@@ -118,7 +118,7 @@ const LatestPosts = () => {
                             <div className="relative h-52 overflow-hidden">
                                 <Image
                                     src={
-                                        item.image?.startsWith(
+                                        item?.image?.startsWith(
                                             "http"
                                         )
                                             ? item.image

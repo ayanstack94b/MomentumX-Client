@@ -119,8 +119,8 @@ const BookedClassesPage = () => {
                             >
                                 <div className="relative h-56">
                                     <Image
-                                        src={booking.image}
-                                        alt={booking.className}
+                                        src={booking?.image}
+                                        alt={booking?.className}
                                         fill
                                         sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                         className="object-cover"
@@ -130,7 +130,7 @@ const BookedClassesPage = () => {
                                 <div className="p-5">
                                     <div className="flex items-center justify-between">
                                         <h2 className="text-xl font-bold">
-                                            {booking.className}
+                                            {booking?.className}
                                         </h2>
 
                                         <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">

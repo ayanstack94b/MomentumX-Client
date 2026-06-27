@@ -151,8 +151,8 @@ const MyClassesPage = () => {
                         >
                             <div className="relative h-56">
                                 <Image
-                                    src={item.image}
-                                    alt={item.className}
+                                    src={item?.image}
+                                    alt={item?.className}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                     className="object-cover"
@@ -162,7 +162,7 @@ const MyClassesPage = () => {
                             <div className="p-5">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-xl font-bold">
-                                        {item.className}
+                                        {item?.className}
                                     </h2>
 
                                     <span

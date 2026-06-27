@@ -537,8 +537,8 @@ const ForumDetailsPage = () => {
                     <div className="relative h-[250px] md:h-[400px]">
 
                         <Image
-                            src={post.image}
-                            alt={post.title}
+                            src={post?.image}
+                            alt={post?.title}
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                             className="object-cover"

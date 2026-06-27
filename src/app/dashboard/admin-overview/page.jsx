@@ -104,7 +104,7 @@ const AdminOverviewPage = () => {
                     opacity: 1,
                     y: 0,
                 }}
-                className="p-5"
+                className="w-full max-w-full overflow-x-hidden p-4 sm:p-5 lg:p-6"
             >
 
                 {/* Header */}
@@ -123,7 +123,7 @@ const AdminOverviewPage = () => {
 
                 {/* Stats Cards */}
 
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 mr-3">
+                <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
 
                     {cards.map(
                         (
@@ -151,7 +151,7 @@ const AdminOverviewPage = () => {
                                 whileHover={{
                                     y: -5,
                                 }}
-                                className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${card.bg} p-6 backdrop-blur-xl`}
+                                className={`relative w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br ${card.bg} p-6 backdrop-blur-xl`}
                             >
 
                                 {/* Glow */}
@@ -209,15 +209,14 @@ const AdminOverviewPage = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="my-10 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl mr-3"
+                    className="my-10 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
                 >
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                         {/* Profile Image */}
                         <div className="flex justify-center sm:justify-start">
                             <img
                                 src={
-                                    user?.image ||
-                                    "https://i.pravatar.cc/150?img=12"
+                                    user?.image || "/default-avatar.png"
                                 }
                                 alt={user?.name}
                                 className="h-24 w-24 rounded-full border-2 border-red-500 object-cover"
@@ -249,7 +248,7 @@ const AdminOverviewPage = () => {
 
                 {/* Recent Activity */}
 
-                <div className="mt-10 grid gap-6 lg:grid-cols-2 mr-3">
+                <div className="mt-10 grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
 
                     {/* Recent Users */}
 
@@ -262,7 +261,7 @@ const AdminOverviewPage = () => {
                             opacity: 1,
                             y: 0,
                         }}
-                        className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl mr-3"
+                        className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
                     >
 
                         <h2 className="mb-5 text-xl font-semibold text-white">

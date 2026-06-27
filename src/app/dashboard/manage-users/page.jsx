@@ -300,13 +300,13 @@ const ManageUsersPage = () => {
                                         <td className="min-w-[300px]">
                                             <div className="flex items-center gap-4">
                                                 <img
-                                                    src={member.image}
-                                                    alt={member.name}
+                                                    src={member?.image}
+                                                    alt={member?.name}
                                                     className="h-11 w-11 rounded-full object-cover ring ring-white/10"
                                                 />
                                                 <div>
                                                     <h3 className="font-semibold text-white">
-                                                        {member.name}
+                                                        {member?.name}
                                                     </h3>
                                                     <p className="text-xs text-gray-500">
                                                         Member Since

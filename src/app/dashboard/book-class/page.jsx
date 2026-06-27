@@ -106,8 +106,8 @@ export default function BookClassPage() {
                                 >
                                     <div className="relative h-56">
                                         <Image
-                                            src={item.image}
-                                            alt={item.className}
+                                            src={item?.image}
+                                            alt={item?.className}
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                             className="object-cover"

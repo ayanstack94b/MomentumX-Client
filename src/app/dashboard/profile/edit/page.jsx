@@ -146,8 +146,8 @@ export default function EditProfilePage() {
                 <div className="my-8 flex flex-col items-center gap-4">
                     {profile?.image ? (
                         <Image
-                            src={profile.image}
-                            alt={profile.name || "User"}
+                            src={profile?.image || "/default-avatar.png"}
+                            alt={profile?.name || "User"}
                             width={120}
                             height={120}
                             priority

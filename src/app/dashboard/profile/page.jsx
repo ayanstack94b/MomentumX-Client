@@ -68,7 +68,7 @@ export default function ProfilePage() {
                     <div className="flex flex-col items-center gap-5 md:flex-row">
                         {profile?.image ? (
                             <Image
-                                src={profile?.image}
+                                src={profile?.image || "/default-avatar.png"}
                                 alt={profile?.name}
                                 width={150}
                                 height={100}

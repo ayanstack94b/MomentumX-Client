@@ -72,9 +72,12 @@ const LoginPage = () => {
 
             if (profile.role === "admin") {
                 router.push("/dashboard/admin-overview");
-            }
-            else {
-                router.push("/dashboard");
+            } else if (profile.role === "trainer") {
+                router.push("/dashboard/trainer-overview");
+            } else if (profile.role === "member") {
+                router.push("/dashboard/member-overview");
+            } else {
+                router.push("/");
             }
 
         } catch (error) {

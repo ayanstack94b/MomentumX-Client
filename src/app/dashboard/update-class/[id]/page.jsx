@@ -209,8 +209,8 @@ const UpdateClassPage = () => {
                         >
                             <div className="grid md:grid-cols-[320px_1fr]">
                                 <Image
-                                    src={classData.image}
-                                    alt={classData.className}
+                                    src={classData?.image}
+                                    alt={classData?.className}
                                     width={500}
                                     height={300}
                                     className="h-full min-h-[240px] w-full object-cover"
@@ -218,11 +218,11 @@ const UpdateClassPage = () => {
 
                                 <div className="flex flex-col justify-center p-6">
                                     <span className="mb-3 w-fit rounded-full bg-red-600/20 px-3 py-1 text-sm text-red-400">
-                                        {classData.category}
+                                        {classData?.category}
                                     </span>
 
                                     <h3 className="text-2xl font-bold">
-                                        {classData.className}
+                                        {classData?.className}
                                     </h3>
 
                                     <p className="mt-2 text-gray-400">

@@ -201,7 +201,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 ">
                                     {user.image?.startsWith("http") ? (
                                         <Image
-                                            src={user?.image}
+                                            src={user?.image || "/default-avatar.png"}
                                             alt={user?.name}
                                             width={40}
                                             height={40}
@@ -320,7 +320,7 @@ export default function Navbar() {
                                         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
                                             {user?.image?.startsWith("http") ? (
                                                 <Image
-                                                    src={user?.image}
+                                                    src={user?.image || "/default-avatar.png"}
                                                     alt={user?.name}
                                                     width={50}
                                                     height={50}

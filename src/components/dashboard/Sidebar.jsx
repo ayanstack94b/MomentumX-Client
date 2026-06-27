@@ -85,11 +85,6 @@ export default function Sidebar() {
                 icon: <FaChartLine />,
             },
             {
-                name: "Profile",
-                href: "/dashboard/profile",
-                icon: <FaUser />,
-            },
-            {
                 name: "Book a Class",
                 href: "/dashboard/book-class",
                 icon: <FaClipboardList />,

@@ -239,7 +239,7 @@ export default function TrainerOverviewPage() {
                         <div className="flex justify-center sm:justify-start">
                             {profile?.image ? (
                                 <img
-                                    src={profile?.image}
+                                    src={profile?.image || "/default-avatar.png"}
                                     alt={profile?.name}
                                     className="h-28 w-28 rounded-full border-2 border-red-500 object-cover"
                                 />
@@ -314,8 +314,8 @@ export default function TrainerOverviewPage() {
 
                                         <span
                                             className={`rounded-full px-3 py-1 text-xs font-medium ${item?.status === "approved"
-                                                    ? "bg-green-500/10 text-green-400"
-                                                    : "bg-yellow-500/10 text-yellow-400"
+                                                ? "bg-green-500/10 text-green-400"
+                                                : "bg-yellow-500/10 text-yellow-400"
                                                 }`}
                                         >
                                             {item?.status}
