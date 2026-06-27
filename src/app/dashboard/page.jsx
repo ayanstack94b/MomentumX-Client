@@ -11,9 +11,7 @@ export default function DashboardPage() {
     const [users, setUsers] = useState([]);
     const [classes, setClasses] = useState([]);
     const [forums, setForums] = useState({ total: 0, forums: [] });
-
-
-
+    const [trainerClasses, setTrainerClasses] = useState([]);
     // fetching all needed data
     useEffect(() => {
 
@@ -37,13 +35,6 @@ export default function DashboardPage() {
         fetchDashboardData();
 
     }, []);
-
-    console.log("USERS:", users);
-    console.log("FORUMS:", forums);
-    console.log("CLASSES:", classes);
-    console.log(typeof users);
-    console.log(typeof forums);
-    console.log(typeof classes);
 
 
     // Real stats
@@ -172,16 +163,15 @@ export default function DashboardPage() {
                     >
                         <FaUsers className="text-3xl text-cyan-400" />
                     </motion.div>
-
                     <h3 className="text-4xl font-bold">
                         <CountUp
-                            end={totalUsers}
+                            end={trainerClasses.length}
                             duration={2}
                         />
                     </h3>
 
                     <p className="mt-2 text-[var(--text-secondary)]">
-                        Community Members
+                        Total Classes Created
                     </p>
                 </motion.div>
 

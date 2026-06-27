@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import {FaUsers,FaUserTie,FaDumbbell,FaComments} from "react-icons/fa";
+import { FaUsers, FaUserTie, FaDumbbell, FaComments, FaCalendarCheck } from "react-icons/fa";
 import AdminRoute from "@/components/shared/AdminRoute";
 
 const AdminOverviewPage = () => {
@@ -52,7 +52,7 @@ const AdminOverviewPage = () => {
                 setLoading(false);
             }
         };
-        
+
 
         fetchData();
     }, [user]);
@@ -83,9 +83,9 @@ const AdminOverviewPage = () => {
         },
 
         {
-            title: "Forum Posts",
-            value: stats.totalPosts,
-            icon: <FaComments />,
+            title: "Booked Classes",
+            value: stats.totalBookedClasses,
+            icon: <FaCalendarCheck />,
             color: "text-purple-400",
             bg: "from-purple-500/10 to-pink-500/10",
         },
@@ -107,209 +107,252 @@ const AdminOverviewPage = () => {
                 className="p-5"
             >
 
-            {/* Header */}
+                {/* Header */}
 
-            <div className="mb-8">
+                <div className="mb-8">
 
-                <h1 className="heading-font text-4xl">
-                    Admin Overview
-                </h1>
+                    <h1 className="heading-font text-4xl">
+                        Admin Overview
+                    </h1>
 
-                <p className="mt-2 text-gray-400">
-                    Monitor platform activity and key statistics.
-                </p>
+                    <p className="mt-2 text-gray-400">
+                        Monitor platform activity and key statistics.
+                    </p>
 
-            </div>
+                </div>
 
-            {/* Stats Cards */}
+                {/* Stats Cards */}
 
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 mr-3">
 
-                {cards.map(
-                    (
-                        card,
-                        index
-                    ) => (
-
-                        <motion.div
-                            key={
-                                card.title
-                            }
-                            initial={{
-                                opacity: 0,
-                                y: 20,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                            }}
-                            transition={{
-                                delay:
-                                    index *
-                                    0.1,
-                            }}
-                            whileHover={{
-                                y: -5,
-                            }}
-                            className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${card.bg} p-6 backdrop-blur-xl`}
-                        >
-
-                            {/* Glow */}
+                    {cards.map(
+                        (
+                            card,
+                            index
+                        ) => (
 
                             <motion.div
+                                key={
+                                    card.title
+                                }
+                                initial={{
+                                    opacity: 0,
+                                    y: 20,
+                                }}
                                 animate={{
-                                    scale: [
-                                        1,
-                                        1.15,
-                                        1,
-                                    ],
+                                    opacity: 1,
+                                    y: 0,
                                 }}
                                 transition={{
-                                    duration: 4,
-                                    repeat: Infinity,
+                                    delay:
+                                        index *
+                                        0.1,
                                 }}
-                                className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white/5 blur-3xl"
-                            />
+                                whileHover={{
+                                    y: -5,
+                                }}
+                                className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br ${card.bg} p-6 backdrop-blur-xl`}
+                            >
 
-                            <div className="relative z-10">
+                                {/* Glow */}
 
-                                <div
-                                    className={`mb-4 text-4xl ${card.color}`}
-                                >
-                                    {
-                                        card.icon
-                                    }
+                                <motion.div
+                                    animate={{
+                                        scale: [
+                                            1,
+                                            1.15,
+                                            1,
+                                        ],
+                                    }}
+                                    transition={{
+                                        duration: 4,
+                                        repeat: Infinity,
+                                    }}
+                                    className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white/5 blur-3xl"
+                                />
+
+                                <div className="relative z-10">
+
+                                    <div
+                                        className={`mb-4 text-4xl ${card.color}`}
+                                    >
+                                        {
+                                            card.icon
+                                        }
+                                    </div>
+
+                                    <h3 className="text-sm uppercase tracking-wider text-gray-400">
+                                        {
+                                            card.title
+                                        }
+                                    </h3>
+
+                                    <h2 className="mt-2 text-4xl font-bold text-white">
+
+                                        {loading
+                                            ? "..."
+                                            : card.value}
+
+                                    </h2>
+
                                 </div>
 
-                                <h3 className="text-sm uppercase tracking-wider text-gray-400">
-                                    {
-                                        card.title
-                                    }
-                                </h3>
+                            </motion.div>
 
-                                <h2 className="mt-2 text-4xl font-bold text-white">
+                        )
+                    )}
+                </div>
 
-                                    {loading
-                                        ? "..."
-                                        : card.value}
-
-                                </h2>
-
-                            </div>
-
-                        </motion.div>
-
-                    )
-                )}
-
-            </div>
-
-            {/* Recent Activity */}
-
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
-
-                {/* Recent Users */}
+                {/* Admin Profile */}
 
                 <motion.div
-                    initial={{
-                        opacity: 0,
-                        y: 20,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        y: 0,
-                    }}
-                    className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="my-10 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl mr-3"
                 >
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+                        {/* Profile Image */}
+                        <div className="flex justify-center sm:justify-start">
+                            <img
+                                src={
+                                    user?.image ||
+                                    "https://i.pravatar.cc/150?img=12"
+                                }
+                                alt={user?.name}
+                                className="h-24 w-24 rounded-full border-2 border-red-500 object-cover"
+                            />
+                        </div>
 
-                    <h2 className="mb-5 text-xl font-semibold text-white">
-                        Recent Users
-                    </h2>
+                        {/* User Details */}
+                        <div className="min-w-0 flex-1 text-center sm:text-left">
+                            <h2 className="break-words text-2xl font-semibold text-white">
+                                {user?.name}
+                            </h2>
 
-                    <div className="space-y-4">
+                            <p className="mt-2 break-all text-sm text-gray-400">
+                                {user?.email}
+                            </p>
 
-                        {recentUsers.map(
-                            (user) => (
+                            <div className="mt-4 flex flex-wrap justify-center gap-3 sm:justify-start">
+                                <span className="rounded-full bg-red-500/10 px-4 py-1 text-sm font-medium text-red-400">
+                                    Admin
+                                </span>
 
-                                <div
-                                    key={user._id}
-                                    className="flex items-center justify-between border-b border-white/5 pb-3"
-                                >
+                                <span className="rounded-full bg-white/5 px-4 py-1 text-sm text-gray-300">
+                                    Platform Administrator
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
 
-                                    <div>
+                {/* Recent Activity */}
+
+                <div className="mt-10 grid gap-6 lg:grid-cols-2 mr-3">
+
+                    {/* Recent Users */}
+
+                    <motion.div
+                        initial={{
+                            opacity: 0,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            y: 0,
+                        }}
+                        className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl mr-3"
+                    >
+
+                        <h2 className="mb-5 text-xl font-semibold text-white">
+                            Recent Users
+                        </h2>
+
+                        <div className="space-y-4">
+
+                            {recentUsers.map(
+                                (user) => (
+
+                                    <div
+                                        key={user._id}
+                                        className="flex items-center justify-between border-b border-white/5 pb-3"
+                                    >
+
+                                        <div>
+
+                                            <h3 className="font-medium text-white">
+                                                {user.name}
+                                            </h3>
+
+                                            <p className="text-sm text-gray-400">
+                                                {user.email}
+                                            </p>
+
+                                        </div>
+
+                                        <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs text-red-400">
+                                            {user.role}
+                                        </span>
+
+                                    </div>
+
+                                )
+                            )}
+
+                        </div>
+
+                    </motion.div>
+
+                    {/* Recent Forum Posts */}
+
+                    <motion.div
+                        initial={{
+                            opacity: 0,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            y: 0,
+                        }}
+                        transition={{
+                            delay: 0.1,
+                        }}
+                        className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+                    >
+
+                        <h2 className="mb-5 text-xl font-semibold text-white">
+                            Recent Forum Posts
+                        </h2>
+
+                        <div className="space-y-4">
+
+                            {recentPosts.map(
+                                (post) => (
+
+                                    <div
+                                        key={post._id}
+                                        className="border-b border-white/5 pb-3"
+                                    >
 
                                         <h3 className="font-medium text-white">
-                                            {user.name}
+                                            {post.title}
                                         </h3>
 
-                                        <p className="text-sm text-gray-400">
-                                            {user.email}
+                                        <p className="mt-1 text-sm text-gray-400">
+                                            {post.authorName}
                                         </p>
 
                                     </div>
 
-                                    <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs text-red-400">
-                                        {user.role}
-                                    </span>
+                                )
+                            )}
 
-                                </div>
+                        </div>
 
-                            )
-                        )}
+                    </motion.div>
 
-                    </div>
-
-                </motion.div>
-
-                {/* Recent Forum Posts */}
-
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                        y: 20,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        y: 0,
-                    }}
-                    transition={{
-                        delay: 0.1,
-                    }}
-                    className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
-                >
-
-                    <h2 className="mb-5 text-xl font-semibold text-white">
-                        Recent Forum Posts
-                    </h2>
-
-                    <div className="space-y-4">
-
-                        {recentPosts.map(
-                            (post) => (
-
-                                <div
-                                    key={post._id}
-                                    className="border-b border-white/5 pb-3"
-                                >
-
-                                    <h3 className="font-medium text-white">
-                                        {post.title}
-                                    </h3>
-
-                                    <p className="mt-1 text-sm text-gray-400">
-                                        {post.authorName}
-                                    </p>
-
-                                </div>
-
-                            )
-                        )}
-
-                    </div>
-
-                </motion.div>
-
-            </div>
+                </div>
 
             </motion.div>
         </AdminRoute>

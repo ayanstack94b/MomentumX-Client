@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";

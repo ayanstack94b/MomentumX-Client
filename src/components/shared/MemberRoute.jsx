@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 
-export default function TrainerRoute({ children }) {
+export default function MemberRoute({ children }) {
     const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -15,7 +15,7 @@ export default function TrainerRoute({ children }) {
             return;
         }
 
-        if (!loading && user && user.role !== "trainer") {
+        if (!loading && user && user.role !== "member") {
             router.push("/dashboard");
         }
     }, [loading, user, router]);
@@ -24,7 +24,7 @@ export default function TrainerRoute({ children }) {
         return <LoadingSpinner />;
     }
 
-    if (!user || user.role !== "trainer") {
+    if (!user || user.role !== "member") {
         return null;
     }
 

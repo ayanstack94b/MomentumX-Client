@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { authClient } from "@/lib/auth-client";
-import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, FaUsers, FaChartLine, } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaCalendarCheck, FaSignOutAlt, FaPlusCircle, FaClipboardList, FaUserCheck, FaHeart, FaComments, FaPen, FaRegComments, FaUsers, FaChartLine, FaUserTie, FaMoneyCheckAlt, } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -80,6 +80,16 @@ export default function Sidebar() {
     if (profile?.role === "member") {
         links.push(
             {
+                name: "Member Overview",
+                href: "/dashboard/member-overview",
+                icon: <FaChartLine />,
+            },
+            {
+                name: "Profile",
+                href: "/dashboard/profile",
+                icon: <FaUser />,
+            },
+            {
                 name: "Book a Class",
                 href: "/dashboard/book-class",
                 icon: <FaClipboardList />,
@@ -90,31 +100,36 @@ export default function Sidebar() {
                 icon: <FaHeart />,
             },
             {
-                name: "My Booked classes",
+                name: "My Booked Classes",
                 href: "/dashboard/booked-classes",
                 icon: <FaCalendarCheck />,
             },
             {
                 name: "My Community Posts",
                 href: "/dashboard/my-forum-posts",
-                icon: <FaComments></FaComments>,
+                icon: <FaComments />,
             },
             {
                 name: "Become Trainer",
                 href: "/dashboard/become-trainer",
                 icon: <FaUserCheck />,
             },
-
             {
                 name: "Trainer Status",
                 href: "/dashboard/trainer-status",
                 icon: <GrStatusUnknown />,
-            }
+            },
         );
     }
     // Trainer
     if (profile?.role === "trainer") {
         links.push(
+            {
+                name: "Trainer Overview",
+                href: "/dashboard/trainer-overview",
+                icon: <FaChartLine />,
+            },
+           
             {
                 name: "Add Class",
                 href: "/dashboard/add-class",
@@ -131,52 +146,55 @@ export default function Sidebar() {
                 icon: <FaPen />,
             },
             {
-                name: "My Community Posts",
+                name: "My Forum Posts",
                 href: "/dashboard/my-forum-posts",
                 icon: <FaRegComments />,
-            }
+            },
         );
     }
     // Admin
     if (profile?.role === "admin") {
         links.push(
             {
-                name: "Trainer Applications",
-                href: "/dashboard/all-trainer-applications",
-                icon: <FaUserCheck />,
-            },
-            {
                 name: "Admin Overview",
                 href: "/dashboard/admin-overview",
                 icon: <FaChartLine />,
             },
             {
+                name: "Manage Users",
+                href: "/dashboard/manage-users",
+                icon: <FaUsers />,
+            },
+            {
+                name: "Trainer Applications",
+                href: "/dashboard/all-trainer-applications",
+                icon: <FaUserCheck />,
+            },
+            {
                 name: "Manage Trainers",
                 href: "/dashboard/manage-trainers",
-                icon: <FaChartLine />,
+                icon: <FaUserTie />,
+            },
+            {
+                name: "Transactions",
+                href: "/dashboard/transactions",
+                icon: <FaMoneyCheckAlt />,
             },
             {
                 name: "Manage Classes",
                 href: "/dashboard/manage-classes",
                 icon: <FaClipboardList />,
             },
-
             {
                 name: "Add Forum Post",
                 href: "/dashboard/add-forum-post",
                 icon: <FaPen />,
             },
-
             {
                 name: "Manage Forum Posts",
                 href: "/dashboard/manage-forum-posts",
                 icon: <FaComments />,
             },
-            {
-                name: "Manage Users",
-                href: "/dashboard/manage-users",
-                icon: <FaUsers />
-            }
         );
     }
 
