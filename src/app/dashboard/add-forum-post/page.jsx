@@ -8,12 +8,14 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";
+import { useEffect, useRef, useState } from "react";
+import { FaCloudUploadAlt } from "react-icons/fa";
 
 export default function AddForumPostPage() {
 
     const router = useRouter();
-
     const { user, loading } = useAuth();
+    const fileInputRef = useRef(null);
 
     const forumImages = [
         {
@@ -38,17 +40,163 @@ export default function AddForumPostPage() {
         },
     ];
 
-
-
     const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
-    const selectedImage = watch("image");
 
+    const selectedImage = watch("image");
+    const canUploadImage =
+        user?.role === "admin" ||
+        user?.role === "trainer";
+
+    // Placeholder until ImageBB integration
+    const [uploadedImage, setUploadedImage] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageName, setImageName] = useState("");
+
+    useEffect(() => {
+        console.log("Uploaded Image State:", uploadedImage);
+    }, [uploadedImage]);
+
+
+    const handleImageUpload = async (file) => {
+        // No File Selected
+
+        if (!file) return;
+
+        // Allowed Image Formats
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+        ];
+
+        // Validate Image Format
+
+        if (!allowedTypes.includes(file.type)) {
+
+            await Swal.fire({
+                icon: "error",
+                title: "Unsupported File",
+                text: "Please upload only JPG, JPEG, PNG or WEBP images.",
+            });
+
+            return;
+        }
+        // Validate Maximum File Size (5 MB)
+
+        if (file.size > 5 * 1024 * 1024) {
+
+            await Swal.fire({
+                icon: "error",
+                title: "Image Too Large",
+                text: "Maximum allowed image size is 5 MB.",
+            });
+
+            return;
+        }
+        // Save Selected File Name
+
+        setImageName(file.name);
+
+        try {
+            // Start Uploading
+
+            setUploadingImage(true);
+
+            // Remove any previously uploaded image
+            setUploadedImage(null);
+
+            // Get ImageBB API Key
+
+            const apiKey =
+                process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
+
+            if (!apiKey) {
+
+                throw new Error(
+                    "ImageBB API key is missing."
+                );
+
+            }
+            // Prepare Image For Upload
+
+            const formData = new FormData();
+
+            formData.append(
+                "image",
+                file
+            );
+            // Upload To ImageBB
+
+            const response = await fetch(
+                `https://api.imgbb.com/1/upload?key=${apiKey}`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+            // Check Server Response
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to connect to ImageBB."
+                );
+
+            }
+
+            const result = await response.json();
+            console.log("ImageBB Response:", result);
+            // Check Upload Success
+            if (!result.success) {
+
+                throw new Error(
+                    "Image upload failed."
+                );
+
+            }
+            // Save Uploaded Image URL
+
+            setUploadedImage(result.data.url);
+            console.log("Uploaded URL:", result.data.url);
+            // Success Alert
+
+            await Swal.fire({
+                icon: "success",
+                title: "Image Uploaded Successfully",
+                timer: 1200,
+                showConfirmButton: false,
+            });
+
+        } catch (error) {
+
+            console.error(error);
+            // Upload Failed
+
+            await Swal.fire({
+                icon: "error",
+                title: "Upload Failed",
+                text:
+                    error.message ||
+                    "Something went wrong while uploading the image.",
+            });
+
+        } finally {
+            // Stop Loading
+
+            setUploadingImage(false);
+
+        }
+
+    };
     const onSubmit = async (data) => {
 
         const forumData = {
             title:
                 data.title,
             image:
+                uploadedImage ||
                 data.image,
             description:
                 data.description,
@@ -85,6 +233,15 @@ export default function AddForumPostPage() {
 
                 reset();
 
+                setUploadedImage(null);
+                setImageName("");
+
+                // Clear file input
+                if (fileInputRef.current) {
+
+                    fileInputRef.current.value = "";
+
+                }
                 router.push("/forum");
 
             }
@@ -187,10 +344,9 @@ export default function AddForumPostPage() {
 
                         <div className="relative h-80">
 
-                            {selectedImage ? (
-
+                            {uploadedImage || selectedImage ? (
                                 <Image
-                                    src={selectedImage}
+                                    src={uploadedImage || selectedImage}
                                     alt="Forum Preview"
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
@@ -272,37 +428,85 @@ export default function AddForumPostPage() {
                                 className="input w-full border border-white/10 bg-slate-900/50 backdrop-blur-sm focus:border-red-500"
                             />
 
-                            <select
-                                {...register(
-                                    "image"
-                                )}
-                                className="select w-full border border-white/10 bg-slate-900 backdrop-blur-sm focus:border-red-500"
-                            >
-                                <option value="">
-                                    Select a Cover Image
-                                </option>
+                            {/* Cover Image */}
 
+                            <div className="space-y-3">
 
+                                <div className="grid gap-5 md:grid-cols-2">
 
-                                {forumImages.map(
-                                    (
-                                        item
-                                    ) => (
-                                        <option
-                                            key={
-                                                item.name
-                                            }
-                                            value={
-                                                item.url
-                                            }
+                                    {/* Template */}
+
+                                    <div className="flex flex-col">
+                                        <label className="mb-2 text-sm font-medium text-gray-300">
+                                            Template Cover
+                                        </label>
+
+                                        <select
+                                            {...register("image")}
+                                            className="select h-14 w-full border border-white/10 bg-slate-900 focus:border-red-500"
                                         >
-                                            {
-                                                item.name
-                                            }
-                                        </option>
-                                    )
-                                )}
-                            </select>
+                                            <option value="">Select Template</option>
+
+                                            {forumImages.map((item) => (
+                                                <option
+                                                    key={item.name}
+                                                    value={item.url}
+                                                >
+                                                    {item.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p className="mt-3 text-xs text-gray-500">
+                                            Select a template or upload your own cover image.
+                                        </p>
+                                    </div>
+
+                                    {/* Upload */}
+
+                                    <div className="flex flex-col">
+                                        <label className="mb-2 text-sm font-medium text-gray-300">
+                                            Upload Image
+                                        </label>
+
+                                        <label
+                                            className={`flex h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed transition-all ${canUploadImage
+                                                ? "cursor-pointer border-red-500/30 bg-red-500/5 hover:border-red-500 hover:bg-red-500/10"
+                                                : "cursor-not-allowed border-white/10 bg-white/5 opacity-60"
+                                                }`}
+                                        >
+                                            <FaCloudUploadAlt className="text-lg text-red-400" />
+
+                                            <span className="font-medium">
+                                                {canUploadImage
+                                                    ? "Choose Image"
+                                                    : "Trainer/Admin Only"}
+                                            </span>
+
+                                            <input onChange={(e) => {
+
+                                                const file =
+                                                    e.target.files?.[0];
+
+                                                if (!file) return;
+
+                                                handleImageUpload(file);
+
+                                            }} ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                disabled={!canUploadImage}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                        <p className="mt-2 text-xs leading-5 text-gray-500">
+                                            Supported: JPG, JPEG, PNG, WEBP • Maximum size: 5 MB
+                                        </p>
+                                    </div>
+
+                                </div>
+                               
+
+                            </div>
 
                             <select
                                 {...register("category")}
@@ -348,6 +552,7 @@ export default function AddForumPostPage() {
                             />
 
                             <motion.button
+                                disabled={uploadingImage}
                                 whileHover={{
                                     scale: 1.02,
                                     y: -2,
@@ -359,7 +564,11 @@ export default function AddForumPostPage() {
                                 }}
                                 className="btn h-14 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-lg text-white"
                             >
-                                🚀 Publish Post
+                                {
+                                    uploadingImage
+                                        ? "Uploading Image..."
+                                        : "🚀 Publish Post"
+                                }
                             </motion.button>
 
                         </form>
