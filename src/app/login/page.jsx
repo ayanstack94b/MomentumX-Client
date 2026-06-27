@@ -13,13 +13,16 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";
 
+
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const router = useRouter();
     const { login } = useAuth();
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         try {
             const { data: userData, error } =
                 await authClient.signIn.email({
@@ -69,7 +72,7 @@ const LoginPage = () => {
 
             if (profile.role === "admin") {
                 router.push("/dashboard/admin-overview");
-            } 
+            }
             else {
                 router.push("/dashboard");
             }
@@ -95,8 +98,33 @@ const LoginPage = () => {
                 text: message,
             });
 
+        } finally {
+            setIsLoading(false);
         }
     };
+
+    // Google Login
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+
+        try {
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "http://localhost:3000/dashboard",
+            });
+        } catch (error) {
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Google Sign-Up Failed",
+                text: "Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2 bg-[#0B0B0D] px-4 lg:px-10">
@@ -239,25 +267,45 @@ const LoginPage = () => {
 
                         <button
                             type="submit"
-                            className="w-full rounded-xl bg-linear-to-r from-red-600 to-red-500 py-3 font-medium transition-all duration-300 hover:shadow-[0_0_25px_rgba(220,38,38,0.35)]"
+                            disabled={isLoading}
+                            className="w-full rounded-xl bg-linear-to-r from-red-600 to-red-500 py-3 font-medium transition-all duration-300 hover:shadow-[0_0_25px_rgba(220,38,38,0.35)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
                         >
-                            Login
+                            {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                    Signing In...
+                                </span>
+                            ) : (
+                                "Login"
+                            )}
                         </button>
 
                         {/* ===============Google Button============== */}
 
                         <button
                             type="button"
-                            className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/5 py-3 font-medium backdrop-blur-md transition-all duration-300 hover:border-red-500/40"
+                            onClick={handleGoogleLogin}
+                            disabled={isLoading}
+                            className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/5 py-3 font-medium backdrop-blur-md transition-all duration-300 hover:border-red-500/40 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-red-500/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
 
-                            <FaGoogle className="relative z-10 text-lg text-gray-300 transition-all duration-300 group-hover:text-red-500" />
+                            {isLoading ? (
+                                <span className="relative z-10 flex items-center gap-2">
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                    Connecting...
+                                </span>
+                            ) : (
+                                <>
+                                    <FaGoogle className="relative z-10 text-lg text-gray-300 transition-all duration-300 group-hover:text-red-500" />
 
-                            <span className="relative z-10">
-                                Continue with Google
-                            </span>
+                                    <span className="relative z-10">
+                                        Continue with Google
+                                    </span>
+                                </>
+                            )}
                         </button>
+
                     </form>
 
                     <p className="mt-6 text-center text-sm text-(--text-secondary)">

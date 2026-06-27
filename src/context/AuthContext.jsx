@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-
+import { authClient } from "@/lib/auth-client";
+import axiosInstance from "@/lib/axios";
 const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
@@ -9,13 +10,45 @@ export default function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("momentumx-user");
+        const syncUser = async () => {
+            const storedUser = localStorage.getItem("momentumx-user");
 
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+            if (storedUser) {
+                setUser(JSON.parse(storedUser));
+                setLoading(false);
+                return;
+            }
 
-        setLoading(false);
+            try {
+                const session = await authClient.getSession();
+
+                if (session?.data?.user) {
+                    const { data } = await axiosInstance.post("/google-login", {
+                        name: session.data.user.name,
+                        email: session.data.user.email,
+                        image: session.data.user.image,
+                    });
+
+                    localStorage.setItem(
+                        "momentumx-token",
+                        data.token
+                    );
+
+                    localStorage.setItem(
+                        "momentumx-user",
+                        JSON.stringify(data.user)
+                    );
+
+                    setUser(data.user);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        syncUser();
     }, []);
 
     const login = (userData) => {
@@ -27,9 +60,16 @@ export default function AuthProvider({ children }) {
         setUser(userData);
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await authClient.signOut();
+        } catch (error) {
+            console.error(error);
+        }
+
         localStorage.removeItem("momentumx-user");
         localStorage.removeItem("momentumx-token");
+
         setUser(null);
     };
 

@@ -28,7 +28,7 @@ export default function Navbar() {
     const [lastScrollY, setLastScrollY] = useState(0);
 
     const handleLogout = async () => {
-        logout();
+        await logout();
 
         await Swal.fire({
             icon: "success",
