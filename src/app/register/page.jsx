@@ -112,7 +112,7 @@ const RegisterPage = () => {
         try {
             await authClient.signIn.social({
                 provider: "google",
-                callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+                callbackURL: "https://momentum-x-client.vercel.app/dashboard",
             });
         } catch (error) {
             console.error(error);
