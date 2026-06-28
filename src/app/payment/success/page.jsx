@@ -1,19 +1,18 @@
 "use client";
-export const dynamic = "force-dynamic";
-import { useEffect } from "react";
+
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 import axiosInstance from "@/lib/axios";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
-const PaymentSuccessPage = () => {
+function PaymentSuccessContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     useEffect(() => {
         const verifyPayment = async () => {
-            const sessionId =
-                searchParams.get("session_id");
+            const sessionId = searchParams.get("session_id");
 
             if (!sessionId) {
                 router.push("/");
@@ -21,13 +20,12 @@ const PaymentSuccessPage = () => {
             }
 
             try {
-                const { data } =
-                    await axiosInstance.post(
-                        "/confirm-payment",
-                        {
-                            sessionId,
-                        }
-                    );
+                const { data } = await axiosInstance.post(
+                    "/confirm-payment",
+                    {
+                        sessionId,
+                    }
+                );
 
                 if (data.success) {
                     Swal.fire({
@@ -38,9 +36,7 @@ const PaymentSuccessPage = () => {
                         showConfirmButton: false,
                     });
 
-                    router.push(
-                        "/dashboard/booked-classes"
-                    );
+                    router.push("/dashboard/booked-classes");
                 }
             } catch (error) {
                 console.error(error);
@@ -59,6 +55,12 @@ const PaymentSuccessPage = () => {
     }, [router, searchParams]);
 
     return <LoadingSpinner />;
-};
+}
 
-export default PaymentSuccessPage;
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={<LoadingSpinner />}>
+            <PaymentSuccessContent />
+        </Suspense>
+    );
+}
