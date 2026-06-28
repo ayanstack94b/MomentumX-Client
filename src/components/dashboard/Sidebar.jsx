@@ -108,6 +108,7 @@ export default function Sidebar() {
                 name: "Become Trainer",
                 href: "/dashboard/become-trainer",
                 icon: <FaUserCheck />,
+                disabled: profile?.status === "blocked",
             },
             {
                 name: "Trainer Status",
@@ -212,10 +213,25 @@ export default function Sidebar() {
                     {links.map((link) => (
                         <Link
                             key={link.href}
-                            href={link.href}
-                            className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 ${pathname === link.href
-                                ? "bg-red-600 text-white"
-                                : "text-gray-300 hover:bg-white/5"
+                            href={link.disabled ? "#" : link.href}
+                            onClick={(e) => {
+                                if (link.disabled) {
+                                    e.preventDefault();
+
+                                    Swal.fire({
+                                        icon: "warning",
+                                        title: "Account Restricted",
+                                        text: "Blocked members cannot apply to become a trainer.",
+                                    });
+
+                                    return;
+                                }
+                            }}
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 ${link.disabled
+                                    ? "cursor-not-allowed opacity-50"
+                                    : pathname === link.href
+                                        ? "bg-red-600 text-white"
+                                        : "text-gray-300 hover:bg-white/5"
                                 }`}
                         >
                             {link.icon}
@@ -223,16 +239,6 @@ export default function Sidebar() {
                         </Link>
                     ))}
                 </nav>
-
-                {/* <div className="mt-auto p-4">
-                    <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition-all duration-300 hover:bg-red-700"
-                    >
-                        <FaSignOutAlt />
-                        Logout
-                    </button>
-                </div> */}
             </aside>
             {/* Mobile Sidebar */}
             <button
@@ -276,11 +282,28 @@ export default function Sidebar() {
                                 {links.map((link) => (
                                     <Link
                                         key={link.href}
-                                        href={link.href}
-                                        onClick={() => setIsOpen(false)}
-                                        className={`flex items-center gap-3 rounded-xl px-4 py-3 ${pathname === link.href
-                                            ? "bg-red-600 text-white"
-                                            : "text-gray-300"
+                                        href={link.disabled ? "#" : link.href}
+                                        onClick={(e) => {
+
+                                            if (link.disabled) {
+                                                e.preventDefault();
+
+                                                Swal.fire({
+                                                    icon: "warning",
+                                                    title: "Account Restricted",
+                                                    text: "Blocked members cannot apply to become a trainer.",
+                                                });
+
+                                                return;
+                                            }
+
+                                            setIsOpen(false);
+                                        }}
+                                        className={`flex items-center gap-3 rounded-xl px-4 py-3 ${link.disabled
+                                                ? "cursor-not-allowed opacity-50"
+                                                : pathname === link.href
+                                                    ? "bg-red-600 text-white"
+                                                    : "text-gray-300"
                                             }`}
                                     >
                                         {link.icon}

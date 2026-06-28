@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import MemberRoute from "@/components/shared/MemberRoute";
 
 import {
+    FaBan,
     FaCalendarCheck,
     FaHeart,
     FaUser,
@@ -276,6 +277,16 @@ const MembersOverviewPage = () => {
                                     {trainerApplication?.status ||
                                         "Not Applied"}
                                 </span>
+
+                                {
+                                    profile?.status === "blocked" && (
+                                        <span className="flex animate-pulse items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 shadow-lg shadow-red-500/20">
+                                            <FaBan />
+                                            Blocked by Admin
+                                        </span>
+                                    )
+                                }
+
                             </div>
 
                             {trainerApplication?.status ===

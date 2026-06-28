@@ -17,6 +17,7 @@ const ClassDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
     const [alreadyBooked, setAlreadyBooked] = useState(false);
+    const [alreadyFavorite, setAlreadyFavorite] = useState(false);
 
     const { user } = useAuth();
 
@@ -82,6 +83,34 @@ const ClassDetailsPage = () => {
     ]);
 
 
+    useEffect(() => {
+        const checkFavorite = async () => {
+
+            if (!user?.email || !classData?._id) {
+                return;
+            }
+
+            try {
+                const { data } = await axiosInstance.get(
+                    `/favorites/check?email=${user.email}&classId=${classData._id}`
+                );
+
+                setAlreadyFavorite(data.favorite);
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        checkFavorite();
+
+    }, [
+        user?.email,
+        classData?._id,
+    ]);
+
+
+
     const handleBooking = async () => {
 
         if (!user) {
@@ -99,10 +128,32 @@ const ClassDetailsPage = () => {
             return;
         }
 
+        if (user.role !== "member") {
+            Swal.fire({
+                icon: "info",
+                title: "Members Only",
+                text: "Only members can book fitness classes.",
+            });
+
+            return;
+        }
+
+        if (alreadyBooked) {
+            Swal.fire({
+                icon: "info",
+                title: "Already Booked",
+                text: "You have already booked this class.",
+            });
+
+            return;
+        }
+
         router.push(
             `/payment/${classData._id}`
         );
     };
+
+
     const handleFavorite = async () => {
         if (!user) {
             Swal.fire({
@@ -110,6 +161,24 @@ const ClassDetailsPage = () => {
                 title: "Login Required",
                 text: "Please login first.",
             });
+            return;
+        }
+        if (user.role !== "member") {
+            Swal.fire({
+                icon: "info",
+                title: "Members Only",
+                text: "Only members can add classes to favorites.",
+            });
+
+            return;
+        }
+        if (alreadyFavorite) {
+            Swal.fire({
+                icon: "info",
+                title: "Already in Favorites",
+                text: "This class is already in your favorites.",
+            });
+
             return;
         }
 
@@ -132,12 +201,17 @@ const ClassDetailsPage = () => {
                 favoriteData
             );
 
-            Swal.fire({
+            setAlreadyFavorite(true);
+
+            await Swal.fire({
                 icon: "success",
                 title: "Added to Favorites",
+                text: "Class added successfully.",
                 timer: 1200,
                 showConfirmButton: false,
             });
+
+            router.push("/dashboard/favorite-classes");
 
         } catch (error) {
             Swal.fire({
@@ -156,7 +230,6 @@ const ClassDetailsPage = () => {
     if (!loading && !classData) {
         notFound();
     }
-    // console.log("Rendering:", classData);
 
 
     return (
@@ -305,6 +378,10 @@ const ClassDetailsPage = () => {
 
                             <motion.button
                                 onClick={handleFavorite}
+                                disabled={
+                                    alreadyFavorite ||
+                                    user?.role !== "member"
+                                }
                                 whileHover={{
                                     scale: 1.03,
                                     y: -2,
@@ -312,14 +389,23 @@ const ClassDetailsPage = () => {
                                 whileTap={{
                                     scale: 0.97,
                                 }}
-                                className="btn flex-1 border border-pink-500/30 bg-gradient-to-r from-pink-600 to-red-500 text-white transition-all hover:shadow-lg hover:shadow-pink-500/20"
+                                className="btn flex-1 border border-pink-500/30 bg-gradient-to-r from-pink-600 to-red-500 text-white transition-all hover:shadow-lg hover:shadow-pink-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                 Add to Favorites
+                                {
+                                    user?.role !== "member"
+                                        ? "Members Only"
+                                        : alreadyFavorite
+                                            ? "Saved to Favorites"
+                                            : "Add to Favorites"
+                                }
                             </motion.button>
 
                             <motion.button
                                 onClick={handleBooking}
-                                disabled={alreadyBooked}
+                                disabled={
+                                    alreadyBooked ||
+                                    user?.role !== "member"
+                                }
                                 whileHover={
                                     alreadyBooked
                                         ? {}
@@ -337,11 +423,15 @@ const ClassDetailsPage = () => {
                                 }
                                 className="btn flex-1 border border-red-500/30 bg-gradient-to-r from-red-600 to-red-500 text-white transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {alreadyBooked
-                                    ? "Already Booked"
-                                    : user
-                                        ? "Book Now"
-                                        : "Register To Book"}
+                                {
+                                    !user
+                                        ? "Register To Book"
+                                        : user.role !== "member"
+                                            ? "Members Only"
+                                            : alreadyBooked
+                                                ? "Already Booked"
+                                                : "Book Now"
+                                }
                             </motion.button>
 
                         </div>

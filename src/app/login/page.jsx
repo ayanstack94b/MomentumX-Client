@@ -107,28 +107,59 @@ const LoginPage = () => {
     };
 
     // Google Login
+    // const handleGoogleLogin = async () => {
+    //     setIsLoading(true);
+
+    //     try {
+    //         console.log("APP URL:", process.env.NEXT_PUBLIC_APP_URL);
+
+    //         await authClient.signIn.social({
+    //             provider: "google",
+    //             callbackURL: "https://momentum-x-client.vercel.app/dashboard",
+    //         });
+
+    //     } catch (error) {
+    //         console.error(error);
+
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Google Sign-Up Failed",
+    //             text: "Please try again.",
+    //         });
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
     const handleGoogleLogin = async () => {
-        setIsLoading(true);
+        await Swal.fire({
+            title: "🛠️ Under Maintenance",
+            html: `
+            <div style="line-height:1.7">
+                <p style="font-size:16px;">
+                    Google Sign In is temporarily unavailable.
+                </p>
 
-        try {
-            console.log("APP URL:", process.env.NEXT_PUBLIC_APP_URL);
+                <p style="color:#9CA3AF;font-size:14px;margin-top:10px;">
+                    Please use <b>Manual Login</b> or
+                    <b>Manual Registration</b> to continue using MomentumX.
+                </p>
 
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "https://momentum-x-client.vercel.app/dashboard",
-            });
-
-        } catch (error) {
-            console.error(error);
-
-            Swal.fire({
-                icon: "error",
-                title: "Google Sign-Up Failed",
-                text: "Please try again.",
-            });
-        } finally {
-            setIsLoading(false);
-        }
+                <p style="margin-top:18px;font-size:22px;">
+                    💪 Thank you for your patience!
+                </p>
+            </div>
+        `,
+            icon: "info",
+            background: "#0B0B0D",
+            color: "#ffffff",
+            confirmButtonText: "Got it",
+            confirmButtonColor: "#DC2626",
+            customClass: {
+                popup: "rounded-3xl",
+                confirmButton: "px-8 py-2 rounded-xl",
+            },
+        });
     };
 
 
@@ -264,12 +295,43 @@ const LoginPage = () => {
                             </label>
 
                             <button
+                                disabled
                                 type="button"
-                                className="text-sm text-red-500 hover:text-red-400"
+                                className="text-sm text-gray-600 hover:text-gray-700"
                             >
                                 Forgot Password?
                             </button>
                         </div>
+
+                        <div className="mt-5 rounded-2xl space-y-8 border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+                            <label className="flex cursor-pointer items-start gap-3">
+
+                                <input
+                                    type="checkbox"
+                                    className="mt-1 h-5 w-5 cursor-pointer rounded-sm border-2 border-white bg-transparent accent-red-600"
+                                />
+
+                                <span className="text-sm leading-6 text-gray-400">
+                                    I agree to the{" "}
+                                    <button
+                                        type="button"
+                                        className="font-medium text-red-400 transition hover:text-red-300 hover:underline"
+                                    >
+                                        Terms of Service
+                                    </button>{" "}
+                                    and{" "}
+                                    <button
+                                        type="button"
+                                        className="font-medium text-red-400 transition hover:text-red-300 hover:underline"
+                                    >
+                                        Privacy Policy
+                                    </button>
+                                    .
+                                </span>
+
+                            </label>
+                        </div>
+
 
                         <button
                             type="submit"

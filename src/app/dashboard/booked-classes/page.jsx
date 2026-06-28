@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";
+import Link from "next/link";
 
 const BookedClassesPage = () => {
     const { user, loading: authLoading } = useAuth();
@@ -108,63 +109,125 @@ const BookedClassesPage = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        {bookings.map((booking) => (
-                            <motion.div
-                                key={booking._id}
-                                whileHover={{
-                                    y: -5,
-                                }}
-                                className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
-                            >
-                                <div className="relative h-56">
-                                    <Image
-                                        src={booking?.image}
-                                        alt={booking?.className}
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                                        className="object-cover"
-                                    />
-                                </div>
-
-                                <div className="p-5">
-                                    <div className="flex items-center justify-between">
-                                        <h2 className="text-xl font-bold">
-                                            {booking?.className}
-                                        </h2>
-
-                                        <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
-                                            Booked
-                                        </span>
+                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                            {bookings.map((booking) => (
+                                <motion.div
+                                    key={booking._id}
+                                    whileHover={{ y: -5 }}
+                                    className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
+                                >
+                                    <div className="relative h-56">
+                                        <Image
+                                            src={booking?.image || "/placeholder.jpg"}
+                                            alt={booking?.className || "Booked Class"}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                            className="object-cover"
+                                        />
                                     </div>
 
-                                    <div className="mt-4 space-y-2 text-sm">
-                                        <p>
-                                            <strong>Trainer:</strong>{" "}
-                                            {booking.trainerName}
-                                        </p>
+                                    <div className="p-5">
 
-                                        <p>
-                                            <strong>Price:</strong> ₹
-                                            {booking.price}
-                                        </p>
+                                        <div className="flex items-center justify-between gap-3">
+                                            <h2 className="line-clamp-1 text-xl font-bold">
+                                                {booking.className || "Unnamed Class"}
+                                            </h2>
 
-                                        <p>
-                                            <strong>Status:</strong>{" "}
-                                            {booking.status}
-                                        </p>
+                                            <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
+                                                {booking.paymentStatus || "Booked"}
+                                            </span>
+                                        </div>
 
-                                        <p>
-                                            <strong>Booked On:</strong>{" "}
-                                            {new Date(
-                                                booking.bookedAt
-                                            ).toLocaleDateString()}
-                                        </p>
+                                        <div className="mt-5 space-y-3 text-sm">
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Trainer
+                                                </span>
+
+                                                <span className="text-right font-medium">
+                                                    {booking.trainerName || "Not Assigned"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Schedule
+                                                </span>
+
+                                                <span className="text-right font-medium">
+                                                    {booking.schedule || "To Be Announced"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Duration
+                                                </span>
+
+                                                <span className="text-right font-medium">
+                                                    {booking.duration || "Not Available"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Category
+                                                </span>
+
+                                                <span className="text-right font-medium">
+                                                    {booking.category || "General Fitness"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Price
+                                                </span>
+
+                                                <span className="font-semibold text-red-400">
+                                                    ₹{booking.price ?? "0"}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between gap-3 border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">
+                                                    Payment Status
+                                                </span>
+
+                                                <span className="font-medium capitalize text-green-400">
+                                                    {booking.paymentStatus || "Pending"}
+                                                </span>
+                                            </div>
+
+
+                                            <div className="flex justify-between gap-3">
+                                                <span className="text-gray-400">
+                                                    Booked On
+                                                </span>
+
+                                                <span className="text-right font-medium">
+                                                    {booking.bookedAt
+                                                        ? new Date(
+                                                            booking.bookedAt
+                                                        ).toLocaleDateString()
+                                                        : "Not Available"}
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <Link
+                                            href={booking.classId ? `/classes/${booking.classId}` : "#"}
+                                            className="btn mt-6 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white"
+                                        >
+                                            View Class Details
+                                        </Link>
+
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                 )}
             </div>
         </motion.div>

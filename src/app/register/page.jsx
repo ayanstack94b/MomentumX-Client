@@ -106,26 +106,58 @@ const RegisterPage = () => {
         }
     };
 
+    // const handleGoogleRegister = async () => {
+    //     setIsLoading(true);
+
+    //     try {
+    //         await authClient.signIn.social({
+    //             provider: "google",
+    //             callbackURL: "https://momentum-x-client.vercel.app/dashboard",
+    //         });
+    //     } catch (error) {
+    //         console.error(error);
+
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Google Sign-Up Failed",
+    //             text: "Please try again.",
+    //         });
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
     const handleGoogleRegister = async () => {
-        setIsLoading(true);
-
-        try {
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "https://momentum-x-client.vercel.app/dashboard",
+            await Swal.fire({
+                title: "🛠️ Under Maintenance",
+                html: `
+                <div style="line-height:1.7">
+                    <p style="font-size:16px;">
+                        Google Sign Up is temporarily unavailable.
+                    </p>
+    
+                    <p style="color:#9CA3AF;font-size:14px;margin-top:10px;">
+                        Please use <b>Manual Registration</b> or
+                        <b>Manual Login</b> to continue using MomentumX.
+                    </p>
+    
+                    <p style="margin-top:18px;font-size:22px;">
+                        💪 Thank you for your patience!
+                    </p>
+                </div>
+            `,
+                icon: "info",
+                background: "#0B0B0D",
+                color: "#ffffff",
+                confirmButtonText: "Got it",
+                confirmButtonColor: "#DC2626",
+                customClass: {
+                    popup: "rounded-3xl",
+                    confirmButton: "px-8 py-2 rounded-xl",
+                },
             });
-        } catch (error) {
-            console.error(error);
+        };
 
-            Swal.fire({
-                icon: "error",
-                title: "Google Sign-Up Failed",
-                text: "Please try again.",
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2 bg-[#0B0B0D] px-4 lg:px-10">
