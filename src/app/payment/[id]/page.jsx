@@ -18,6 +18,9 @@ const PaymentPage = () => {
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
     const [profile, setProfile] = useState(null);
+    const isBlocked = profile?.status === "blocked";
+    const canPay = profile?.role === "member" && !isBlocked;
+
 
     useEffect(() => {
         const fetchClass =
@@ -68,79 +71,7 @@ const PaymentPage = () => {
         fetchProfile();
     }, [user?.email]);
 
-    // const handlePayment = async () => {
-    //         const bookingData = {
-    //             classId:
-    //                 classData._id,
-
-    //             className:
-    //                 classData.className,
-
-    //             image:
-    //                 classData.image,
-
-    //             trainerName:
-    //                 classData.trainerName,
-
-    //             trainerEmail:
-    //                 classData.trainerEmail,
-
-    //             schedule:
-    //                 classData.schedule,
-
-    //             duration:
-    //                 classData.duration,
-
-    //             category:
-    //                 classData.category,
-
-    //             memberName: user?.name,
-
-    //             memberEmail: user?.email,
-
-    //             price:
-    //                 classData.price,
-
-    //             status:
-    //                 "paid",
-
-    //             bookedAt:
-    //                 new Date().toISOString(),
-    //         };
-
-    //         try {
-               
-    //                 const { data: result } = await axiosInstance.post(
-    //                     "/bookings",
-    //                     bookingData
-    //                 );
-
-    //                 if (result.insertedId) {
-    //                 await Swal.fire(
-    //                     {
-    //                         icon: "success",
-
-    //                         title:
-    //                             "Payment Successful",
-
-    //                         text: "Your class has been booked successfully.",
-    //                     }
-    //                 );
-
-    //                 router.push(
-    //                     "/dashboard/booked-classes"
-    //                 );
-    //             }
-    //         } catch (error) {
-    //             Swal.fire({
-    //                 icon: "error",
-    //                 title: "Booking Failed",
-    //                 text:
-    //                     error.response?.data?.message ||
-    //                     "Something went wrong.",
-    //             });
-    //         }
-    //     };
+   
 
     const handlePayment = async () => {
         try {
@@ -163,12 +94,18 @@ const PaymentPage = () => {
 
             window.location.href = data.url;
         } catch (error) {
-            console.error(error);
+            const message = error.response?.data?.message;
 
             Swal.fire({
-                icon: "error",
-                title: "Payment Failed",
-                text: "Unable to start Stripe Checkout.",
+                icon: message === "You have already booked this class."
+                    ? "info"
+                    : "error",
+                title: message === "You have already booked this class."
+                    ? "Already Booked"
+                    : "Payment Unavailable",
+                text:
+                    message ||
+                    "Something went wrong. Please try again.",
             });
         }
     };
@@ -309,18 +246,22 @@ const PaymentPage = () => {
 
                         <motion.button
                             onClick={handlePayment}
-                            disabled={profile?.role !== "member"}
+                            disabled={!canPay}
                             whileHover={{
-                                scale: profile?.role === "member" ? 1.03 : 1,
+                                scale: canPay ? 1.03 : 1,
                             }}
                             whileTap={{
-                                scale: profile?.role === "member" ? 0.97 : 1,
+                                scale: canPay ? 0.97 : 1,
                             }}
                             className="btn mt-10 w-full border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            {profile?.role === "member"
-                                ? `Pay ₹${classData.price}`
-                                : "Only members can book classes"}
+                            {
+                                isBlocked
+                                    ? "Action Restricted by Admin"
+                                    : profile?.role === "member"
+                                        ? `Pay ₹${classData.price}`
+                                        : "Only members can book classes"
+                            }
                         </motion.button>
                     </div>
                 </motion.div>

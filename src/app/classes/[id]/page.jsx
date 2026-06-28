@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import axiosInstance from "@/lib/axios";
 
 const ClassDetailsPage = () => {
     const { id } = useParams();
@@ -63,17 +64,11 @@ const ClassDetailsPage = () => {
                 }
 
                 try {
-                    const res =
-                        await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/bookings/check?email=${user?.email}&classId=${classData._id}`
-                        );
-
-                    const data =
-                        await res.json();
-
-                    setAlreadyBooked(
-                        data.booked
+                    const { data } = await axiosInstance.get(
+                        `/bookings/check?email=${user.email}&classId=${classData._id}`
                     );
+
+                    setAlreadyBooked(data.booked);
                 } catch (error) {
                     console.error(error);
                 }
@@ -115,7 +110,6 @@ const ClassDetailsPage = () => {
                 title: "Login Required",
                 text: "Please login first.",
             });
-
             return;
         }
 
@@ -123,77 +117,34 @@ const ClassDetailsPage = () => {
             classId: classData._id,
             className: classData.className,
             image: classData.image,
-
-            trainerName:
-                classData.trainerName,
-
-            category:
-                classData.category,
-
-            difficulty:
-                classData.difficulty,
-
-            duration:
-                classData.duration,
-
-            price:
-                classData.price,
-
-            userEmail:
-                user.email,
-
-            createdAt:
-                new Date().toISOString(),
+            trainerName: classData.trainerName,
+            category: classData.category,
+            difficulty: classData.difficulty,
+            duration: classData.duration,
+            price: classData.price,
+            userEmail: user.email,
+            createdAt: new Date().toISOString(),
         };
 
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/favorites`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body: JSON.stringify(
-                        favoriteData
-                    ),
-                }
+            await axiosInstance.post(
+                "/favorites",
+                favoriteData
             );
 
-            const result =
-                await res.json();
-
-            if (res.ok) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Added To Favorites",
-                    timer: 1200,
-                    showConfirmButton: false,
-                    
-                });
-
-                router.push(
-                    "/dashboard/favorite-classes"
-                );
-
-            } else {
-                Swal.fire({
-                    icon: "warning",
-                    title:
-                        result.message ||
-                        "Already Added",
-                });
-            }
-        } catch (error) {
-            console.error(error);
-
             Swal.fire({
-                icon: "error",
+                icon: "success",
+                title: "Added to Favorites",
+                timer: 1200,
+                showConfirmButton: false,
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "info",
                 title:
-                    "Failed To Add Favorite",
+                    error.response?.data?.message ||
+                    "Already in Favorites",
             });
         }
     };
@@ -350,32 +301,50 @@ const ClassDetailsPage = () => {
                             </div>
                         </div>
 
-                        <motion.button
-                            onClick={handleBooking}
-                            disabled={alreadyBooked}
-                            whileHover={
-                                alreadyBooked
-                                    ? {}
-                                    : {
-                                        scale: 1.03,
-                                        y: -2,
-                                    }
-                            }
-                            whileTap={
-                                alreadyBooked
-                                    ? {}
-                                    : {
-                                        scale: 0.97,
-                                    }
-                            }
-                            className="btn mt-5 border-none bg-gradient-to-r from-red-600 to-red-500 text-white disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {alreadyBooked
-                                ? "Already Booked"
-                                : user
-                                    ? "Book Now"
-                                    : "Register To Book"}
-                        </motion.button>
+                        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+
+                            <motion.button
+                                onClick={handleFavorite}
+                                whileHover={{
+                                    scale: 1.03,
+                                    y: -2,
+                                }}
+                                whileTap={{
+                                    scale: 0.97,
+                                }}
+                                className="btn flex-1 border border-pink-500/30 bg-gradient-to-r from-pink-600 to-red-500 text-white transition-all hover:shadow-lg hover:shadow-pink-500/20"
+                            >
+                                 Add to Favorites
+                            </motion.button>
+
+                            <motion.button
+                                onClick={handleBooking}
+                                disabled={alreadyBooked}
+                                whileHover={
+                                    alreadyBooked
+                                        ? {}
+                                        : {
+                                            scale: 1.03,
+                                            y: -2,
+                                        }
+                                }
+                                whileTap={
+                                    alreadyBooked
+                                        ? {}
+                                        : {
+                                            scale: 0.97,
+                                        }
+                                }
+                                className="btn flex-1 border border-red-500/30 bg-gradient-to-r from-red-600 to-red-500 text-white transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {alreadyBooked
+                                    ? "Already Booked"
+                                    : user
+                                        ? "Book Now"
+                                        : "Register To Book"}
+                            </motion.button>
+
+                        </div>
 
 
                     </div>

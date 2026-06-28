@@ -58,45 +58,35 @@ const FavoriteClassesPage = () => {
                 return;
 
             try {
-                const res =
-                    await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/favorites/${id}`,
-                        {
-                            method:
-                                "DELETE",
-                        }
+                const { data } =
+                    await axiosInstance.delete(
+                        `/favorites/${id}`
                     );
 
-                const data =
-                    await res.json();
-
-                if (
-                    data.deletedCount >
-                    0
-                ) {
-                    setFavorites(
-                        (prev) =>
-                            prev.filter(
-                                (
-                                    item
-                                ) =>
-                                    item._id !==
-                                    id
-                            )
+                if (data.deletedCount > 0) {
+                    setFavorites((prev) =>
+                        prev.filter(
+                            (item) => item._id !== id
+                        )
                     );
 
                     Swal.fire({
                         icon: "success",
-                        title:
-                            "Removed",
+                        title: "Removed from Favorites",
                         timer: 1200,
                         showConfirmButton: false,
                     });
                 }
             } catch (error) {
-                console.error(
-                    error
-                );
+                console.error(error);
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Delete Failed",
+                    text:
+                        error.response?.data?.message ||
+                        "Something went wrong.",
+                });
             }
         };
 
