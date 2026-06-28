@@ -26,9 +26,6 @@ export default function EditProfilePage() {
                 icon: "error",
                 title: "Profile ID Missing",
             });
-
-            console.log(profile);
-            console.log(profile?._id);
             return;
         }
         try {

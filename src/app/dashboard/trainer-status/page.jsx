@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { authClient } from "@/lib/auth-client";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -24,8 +23,8 @@ const TrainerStatusPage = () => {
 
         const email = user?.email;
 
+        // console.log("Email:", email);
 
-        console.log("Email:", email);
         if (!email) return;
 
         const fetchApplication =

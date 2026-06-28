@@ -345,12 +345,7 @@ const RegisterPage = () => {
                         >
                             <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-red-500/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
 
-                            {isLoading ? (
-                                <span className="relative z-10 flex items-center gap-2">
-                                    <span className="loading loading-spinner loading-sm"></span>
-                                    Connecting...
-                                </span>
-                            ) : (
+                          
                                 <>
                                     <FaGoogle className="relative z-10 text-lg text-gray-300 transition-all duration-300 group-hover:text-red-500" />
 
@@ -358,7 +353,7 @@ const RegisterPage = () => {
                                         Continue with Google
                                     </span>
                                 </>
-                            )}
+                            
                         </button>
                     </form>
 

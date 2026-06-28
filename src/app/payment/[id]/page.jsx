@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import { authClient } from "@/lib/auth-client";
 import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";
 

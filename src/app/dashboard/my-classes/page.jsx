@@ -1,5 +1,4 @@
 "use client"
-import { authClient } from '@/lib/auth-client';
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -95,7 +94,7 @@ const MyClassesPage = () => {
                 `/bookings/class/${classId}`
             );
 
-            console.log("Members:", membersData);
+            // console.log("Members:", membersData);
 
             setMembers(
                 Array.isArray(membersData)

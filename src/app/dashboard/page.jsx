@@ -2,13 +2,10 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import CountUp from "react-countup";
-import axiosInstance from "@/lib/axios";
 import { FaDumbbell, FaUsers, FaComments, FaChartLine } from "react-icons/fa";
 
 
 export default function DashboardPage() {
-
-    const [users, setUsers] = useState([]);
     const [classes, setClasses] = useState([]);
     const [forums, setForums] = useState({ total: 0, forums: [] });
     const [trainerClasses, setTrainerClasses] = useState([]);
@@ -28,7 +25,7 @@ export default function DashboardPage() {
                 setForums(forumsData);
                 setClasses(classesData.classes);
             } catch (error) {
-                console.error(error);
+                // console.error(error);
             }
         };
 
@@ -322,7 +319,9 @@ export default function DashboardPage() {
                                             width: `${classApprovalRate}%`,
                                         }}
                                         transition={{
-                                            duration: 1.5,
+                                            duration: 2.5,
+                                            delay: 0.8,
+                                            ease: "easeInOut",
                                         }}
                                         className="h-full rounded-full bg-gradient-to-r from-red-600 to-red-400"
                                     />
@@ -351,6 +350,8 @@ export default function DashboardPage() {
                                         }}
                                         transition={{
                                             duration: 1.8,
+                                            delay: 0.3,
+                                            ease: "easeInOut",
                                         }}
                                         className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-400"
                                     />
@@ -379,6 +380,8 @@ export default function DashboardPage() {
                                         }}
                                         transition={{
                                             duration: 2,
+                                            delay: 1.2,
+                                            ease: "easeInOut",
                                         }}
                                         className="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-400"
                                     />
@@ -421,7 +424,9 @@ export default function DashboardPage() {
                                                 platformHealth / 100,
                                         }}
                                         transition={{
-                                            duration: 2,
+                                            duration: 4,
+                                            delay:1.8,
+                                            ease: "easeInOut",
                                         }}
                                         style={{
                                             pathLength:

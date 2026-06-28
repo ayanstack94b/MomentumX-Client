@@ -103,7 +103,7 @@ const ManageClassesPage = () => {
                 `/admin/classes/${id}`
             );
 
-            console.log(deleteResult);
+            // console.log(deleteResult);
 
             if (deleteResult.deletedCount > 0) {
                 setClasses((prev) =>

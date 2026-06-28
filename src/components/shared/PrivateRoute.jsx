@@ -27,7 +27,6 @@ export default function PrivateRoute({ children }) {
         );
     }
 
-    // if (!user) return null;
     if (!user) {
         return (
             <div className="p-10 text-center">

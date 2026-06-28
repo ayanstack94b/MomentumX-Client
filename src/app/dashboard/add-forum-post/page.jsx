@@ -89,9 +89,9 @@ export default function AddForumPostPage() {
         Boolean(selectedImage);
 
 
-    useEffect(() => {
-        console.log("Uploaded Image State:", uploadedImage);
-    }, [uploadedImage]);
+    // useEffect(() => {
+    //     console.log("Uploaded Image State:", uploadedImage);
+    // }, [uploadedImage]);
 
 
     const handleImageUpload = async (file) => {
@@ -292,13 +292,6 @@ export default function AddForumPostPage() {
             });
         }
     };
-
-    console.log({
-        profileRole: profile?.role,
-        canUploadImage,
-        selectedImage,
-        disableUpload,
-    });
 
     return (
         <motion.div

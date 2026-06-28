@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";

@@ -41,7 +41,7 @@ const LoginPage = () => {
                 return;
             }
 
-            console.log("LOGIN RESULT:", userData);
+            // console.log("LOGIN RESULT:", userData);
 
             // Generate JWT from backend
             const jwtResponse = await axiosInstance.post("/jwt", {
@@ -307,6 +307,7 @@ const LoginPage = () => {
                             <label className="flex cursor-pointer items-start gap-3">
 
                                 <input
+                                    required
                                     type="checkbox"
                                     className="mt-1 h-5 w-5 cursor-pointer rounded-sm border-2 border-white bg-transparent accent-red-600"
                                 />
@@ -358,20 +359,14 @@ const LoginPage = () => {
                         >
                             <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-red-500/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
 
-                            {isLoading ? (
-                                <span className="relative z-10 flex items-center gap-2">
-                                    <span className="loading loading-spinner loading-sm"></span>
-                                    Connecting...
-                                </span>
-                            ) : (
-                                <>
-                                    <FaGoogle className="relative z-10 text-lg text-gray-300 transition-all duration-300 group-hover:text-red-500" />
+                            <>
+                                <FaGoogle className="relative z-10 text-lg text-gray-300 transition-all duration-300 group-hover:text-red-500" />
 
-                                    <span className="relative z-10">
-                                        Continue with Google
-                                    </span>
-                                </>
-                            )}
+                                <span className="relative z-10">
+                                    Continue with Google
+                                </span>
+                            </>
+
                         </button>
 
                     </form>

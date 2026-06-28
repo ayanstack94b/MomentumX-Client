@@ -57,7 +57,7 @@ const ManageUsersPage = () => {
         const { data: updateResult } = await axiosInstance.patch(
             `/users/remove-admin/${id}`
         );
-        console.log("UPDATE RESULT:", updateResult);
+        // console.log("UPDATE RESULT:", updateResult);
         if (updateResult.modifiedCount > 0) {
             Swal.fire({
                 icon: "success",
@@ -104,11 +104,11 @@ const ManageUsersPage = () => {
         if (!result.isConfirmed)
             return;
 
-        console.log("MAKE ADMIN ID:", id);
+        // console.log("MAKE ADMIN ID:", id);
         const { data: updateResult } = await axiosInstance.patch(
             `/users/admin/${id}`
         );
-        console.log("UPDATE RESULT:", updateResult);
+        // console.log("UPDATE RESULT:", updateResult);
 
         if (updateResult.modifiedCount > 0) {
 
@@ -141,7 +141,7 @@ const ManageUsersPage = () => {
         const { data: updateResult } = await axiosInstance.patch(
             `/users/block/${id}`
         );
-        console.log("UPDATE RESULT:", updateResult);
+        // console.log("UPDATE RESULT:", updateResult);
 
         if (
             updateResult.modifiedCount >
@@ -169,7 +169,7 @@ const ManageUsersPage = () => {
             `/users/unblock/${id}`
         );
 
-        console.log("UPDATE RESULT:", updateResult);
+        // console.log("UPDATE RESULT:", updateResult);
 
         if (
             updateResult.modifiedCount > 0

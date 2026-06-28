@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { GiMuscleUp } from "react-icons/gi";
 
 const TrainerCTA = () => {
     return (

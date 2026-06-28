@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaPlus, FaComments, FaTrash } from "react-icons/fa";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import { authClient } from "@/lib/auth-client";
 import Swal from "sweetalert2";
 import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";

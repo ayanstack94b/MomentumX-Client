@@ -134,9 +134,9 @@ const AllTrainerApplicationsPage = () => {
 
         }
     );
-    console.log(
-        applications[0]
-    );
+    // console.log(
+    //     applications[0]
+    // );
 
     // Handle delete 
     const handleDeleteApplication = async (id) => {

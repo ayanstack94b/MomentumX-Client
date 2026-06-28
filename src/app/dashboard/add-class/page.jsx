@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import PrivateRoute from "@/components/shared/PrivateRoute";
 import Image from "next/image";
