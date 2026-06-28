@@ -68,79 +68,110 @@ const PaymentPage = () => {
         fetchProfile();
     }, [user?.email]);
 
-    const handlePayment = async () => {
-            const bookingData = {
-                classId:
-                    classData._id,
+    // const handlePayment = async () => {
+    //         const bookingData = {
+    //             classId:
+    //                 classData._id,
 
-                className:
-                    classData.className,
+    //             className:
+    //                 classData.className,
 
-                image:
-                    classData.image,
+    //             image:
+    //                 classData.image,
 
-                trainerName:
-                    classData.trainerName,
+    //             trainerName:
+    //                 classData.trainerName,
 
-                trainerEmail:
-                    classData.trainerEmail,
+    //             trainerEmail:
+    //                 classData.trainerEmail,
 
-                schedule:
-                    classData.schedule,
+    //             schedule:
+    //                 classData.schedule,
 
-                duration:
-                    classData.duration,
+    //             duration:
+    //                 classData.duration,
 
-                category:
-                    classData.category,
+    //             category:
+    //                 classData.category,
 
-                memberName: user?.name,
+    //             memberName: user?.name,
 
-                memberEmail: user?.email,
+    //             memberEmail: user?.email,
 
-                price:
-                    classData.price,
+    //             price:
+    //                 classData.price,
 
-                status:
-                    "paid",
+    //             status:
+    //                 "paid",
 
-                bookedAt:
-                    new Date().toISOString(),
-            };
+    //             bookedAt:
+    //                 new Date().toISOString(),
+    //         };
 
-            try {
+    //         try {
                
-                    const { data: result } = await axiosInstance.post(
-                        "/bookings",
-                        bookingData
-                    );
+    //                 const { data: result } = await axiosInstance.post(
+    //                     "/bookings",
+    //                     bookingData
+    //                 );
 
-                    if (result.insertedId) {
-                    await Swal.fire(
-                        {
-                            icon: "success",
+    //                 if (result.insertedId) {
+    //                 await Swal.fire(
+    //                     {
+    //                         icon: "success",
 
-                            title:
-                                "Payment Successful",
+    //                         title:
+    //                             "Payment Successful",
 
-                            text: "Your class has been booked successfully.",
-                        }
-                    );
+    //                         text: "Your class has been booked successfully.",
+    //                     }
+    //                 );
 
-                    router.push(
-                        "/dashboard/booked-classes"
-                    );
+    //                 router.push(
+    //                     "/dashboard/booked-classes"
+    //                 );
+    //             }
+    //         } catch (error) {
+    //             Swal.fire({
+    //                 icon: "error",
+    //                 title: "Booking Failed",
+    //                 text:
+    //                     error.response?.data?.message ||
+    //                     "Something went wrong.",
+    //             });
+    //         }
+    //     };
+
+    const handlePayment = async () => {
+        try {
+            const { data } = await axiosInstance.post(
+                "/create-checkout-session",
+                {
+                    classId: classData._id,
+                    className: classData.className,
+                    trainerName: classData.trainerName,
+                    trainerEmail: classData.trainerEmail,
+                    price: classData.price,
+                    memberName: user?.name,
+                    memberEmail: user?.email,
+                    schedule: classData.schedule,
+                    duration: classData.duration,
+                    category: classData.category,
+                    image: classData.image,
                 }
-            } catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Booking Failed",
-                    text:
-                        error.response?.data?.message ||
-                        "Something went wrong.",
-                });
-            }
-        };
+            );
+
+            window.location.href = data.url;
+        } catch (error) {
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Payment Failed",
+                text: "Unable to start Stripe Checkout.",
+            });
+        }
+    };
 
     if (
         loading ||
