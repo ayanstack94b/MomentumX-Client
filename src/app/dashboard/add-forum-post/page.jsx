@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 export default function AddForumPostPage() {
 
     const router = useRouter();
-    const { user, loading } = useAuth();
+    const { user } = useAuth();
     const fileInputRef = useRef(null);
 
 
@@ -45,14 +44,39 @@ export default function AddForumPostPage() {
     const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
 
     const selectedImage = watch("image");
-    const canUploadImage =
-        user?.role === "admin" ||
-        user?.role === "trainer";
+
+    // const canUploadImage =
+    //     user?.role === "admin" ||
+    //     user?.role === "trainer";
 
     // Placeholder until ImageBB integration
     const [uploadedImage, setUploadedImage] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [imageName, setImageName] = useState("");
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        if (!user?.email) return;
+
+        const fetchProfile = async () => {
+            try {
+                const { data } = await axiosInstance.get(
+                    `/users/${user.email}`
+                );
+
+                setProfile(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchProfile();
+    }, [user?.email]);
+
+    const canUploadImage =
+        profile?.role === "admin" ||
+        profile?.role === "trainer";
+
 
     // Disable Logic
 
@@ -269,6 +293,13 @@ export default function AddForumPostPage() {
         }
     };
 
+    console.log({
+        profileRole: profile?.role,
+        canUploadImage,
+        selectedImage,
+        disableUpload,
+    });
+
     return (
         <motion.div
             initial={{
@@ -484,7 +515,7 @@ export default function AddForumPostPage() {
                                         <label
                                             className={`flex h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed transition-all ${canUploadImage
                                                 ? "cursor-pointer border-red-500/30 bg-red-500/5 hover:border-red-500 hover:bg-red-500/10"
-                                                : "cursor-not-allowed border-white/10 bg-white/5 opacity-60"
+                                                : " cursor-pointer border-white/10 bg-white/5 opacity-60"
                                                 }`}
                                         >
                                             <FaCloudUploadAlt className="text-lg text-red-400" />
