@@ -10,14 +10,6 @@ MomentumX is a modern full-stack fitness and gym management platform built to st
 
 ---
 
-# 👤 Admin Credentials (For Evaluation)
-
-**Email:** [admin@momentumx.com](mailto:admin@momentumx.com)
-
-**Password:** Password@123#
-
----
-
 # 🔗 GitHub Repositories
 
 ### Client Repository
